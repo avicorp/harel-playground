@@ -84,3 +84,31 @@ body {
   from {opacity: 0;}
   to {opacity: 1;}
 }
+
+.post-summaries {
+  width: 80%;
+  max-width: 600px;
+  margin: 2em auto;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 8px;
+  padding: 1em;
+}
+
+.post-summaries article {
+  margin-bottom: 1.5em;
+}
+
+.post-summaries h3 {
+  margin: 0 0 0.3em;
+  color: #333;
+}
+
+.post-summaries p {
+  margin: 0;
+  color: #333;
+  line-height: 1.4;
+}
+
+.post-summaries a {
+  color: #1a76d2;
+}

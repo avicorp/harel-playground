@@ -380,6 +380,99 @@
             z-index: 0;
             pointer-events: none;
         }
+
+        /* Game Over */
+        #game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        #game-over-overlay.active {
+            display: flex;
+        }
+
+        #game-over-box {
+            background: linear-gradient(135deg, #2d1b69, #1a1a2e);
+            border: 3px solid #FF5252;
+            border-radius: 24px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 0 60px rgba(255, 82, 82, 0.3);
+            direction: rtl;
+        }
+
+        #game-over-box h2 {
+            font-size: 42px;
+            margin-bottom: 10px;
+            color: #FF5252;
+        }
+
+        #game-over-box .stats {
+            font-size: 20px;
+            margin: 20px 0;
+            line-height: 2;
+            color: #ccc;
+        }
+
+        #game-over-box .stats span {
+            color: #FFD740;
+            font-weight: bold;
+        }
+
+        #restart-btn {
+            background: linear-gradient(135deg, #66BB6A, #2E7D32);
+            border: 2px solid #1B5E20;
+            color: white;
+            padding: 14px 50px;
+            border-radius: 50px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        #restart-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 4px 20px rgba(102, 187, 106, 0.5);
+        }
+
+        .lives-container {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .heart {
+            font-size: 20px;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .heart.lost {
+            opacity: 0.2;
+            transform: scale(0.7);
+        }
+
+        .heart.breaking {
+            animation: heartBreak 0.5s ease-out;
+        }
+
+        @keyframes heartBreak {
+            0% { transform: scale(1); }
+            30% { transform: scale(1.4); color: #FF1744; }
+            100% { transform: scale(0.7); opacity: 0.2; }
+        }
     </style>
 </head>
 <body>
@@ -398,6 +491,7 @@
             <span>רמה: </span>
             <span class="hud-value" id="level-display">1</span>
         </div>
+        <div class="lives-container" id="lives-container"></div>
         <button id="shop-btn" onclick="openShop()">🛒 חנות</button>
     </div>
 
@@ -407,6 +501,19 @@
     <canvas id="game-canvas"></canvas>
 
     <button id="spawn-btn" onclick="spawnWave()">🎈 שלח בלונים!</button>
+
+    <!-- Game Over -->
+    <div id="game-over-overlay">
+        <div id="game-over-box">
+            <h2>💔 המשחק נגמר!</h2>
+            <div class="stats">
+                פוצצת <span id="go-popped">0</span> בלונים<br>
+                צברת <span id="go-coins">0</span> 🪙 מטבעות<br>
+                הגעת לרמה <span id="go-level">1</span>
+            </div>
+            <button id="restart-btn" onclick="restartGame()">🔄 שחק שוב!</button>
+        </div>
+    </div>
 
     <!-- Shop -->
     <div id="shop-overlay" onclick="closeShopOutside(event)">
@@ -433,6 +540,7 @@
         resize();
         window.addEventListener('resize', resize);
 
+        const MAX_LIVES = 10;
         const state = {
             coins: 0,
             totalPopped: 0,
@@ -441,7 +549,76 @@
             comboTimer: null,
             selectedChar: 0,
             ownedChars: [0],
+            lives: MAX_LIVES,
+            gameOver: false,
         };
+
+        // ========================
+        // PATH / TRACK
+        // ========================
+        // Path is defined as relative points (0-1 range), scaled to screen
+        const PATH_POINTS_REL = [
+            { x: 0.1, y: 1.05 },
+            { x: 0.1, y: 0.85 },
+            { x: 0.1, y: 0.75 },
+            { x: 0.35, y: 0.68 },
+            { x: 0.6, y: 0.68 },
+            { x: 0.85, y: 0.62 },
+            { x: 0.85, y: 0.52 },
+            { x: 0.6, y: 0.46 },
+            { x: 0.35, y: 0.46 },
+            { x: 0.15, y: 0.40 },
+            { x: 0.15, y: 0.30 },
+            { x: 0.4, y: 0.24 },
+            { x: 0.65, y: 0.24 },
+            { x: 0.85, y: 0.18 },
+            { x: 0.85, y: 0.08 },
+            { x: 0.65, y: 0.02 },
+            { x: 0.5, y: -0.05 },
+        ];
+
+        function getPathPoints() {
+            return PATH_POINTS_REL.map(p => ({ x: p.x * W, y: p.y * H }));
+        }
+
+        function drawTrack() {
+            const pts = getPathPoints();
+            if (pts.length < 2) return;
+
+            // Track shadow
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(pts[0].x, pts[0].y);
+            for (let i = 1; i < pts.length; i++) {
+                const prev = pts[i - 1];
+                const curr = pts[i];
+                const cx = (prev.x + curr.x) / 2;
+                const cy = (prev.y + curr.y) / 2;
+                ctx.quadraticCurveTo(prev.x, prev.y, cx, cy);
+            }
+            const last = pts[pts.length - 1];
+            ctx.lineTo(last.x, last.y);
+
+            ctx.strokeStyle = 'rgba(139, 90, 43, 0.35)';
+            ctx.lineWidth = 52;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            ctx.stroke();
+
+            // Track main
+            ctx.strokeStyle = 'rgba(210, 180, 140, 0.5)';
+            ctx.lineWidth = 44;
+            ctx.stroke();
+
+            // Track center line (dashed)
+            ctx.setLineDash([12, 16]);
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.restore();
+        }
 
         // ========================
         // CHARACTERS
@@ -470,16 +647,18 @@
 
         class Balloon {
             constructor() {
-                this.x = Math.random() * (W - 80) + 40;
-                this.y = H + 60;
+                const pts = getPathPoints();
+                this.pathIndex = 0;
+                this.x = pts[0].x;
+                this.y = pts[0].y;
                 this.radius = 22 + Math.random() * 18;
                 this.color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
-                this.speedY = -(1.2 + Math.random() * 2.5);
-                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.speed = 1.2 + Math.random() * 1.3;
                 this.wobbleOffset = Math.random() * Math.PI * 2;
-                this.wobbleSpeed = 0.02 + Math.random() * 0.03;
-                this.wobbleAmp = 0.5 + Math.random() * 1;
+                this.wobbleSpeed = 0.03 + Math.random() * 0.03;
+                this.wobbleAmp = 3 + Math.random() * 4;
                 this.alive = true;
+                this.escaped = false;
                 this.opacity = 1;
                 this.type = 'normal';
                 this.coins = 1;
@@ -502,14 +681,30 @@
             }
 
             update() {
+                const pts = getPathPoints();
+                if (this.pathIndex >= pts.length - 1) {
+                    this.alive = false;
+                    this.escaped = true;
+                    return;
+                }
+
+                const target = pts[this.pathIndex + 1];
+                const dx = target.x - this.x;
+                const dy = target.y - this.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < this.speed * 2) {
+                    this.pathIndex++;
+                } else {
+                    this.x += (dx / dist) * this.speed;
+                    this.y += (dy / dist) * this.speed;
+                }
+
+                // Wobble perpendicular to direction
                 this.wobbleOffset += this.wobbleSpeed;
-                this.x += this.speedX + Math.sin(this.wobbleOffset) * this.wobbleAmp;
-                this.y += this.speedY;
-
-                if (this.x < this.radius) this.speedX = Math.abs(this.speedX);
-                if (this.x > W - this.radius) this.speedX = -Math.abs(this.speedX);
-
-                if (this.y < -60) this.alive = false;
+                const angle = Math.atan2(dy, dx);
+                this.x += Math.cos(angle + Math.PI / 2) * Math.sin(this.wobbleOffset) * this.wobbleAmp * 0.1;
+                this.y += Math.sin(angle + Math.PI / 2) * Math.sin(this.wobbleOffset) * this.wobbleAmp * 0.1;
             }
 
             draw(ctx) {
@@ -764,17 +959,20 @@
         // SPAWN WAVES
         // ========================
         function spawnWave() {
+            if (state.gameOver) return;
             const count = 5 + Math.floor(state.level * 1.5);
             for (let i = 0; i < count; i++) {
                 setTimeout(() => {
+                    if (state.gameOver) return;
                     const b = new Balloon();
                     balloons.push(b);
-                }, i * 150);
+                }, i * 300);
             }
         }
 
         // Auto-spawn some balloons periodically
         setInterval(() => {
+            if (state.gameOver) return;
             if (balloons.filter(b => b.alive).length < 5) {
                 const b = new Balloon();
                 balloons.push(b);
@@ -886,6 +1084,59 @@
         }
 
         // ========================
+        // LIVES SYSTEM
+        // ========================
+        function renderLives() {
+            const container = document.getElementById('lives-container');
+            container.innerHTML = '<span class="hud-icon">❤️</span> ';
+            for (let i = 0; i < MAX_LIVES; i++) {
+                const heart = document.createElement('span');
+                heart.className = 'heart' + (i >= state.lives ? ' lost' : '');
+                heart.textContent = '❤️';
+                heart.id = 'heart-' + i;
+                container.appendChild(heart);
+            }
+        }
+
+        function loseLife() {
+            if (state.gameOver) return;
+            state.lives--;
+            // Animate the lost heart
+            const heartEl = document.getElementById('heart-' + state.lives);
+            if (heartEl) {
+                heartEl.classList.add('breaking');
+                setTimeout(() => heartEl.classList.add('lost'), 500);
+            }
+            if (state.lives <= 0) {
+                triggerGameOver();
+            }
+        }
+
+        function triggerGameOver() {
+            state.gameOver = true;
+            document.getElementById('go-popped').textContent = state.totalPopped;
+            document.getElementById('go-coins').textContent = state.coins;
+            document.getElementById('go-level').textContent = state.level;
+            document.getElementById('game-over-overlay').classList.add('active');
+            document.getElementById('spawn-btn').style.display = 'none';
+        }
+
+        function restartGame() {
+            state.coins = 0;
+            state.totalPopped = 0;
+            state.level = 1;
+            state.combo = 0;
+            state.lives = MAX_LIVES;
+            state.gameOver = false;
+            balloons = [];
+            document.getElementById('game-over-overlay').classList.remove('active');
+            document.getElementById('spawn-btn').style.display = '';
+            renderLives();
+            updateHUD();
+            setTimeout(spawnWave, 500);
+        }
+
+        // ========================
         // DECORATIVE CLOUDS
         // ========================
         function spawnCloud() {
@@ -911,6 +1162,15 @@
         function gameLoop() {
             ctx.clearRect(0, 0, W, H);
 
+            if (state.gameOver) {
+                drawTrack();
+                requestAnimationFrame(gameLoop);
+                return;
+            }
+
+            // Draw the track
+            drawTrack();
+
             // Update & draw balloons
             for (let i = balloons.length - 1; i >= 0; i--) {
                 const b = balloons[i];
@@ -918,6 +1178,9 @@
                     b.update();
                     b.draw(ctx);
                 } else {
+                    if (b.escaped) {
+                        loseLife();
+                    }
                     balloons.splice(i, 1);
                 }
             }
@@ -930,6 +1193,7 @@
 
         // Start
         gameLoop();
+        renderLives();
         updateHUD();
 
         // Spawn initial balloons

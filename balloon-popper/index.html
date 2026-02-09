@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balloon Popper - פוצץ בלונים!</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F7FA 60%, #A5D6A7 60%, #66BB6A 100%);
+            height: 100vh;
+            width: 100vw;
+            user-select: none;
+            cursor: crosshair;
+        }
+
+        #game-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            color: white;
+            font-size: 18px;
+            direction: rtl;
+        }
+
+        #hud > div {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .hud-icon {
+            font-size: 24px;
+        }
+
+        .hud-value {
+            font-weight: bold;
+            font-size: 22px;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        #shop-btn {
+            background: linear-gradient(135deg, #FFD700, #FFA000);
+            border: 2px solid #FF8F00;
+            color: #4E342E;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            text-shadow: none;
+        }
+
+        #shop-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+
+        #spawn-btn {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #E91E63, #AD1457);
+            border: 3px solid #880E4F;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s;
+            font-family: inherit;
+            box-shadow: 0 5px 20px rgba(233, 30, 99, 0.4);
+        }
+
+        #spawn-btn:hover {
+            transform: translateX(-50%) scale(1.1);
+            box-shadow: 0 8px 30px rgba(233, 30, 99, 0.6);
+        }
+
+        #spawn-btn:active {
+            transform: translateX(-50%) scale(0.95);
+        }
+
+        /* Shop Modal */
+        #shop-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        #shop-overlay.active {
+            display: flex;
+        }
+
+        #shop-modal {
+            background: linear-gradient(135deg, #FFF3E0, #FFE0B2);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 700px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            direction: rtl;
+            position: relative;
+        }
+
+        #shop-modal h2 {
+            text-align: center;
+            font-size: 32px;
+            margin-bottom: 5px;
+            color: #4E342E;
+        }
+
+        .shop-coins {
+            text-align: center;
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #6D4C41;
+        }
+
+        #close-shop {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            background: #EF5350;
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        #close-shop:hover {
+            transform: scale(1.2);
+        }
+
+        .characters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+        }
+
+        .char-card {
+            background: white;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 3px solid #E0E0E0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .char-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .char-card.owned {
+            border-color: #66BB6A;
+        }
+
+        .char-card.selected {
+            border-color: #FFD700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            background: #FFFDE7;
+        }
+
+        .char-card.locked {
+            opacity: 0.7;
+        }
+
+        .char-preview {
+            font-size: 60px;
+            margin: 10px 0;
+            line-height: 1;
+        }
+
+        .char-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .char-desc {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 8px;
+        }
+
+        .char-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: #FF8F00;
+        }
+
+        .char-price.free {
+            color: #66BB6A;
+        }
+
+        .char-status {
+            font-size: 13px;
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            font-weight: bold;
+        }
+
+        .char-status.equipped {
+            background: #FFD700;
+            color: #4E342E;
+        }
+
+        .char-status.owned-status {
+            background: #A5D6A7;
+            color: #1B5E20;
+        }
+
+        .char-status.buy-btn {
+            background: linear-gradient(135deg, #42A5F5, #1565C0);
+            color: white;
+            cursor: pointer;
+            border: none;
+            font-family: inherit;
+            transition: transform 0.2s;
+        }
+
+        .char-status.buy-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .char-status.too-expensive {
+            background: #BDBDBD;
+            color: #616161;
+        }
+
+        /* Pop effects */
+        .pop-effect {
+            position: absolute;
+            pointer-events: none;
+            z-index: 5;
+            animation: popAnim 0.6s ease-out forwards;
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+        }
+
+        @keyframes popAnim {
+            0% { transform: scale(0.5); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 1; }
+            100% { transform: scale(0.8) translateY(-40px); opacity: 0; }
+        }
+
+        .pop-particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 4;
+            border-radius: 50%;
+            animation: particleFly 0.5s ease-out forwards;
+        }
+
+        @keyframes particleFly {
+            0% { transform: translate(0, 0) scale(1); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(0); opacity: 0; }
+        }
+
+        /* Clouds */
+        .cloud {
+            position: absolute;
+            z-index: 0;
+            opacity: 0.6;
+            font-size: 80px;
+            color: white;
+            pointer-events: none;
+            animation: cloudFloat linear infinite;
+        }
+
+        @keyframes cloudFloat {
+            0% { transform: translateX(110vw); }
+            100% { transform: translateX(-200px); }
+        }
+
+        /* Level up banner */
+        #level-up {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            font-size: 48px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 3px 3px 6px rgba(0,0,0,0.5);
+            animation: levelUpAnim 1.5s ease-out forwards;
+        }
+
+        #level-up.show {
+            display: block;
+        }
+
+        @keyframes levelUpAnim {
+            0% { transform: translate(-50%, -50%) scale(0.3); opacity: 0; }
+            30% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+            70% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0.8); opacity: 0; }
+        }
+
+        /* Combo display */
+        #combo-display {
+            position: fixed;
+            top: 60px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            font-size: 28px;
+            font-weight: bold;
+            color: #FF6F00;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        #combo-display.active {
+            opacity: 1;
+        }
+
+        /* Ground decoration */
+        .ground-deco {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            z-index: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="hud">
+        <div>
+            <span class="hud-icon">🪙</span>
+            <span class="hud-value" id="coins-display">0</span>
+        </div>
+        <div>
+            <span class="hud-icon">💥</span>
+            <span>פוצצו: </span>
+            <span class="hud-value" id="popped-display">0</span>
+        </div>
+        <div>
+            <span class="hud-icon">⭐</span>
+            <span>רמה: </span>
+            <span class="hud-value" id="level-display">1</span>
+        </div>
+        <button id="shop-btn" onclick="openShop()">🛒 חנות</button>
+    </div>
+
+    <div id="combo-display"></div>
+    <div id="level-up"></div>
+
+    <canvas id="game-canvas"></canvas>
+
+    <button id="spawn-btn" onclick="spawnWave()">🎈 שלח בלונים!</button>
+
+    <!-- Shop -->
+    <div id="shop-overlay" onclick="closeShopOutside(event)">
+        <div id="shop-modal">
+            <button id="close-shop" onclick="closeShop()">X</button>
+            <h2>🛒 חנות דמויות</h2>
+            <div class="shop-coins" id="shop-coins">🪙 <span id="shop-coins-val">0</span></div>
+            <div class="characters-grid" id="characters-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        // ========================
+        // GAME STATE
+        // ========================
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+
+        let W, H;
+        function resize() {
+            W = canvas.width = window.innerWidth;
+            H = canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const state = {
+            coins: 0,
+            totalPopped: 0,
+            level: 1,
+            combo: 0,
+            comboTimer: null,
+            selectedChar: 0,
+            ownedChars: [0],
+        };
+
+        // ========================
+        // CHARACTERS
+        // ========================
+        const characters = [
+            { id: 0, name: 'ילד עם סיכה', emoji: '👦', weapon: '📌', desc: 'הדמות הקלאסית', price: 0, popRadius: 30, speed: 1, bonusCoins: 0 },
+            { id: 1, name: 'נינג\'ה', emoji: '🥷', weapon: '🌟', desc: 'מהיר ומדויק', price: 50, popRadius: 40, speed: 1.5, bonusCoins: 0 },
+            { id: 2, name: 'קוסם', emoji: '🧙', weapon: '✨', desc: 'פוצץ 2 בלונים בבת אחת', price: 150, popRadius: 60, speed: 1, bonusCoins: 0 },
+            { id: 3, name: 'רובוט', emoji: '🤖', weapon: '⚡', desc: 'מרוויח מטבעות כפולים', price: 300, popRadius: 35, speed: 1.2, bonusCoins: 1 },
+            { id: 4, name: 'דרקון', emoji: '🐉', weapon: '🔥', desc: 'שורף הכל בדרך', price: 500, popRadius: 80, speed: 1, bonusCoins: 0 },
+            { id: 5, name: 'חייזר', emoji: '👽', weapon: '🛸', desc: 'לייזר מהחלל', price: 800, popRadius: 50, speed: 2, bonusCoins: 1 },
+            { id: 6, name: 'פיראט', emoji: '🏴‍☠️', weapon: '⚓', desc: 'אוצרות מכל בלון', price: 1200, popRadius: 45, speed: 1.3, bonusCoins: 3 },
+            { id: 7, name: 'גיבור על', emoji: '🦸', weapon: '💫', desc: 'כוח על מוחלט', price: 2000, popRadius: 100, speed: 1.8, bonusCoins: 2 },
+        ];
+
+        // ========================
+        // BALLOONS
+        // ========================
+        const BALLOON_COLORS = [
+            '#FF5252', '#FF4081', '#E040FB', '#7C4DFF',
+            '#448AFF', '#18FFFF', '#69F0AE', '#EEFF41',
+            '#FFD740', '#FF6E40', '#F06292', '#BA68C8',
+        ];
+
+        let balloons = [];
+
+        class Balloon {
+            constructor() {
+                this.x = Math.random() * (W - 80) + 40;
+                this.y = H + 60;
+                this.radius = 22 + Math.random() * 18;
+                this.color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
+                this.speedY = -(1.2 + Math.random() * 2.5);
+                this.speedX = (Math.random() - 0.5) * 1.5;
+                this.wobbleOffset = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = 0.02 + Math.random() * 0.03;
+                this.wobbleAmp = 0.5 + Math.random() * 1;
+                this.alive = true;
+                this.opacity = 1;
+                this.type = 'normal';
+                this.coins = 1;
+                this.hp = 1;
+
+                // Special balloons
+                const roll = Math.random();
+                if (roll < 0.08) {
+                    this.type = 'golden';
+                    this.color = '#FFD700';
+                    this.coins = 5;
+                    this.radius += 5;
+                } else if (roll < 0.15) {
+                    this.type = 'tough';
+                    this.color = '#78909C';
+                    this.hp = 2;
+                    this.coins = 3;
+                    this.radius += 3;
+                }
+            }
+
+            update() {
+                this.wobbleOffset += this.wobbleSpeed;
+                this.x += this.speedX + Math.sin(this.wobbleOffset) * this.wobbleAmp;
+                this.y += this.speedY;
+
+                if (this.x < this.radius) this.speedX = Math.abs(this.speedX);
+                if (this.x > W - this.radius) this.speedX = -Math.abs(this.speedX);
+
+                if (this.y < -60) this.alive = false;
+            }
+
+            draw(ctx) {
+                ctx.save();
+                ctx.globalAlpha = this.opacity;
+
+                // Balloon body
+                ctx.beginPath();
+                ctx.ellipse(this.x, this.y, this.radius, this.radius * 1.2, 0, 0, Math.PI * 2);
+
+                // Gradient fill
+                const grad = ctx.createRadialGradient(
+                    this.x - this.radius * 0.3, this.y - this.radius * 0.4, 2,
+                    this.x, this.y, this.radius * 1.2
+                );
+                grad.addColorStop(0, '#FFFFFF');
+                grad.addColorStop(0.3, this.color);
+                grad.addColorStop(1, this.darken(this.color, 30));
+                ctx.fillStyle = grad;
+                ctx.fill();
+                ctx.strokeStyle = this.darken(this.color, 50);
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+
+                // Shine highlight
+                ctx.beginPath();
+                ctx.ellipse(this.x - this.radius * 0.25, this.y - this.radius * 0.35, this.radius * 0.2, this.radius * 0.3, -0.5, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                ctx.fill();
+
+                // Knot
+                ctx.beginPath();
+                ctx.moveTo(this.x - 4, this.y + this.radius * 1.18);
+                ctx.lineTo(this.x, this.y + this.radius * 1.28);
+                ctx.lineTo(this.x + 4, this.y + this.radius * 1.18);
+                ctx.fillStyle = this.darken(this.color, 40);
+                ctx.fill();
+
+                // String
+                ctx.beginPath();
+                ctx.moveTo(this.x, this.y + this.radius * 1.28);
+                ctx.quadraticCurveTo(
+                    this.x + Math.sin(this.wobbleOffset) * 10,
+                    this.y + this.radius * 1.28 + 30,
+                    this.x + Math.sin(this.wobbleOffset * 1.5) * 5,
+                    this.y + this.radius * 1.28 + 50
+                );
+                ctx.strokeStyle = '#999';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                // Type indicators
+                if (this.type === 'golden') {
+                    ctx.font = `${this.radius * 0.8}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('⭐', this.x, this.y);
+                } else if (this.type === 'tough') {
+                    ctx.font = `bold ${this.radius * 0.6}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillStyle = 'white';
+                    ctx.fillText(this.hp.toString(), this.x, this.y);
+                }
+
+                ctx.restore();
+            }
+
+            darken(hex, amount) {
+                let r = parseInt(hex.slice(1, 3), 16);
+                let g = parseInt(hex.slice(3, 5), 16);
+                let b = parseInt(hex.slice(5, 7), 16);
+                r = Math.max(0, r - amount);
+                g = Math.max(0, g - amount);
+                b = Math.max(0, b - amount);
+                return `rgb(${r},${g},${b})`;
+            }
+        }
+
+        // ========================
+        // CHARACTER (Player)
+        // ========================
+        let player = {
+            x: W / 2,
+            y: H / 2,
+            targetX: W / 2,
+            targetY: H / 2,
+            attacking: false,
+            attackTimer: 0,
+        };
+
+        function drawPlayer() {
+            const char = characters[state.selectedChar];
+            const size = 40;
+
+            // Smooth follow cursor
+            const spd = char.speed * 0.12;
+            player.x += (player.targetX - player.x) * spd;
+            player.y += (player.targetY - player.y) * spd;
+
+            ctx.save();
+            ctx.font = `${size}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+
+            // Shadow
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 10;
+            ctx.shadowOffsetY = 5;
+
+            ctx.fillText(char.emoji, player.x, player.y);
+
+            // Draw weapon when attacking
+            if (player.attacking) {
+                player.attackTimer++;
+                const weaponOffset = Math.sin(player.attackTimer * 0.3) * 10;
+                ctx.font = `${size * 0.7}px Arial`;
+                ctx.fillText(char.weapon, player.x + 30 + weaponOffset, player.y - 20);
+
+                if (player.attackTimer > 15) {
+                    player.attacking = false;
+                    player.attackTimer = 0;
+                }
+            }
+
+            // Pop radius indicator (faint)
+            ctx.shadowColor = 'transparent';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, char.popRadius, 0, Math.PI * 2);
+            ctx.strokeStyle = 'rgba(255,255,255,0.15)';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.restore();
+        }
+
+        // ========================
+        // INPUT
+        // ========================
+        canvas.addEventListener('mousemove', (e) => {
+            player.targetX = e.clientX;
+            player.targetY = e.clientY;
+        });
+
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            player.targetX = e.touches[0].clientX;
+            player.targetY = e.touches[0].clientY;
+        }, { passive: false });
+
+        canvas.addEventListener('click', (e) => {
+            tryPop(e.clientX, e.clientY);
+        });
+
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            player.targetX = e.touches[0].clientX;
+            player.targetY = e.touches[0].clientY;
+            tryPop(e.touches[0].clientX, e.touches[0].clientY);
+        }, { passive: false });
+
+        // ========================
+        // POP MECHANIC
+        // ========================
+        function tryPop(mx, my) {
+            const char = characters[state.selectedChar];
+            let popped = false;
+
+            player.attacking = true;
+            player.attackTimer = 0;
+
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                const b = balloons[i];
+                if (!b.alive) continue;
+
+                const dx = player.x - b.x;
+                const dy = player.y - b.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+
+                if (dist < char.popRadius + b.radius) {
+                    b.hp--;
+                    if (b.hp <= 0) {
+                        b.alive = false;
+                        popped = true;
+
+                        // Combo
+                        state.combo++;
+                        clearTimeout(state.comboTimer);
+                        state.comboTimer = setTimeout(() => {
+                            state.combo = 0;
+                            document.getElementById('combo-display').classList.remove('active');
+                        }, 1500);
+
+                        const comboMultiplier = Math.min(state.combo, 10);
+                        const coinEarned = b.coins + char.bonusCoins + Math.floor(comboMultiplier / 3);
+                        state.coins += coinEarned;
+                        state.totalPopped++;
+
+                        // Effects
+                        createPopEffect(b.x, b.y, coinEarned, b.color);
+                        createParticles(b.x, b.y, b.color);
+
+                        // Combo display
+                        if (state.combo >= 3) {
+                            const comboEl = document.getElementById('combo-display');
+                            comboEl.textContent = `x${state.combo} קומבו! 🔥`;
+                            comboEl.classList.add('active');
+                        }
+
+                        // Level check
+                        checkLevel();
+                    } else {
+                        // Hit but not dead (tough balloon)
+                        createParticles(b.x, b.y, b.color, 3);
+                    }
+                }
+            }
+
+            updateHUD();
+        }
+
+        function createPopEffect(x, y, coins, color) {
+            const el = document.createElement('div');
+            el.className = 'pop-effect';
+            el.textContent = `+${coins} 🪙`;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 600);
+        }
+
+        function createParticles(x, y, color, count = 8) {
+            for (let i = 0; i < count; i++) {
+                const el = document.createElement('div');
+                el.className = 'pop-particle';
+                const size = 4 + Math.random() * 8;
+                el.style.width = size + 'px';
+                el.style.height = size + 'px';
+                el.style.background = color;
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+                const angle = (Math.PI * 2 * i) / count + Math.random() * 0.5;
+                const dist = 30 + Math.random() * 50;
+                el.style.setProperty('--tx', Math.cos(angle) * dist + 'px');
+                el.style.setProperty('--ty', Math.sin(angle) * dist + 'px');
+                document.body.appendChild(el);
+                setTimeout(() => el.remove(), 500);
+            }
+        }
+
+        // ========================
+        // SPAWN WAVES
+        // ========================
+        function spawnWave() {
+            const count = 5 + Math.floor(state.level * 1.5);
+            for (let i = 0; i < count; i++) {
+                setTimeout(() => {
+                    const b = new Balloon();
+                    balloons.push(b);
+                }, i * 150);
+            }
+        }
+
+        // Auto-spawn some balloons periodically
+        setInterval(() => {
+            if (balloons.filter(b => b.alive).length < 5) {
+                const b = new Balloon();
+                balloons.push(b);
+            }
+        }, 2000);
+
+        // ========================
+        // LEVEL SYSTEM
+        // ========================
+        function checkLevel() {
+            const newLevel = 1 + Math.floor(state.totalPopped / 20);
+            if (newLevel > state.level) {
+                state.level = newLevel;
+                showLevelUp();
+            }
+        }
+
+        function showLevelUp() {
+            const el = document.getElementById('level-up');
+            el.textContent = `🎉 רמה ${state.level}! 🎉`;
+            el.classList.remove('show');
+            void el.offsetWidth; // reflow
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 1500);
+        }
+
+        // ========================
+        // HUD
+        // ========================
+        function updateHUD() {
+            document.getElementById('coins-display').textContent = state.coins;
+            document.getElementById('popped-display').textContent = state.totalPopped;
+            document.getElementById('level-display').textContent = state.level;
+        }
+
+        // ========================
+        // SHOP
+        // ========================
+        function openShop() {
+            document.getElementById('shop-overlay').classList.add('active');
+            document.getElementById('shop-coins-val').textContent = state.coins;
+            renderShop();
+        }
+
+        function closeShop() {
+            document.getElementById('shop-overlay').classList.remove('active');
+        }
+
+        function closeShopOutside(e) {
+            if (e.target === document.getElementById('shop-overlay')) closeShop();
+        }
+
+        function renderShop() {
+            const grid = document.getElementById('characters-grid');
+            grid.innerHTML = '';
+
+            characters.forEach(char => {
+                const owned = state.ownedChars.includes(char.id);
+                const selected = state.selectedChar === char.id;
+                const canAfford = state.coins >= char.price;
+
+                const card = document.createElement('div');
+                card.className = `char-card ${owned ? 'owned' : 'locked'} ${selected ? 'selected' : ''}`;
+
+                let statusHTML = '';
+                if (selected) {
+                    statusHTML = `<span class="char-status equipped">✓ משומש</span>`;
+                } else if (owned) {
+                    statusHTML = `<button class="char-status owned-status" onclick="selectChar(${char.id})">בחר</button>`;
+                } else if (canAfford) {
+                    statusHTML = `<button class="char-status buy-btn" onclick="buyChar(${char.id})">קנה - ${char.price} 🪙</button>`;
+                } else {
+                    statusHTML = `<span class="char-status too-expensive">🔒 ${char.price} 🪙</span>`;
+                }
+
+                card.innerHTML = `
+                    <div class="char-preview">${char.emoji}</div>
+                    <div class="char-name">${char.name}</div>
+                    <div class="char-desc">${char.desc}</div>
+                    <div class="char-desc">טווח: ${char.popRadius} | מהירות: x${char.speed}</div>
+                    ${statusHTML}
+                `;
+
+                if (owned && !selected) {
+                    card.addEventListener('click', () => selectChar(char.id));
+                }
+
+                grid.appendChild(card);
+            });
+        }
+
+        function buyChar(id) {
+            const char = characters[id];
+            if (state.coins >= char.price && !state.ownedChars.includes(id)) {
+                state.coins -= char.price;
+                state.ownedChars.push(id);
+                state.selectedChar = id;
+                updateHUD();
+                document.getElementById('shop-coins-val').textContent = state.coins;
+                renderShop();
+            }
+        }
+
+        function selectChar(id) {
+            if (state.ownedChars.includes(id)) {
+                state.selectedChar = id;
+                renderShop();
+            }
+        }
+
+        // ========================
+        // DECORATIVE CLOUDS
+        // ========================
+        function spawnCloud() {
+            const cloud = document.createElement('div');
+            cloud.className = 'cloud';
+            cloud.textContent = '☁️';
+            cloud.style.top = (Math.random() * 30) + '%';
+            cloud.style.fontSize = (60 + Math.random() * 60) + 'px';
+            cloud.style.animationDuration = (20 + Math.random() * 30) + 's';
+            document.body.appendChild(cloud);
+            cloud.addEventListener('animationend', () => cloud.remove());
+        }
+
+        // Spawn clouds periodically
+        setInterval(spawnCloud, 8000);
+        spawnCloud();
+        setTimeout(spawnCloud, 2000);
+        setTimeout(spawnCloud, 5000);
+
+        // ========================
+        // GAME LOOP
+        // ========================
+        function gameLoop() {
+            ctx.clearRect(0, 0, W, H);
+
+            // Update & draw balloons
+            for (let i = balloons.length - 1; i >= 0; i--) {
+                const b = balloons[i];
+                if (b.alive) {
+                    b.update();
+                    b.draw(ctx);
+                } else {
+                    balloons.splice(i, 1);
+                }
+            }
+
+            // Draw player
+            drawPlayer();
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start
+        gameLoop();
+        updateHUD();
+
+        // Spawn initial balloons
+        setTimeout(spawnWave, 500);
+    </script>
+</body>
+</html>

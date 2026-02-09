@@ -385,20 +385,15 @@
         #game-over-overlay {
             display: none;
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             background: rgba(0, 0, 0, 0.75);
             z-index: 200;
             justify-content: center;
             align-items: center;
             backdrop-filter: blur(8px);
         }
-
-        #game-over-overlay.active {
-            display: flex;
-        }
+        #game-over-overlay.active { display: flex; }
 
         #game-over-box {
             background: linear-gradient(135deg, #2d1b69, #1a1a2e);
@@ -410,24 +405,9 @@
             box-shadow: 0 0 60px rgba(255, 82, 82, 0.3);
             direction: rtl;
         }
-
-        #game-over-box h2 {
-            font-size: 42px;
-            margin-bottom: 10px;
-            color: #FF5252;
-        }
-
-        #game-over-box .stats {
-            font-size: 20px;
-            margin: 20px 0;
-            line-height: 2;
-            color: #ccc;
-        }
-
-        #game-over-box .stats span {
-            color: #FFD740;
-            font-weight: bold;
-        }
+        #game-over-box h2 { font-size: 42px; margin-bottom: 10px; color: #FF5252; }
+        #game-over-box .stats { font-size: 20px; margin: 20px 0; line-height: 2; color: #ccc; }
+        #game-over-box .stats span { color: #FFD740; font-weight: bold; }
 
         #restart-btn {
             background: linear-gradient(135deg, #66BB6A, #2E7D32);
@@ -442,32 +422,12 @@
             transition: all 0.2s;
             margin-top: 10px;
         }
+        #restart-btn:hover { transform: scale(1.08); box-shadow: 0 4px 20px rgba(102, 187, 106, 0.5); }
 
-        #restart-btn:hover {
-            transform: scale(1.08);
-            box-shadow: 0 4px 20px rgba(102, 187, 106, 0.5);
-        }
-
-        .lives-container {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .heart {
-            font-size: 20px;
-            transition: transform 0.3s, opacity 0.3s;
-        }
-
-        .heart.lost {
-            opacity: 0.2;
-            transform: scale(0.7);
-        }
-
-        .heart.breaking {
-            animation: heartBreak 0.5s ease-out;
-        }
-
+        .lives-container { display: flex; align-items: center; gap: 4px; }
+        .heart { font-size: 20px; transition: transform 0.3s, opacity 0.3s; }
+        .heart.lost { opacity: 0.2; transform: scale(0.7); }
+        .heart.breaking { animation: heartBreak 0.5s ease-out; }
         @keyframes heartBreak {
             0% { transform: scale(1); }
             30% { transform: scale(1.4); color: #FF1744; }
@@ -556,7 +516,6 @@
         // ========================
         // PATH / TRACK
         // ========================
-        // Path is defined as relative points (0-1 range), scaled to screen
         const PATH_POINTS_REL = [
             { x: 0.1, y: 1.05 },
             { x: 0.1, y: 0.85 },
@@ -584,8 +543,6 @@
         function drawTrack() {
             const pts = getPathPoints();
             if (pts.length < 2) return;
-
-            // Track shadow
             ctx.save();
             ctx.beginPath();
             ctx.moveTo(pts[0].x, pts[0].y);
@@ -598,25 +555,19 @@
             }
             const last = pts[pts.length - 1];
             ctx.lineTo(last.x, last.y);
-
             ctx.strokeStyle = 'rgba(139, 90, 43, 0.35)';
             ctx.lineWidth = 52;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
             ctx.stroke();
-
-            // Track main
             ctx.strokeStyle = 'rgba(210, 180, 140, 0.5)';
             ctx.lineWidth = 44;
             ctx.stroke();
-
-            // Track center line (dashed)
             ctx.setLineDash([12, 16]);
             ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
             ctx.lineWidth = 2;
             ctx.stroke();
             ctx.setLineDash([]);
-
             ctx.restore();
         }
 
@@ -687,19 +638,16 @@
                     this.escaped = true;
                     return;
                 }
-
                 const target = pts[this.pathIndex + 1];
                 const dx = target.x - this.x;
                 const dy = target.y - this.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-
                 if (dist < this.speed * 2) {
                     this.pathIndex++;
                 } else {
                     this.x += (dx / dist) * this.speed;
                     this.y += (dy / dist) * this.speed;
                 }
-
                 // Wobble perpendicular to direction
                 this.wobbleOffset += this.wobbleSpeed;
                 const angle = Math.atan2(dy, dx);
@@ -1101,7 +1049,6 @@
         function loseLife() {
             if (state.gameOver) return;
             state.lives--;
-            // Animate the lost heart
             const heartEl = document.getElementById('heart-' + state.lives);
             if (heartEl) {
                 heartEl.classList.add('breaking');

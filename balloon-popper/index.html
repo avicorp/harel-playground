@@ -45,6 +45,8 @@
             color: white;
             font-size: 18px;
             direction: rtl;
+            flex-wrap: wrap;
+            gap: 5px;
         }
 
         #hud > div {
@@ -63,7 +65,33 @@
             text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
         }
 
-        #shop-btn {
+        #lives-display {
+            color: #FF6B6B;
+        }
+
+        /* Level progress bar */
+        .level-progress-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .level-progress-bar {
+            width: 100px;
+            height: 12px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .level-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA000);
+            border-radius: 6px;
+            transition: width 0.3s ease;
+        }
+
+        #shop-btn, #upgrade-btn {
             background: linear-gradient(135deg, #FFD700, #FFA000);
             border: 2px solid #FF8F00;
             color: #4E342E;
@@ -77,9 +105,20 @@
             text-shadow: none;
         }
 
-        #shop-btn:hover {
+        #upgrade-btn {
+            background: linear-gradient(135deg, #7C4DFF, #536DFE);
+            border-color: #651FFF;
+            color: white;
+        }
+
+        #shop-btn:hover, #upgrade-btn:hover {
             transform: scale(1.1);
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .hud-buttons {
+            display: flex;
+            gap: 8px;
         }
 
         #spawn-btn {
@@ -111,7 +150,7 @@
         }
 
         /* Shop Modal */
-        #shop-overlay {
+        .modal-overlay {
             display: none;
             position: fixed;
             top: 0;
@@ -125,7 +164,7 @@
             backdrop-filter: blur(5px);
         }
 
-        #shop-overlay.active {
+        .modal-overlay.active {
             display: flex;
         }
 
@@ -156,7 +195,7 @@
             color: #6D4C41;
         }
 
-        #close-shop {
+        .close-modal {
             position: absolute;
             top: 15px;
             left: 15px;
@@ -174,7 +213,7 @@
             transition: transform 0.2s;
         }
 
-        #close-shop:hover {
+        .close-modal:hover {
             transform: scale(1.2);
         }
 
@@ -278,6 +317,130 @@
             color: #616161;
         }
 
+        /* Upgrade Modal */
+        #upgrade-modal {
+            background: linear-gradient(135deg, #E8EAF6, #C5CAE9);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            direction: rtl;
+            position: relative;
+        }
+
+        #upgrade-modal h2 {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 5px;
+            color: #283593;
+        }
+
+        .upgrade-char-info {
+            text-align: center;
+            font-size: 50px;
+            margin: 10px 0;
+        }
+
+        .upgrade-char-name {
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .upgrade-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .upgrade-item {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 2px solid #E0E0E0;
+            transition: all 0.2s;
+        }
+
+        .upgrade-item:hover {
+            border-color: #7C4DFF;
+        }
+
+        .upgrade-info {
+            flex: 1;
+        }
+
+        .upgrade-name {
+            font-weight: bold;
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 4px;
+        }
+
+        .upgrade-detail {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .upgrade-level-dots {
+            display: flex;
+            gap: 4px;
+            margin-top: 5px;
+        }
+
+        .upgrade-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #E0E0E0;
+        }
+
+        .upgrade-dot.filled {
+            background: #7C4DFF;
+        }
+
+        .upgrade-buy-btn {
+            background: linear-gradient(135deg, #7C4DFF, #536DFE);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .upgrade-buy-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(124, 77, 255, 0.4);
+        }
+
+        .upgrade-buy-btn:disabled {
+            background: #BDBDBD;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .upgrade-maxed {
+            background: #A5D6A7;
+            color: #1B5E20;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
         /* Pop effects */
         .pop-effect {
             position: absolute;
@@ -354,7 +517,7 @@
         /* Combo display */
         #combo-display {
             position: fixed;
-            top: 60px;
+            top: 70px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 10;
@@ -368,6 +531,115 @@
 
         #combo-display.active {
             opacity: 1;
+        }
+
+        /* Game over overlay */
+        #game-over-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(8px);
+        }
+
+        #game-over-overlay.active {
+            display: flex;
+        }
+
+        .game-over-box {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            border-radius: 25px;
+            padding: 40px;
+            text-align: center;
+            color: white;
+            border: 3px solid #e94560;
+            box-shadow: 0 20px 60px rgba(233, 69, 96, 0.3);
+            direction: rtl;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .game-over-box h1 {
+            font-size: 42px;
+            color: #e94560;
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px rgba(233, 69, 96, 0.5);
+        }
+
+        .game-over-stats {
+            margin: 20px 0;
+            font-size: 18px;
+            line-height: 2;
+        }
+
+        .game-over-stats span {
+            color: #FFD700;
+            font-weight: bold;
+        }
+
+        .restart-btn {
+            background: linear-gradient(135deg, #e94560, #c62828);
+            border: none;
+            color: white;
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .restart-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 30px rgba(233, 69, 96, 0.5);
+        }
+
+        /* Life lost flash */
+        #life-lost-flash {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.15);
+            z-index: 9;
+            pointer-events: none;
+            animation: flashRed 0.3s ease-out forwards;
+        }
+
+        #life-lost-flash.show {
+            display: block;
+        }
+
+        @keyframes flashRed {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* Level info */
+        .level-info-bar {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(5px);
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            text-align: center;
+            direction: rtl;
         }
 
         /* Ground decoration */
@@ -385,6 +657,10 @@
 <body>
     <div id="hud">
         <div>
+            <span class="hud-icon">❤️</span>
+            <span class="hud-value" id="lives-display">100</span>
+        </div>
+        <div>
             <span class="hud-icon">🪙</span>
             <span class="hud-value" id="coins-display">0</span>
         </div>
@@ -393,28 +669,61 @@
             <span>פוצצו: </span>
             <span class="hud-value" id="popped-display">0</span>
         </div>
-        <div>
+        <div class="level-progress-wrap">
             <span class="hud-icon">⭐</span>
-            <span>רמה: </span>
+            <span>שלב </span>
             <span class="hud-value" id="level-display">1</span>
+            <div class="level-progress-bar">
+                <div class="level-progress-fill" id="level-progress-fill" style="width: 0%"></div>
+            </div>
         </div>
-        <button id="shop-btn" onclick="openShop()">🛒 חנות</button>
+        <div class="hud-buttons">
+            <button id="upgrade-btn" onclick="openUpgrade()">⬆ שדרוגים</button>
+            <button id="shop-btn" onclick="openShop()">🛒 חנות</button>
+        </div>
     </div>
 
     <div id="combo-display"></div>
     <div id="level-up"></div>
+    <div id="life-lost-flash"></div>
 
     <canvas id="game-canvas"></canvas>
 
+    <div class="level-info-bar" id="level-info-bar"></div>
     <button id="spawn-btn" onclick="spawnWave()">🎈 שלח בלונים!</button>
 
+    <!-- Game Over -->
+    <div id="game-over-overlay">
+        <div class="game-over-box">
+            <h1>💀 המשחק נגמר!</h1>
+            <div class="game-over-stats">
+                הגעת לשלב <span id="go-level">1</span><br>
+                פוצצת <span id="go-popped">0</span> בלונים<br>
+                צברת <span id="go-coins">0</span> מטבעות
+            </div>
+            <button class="restart-btn" onclick="restartGame()">🔄 שחק שוב!</button>
+        </div>
+    </div>
+
     <!-- Shop -->
-    <div id="shop-overlay" onclick="closeShopOutside(event)">
+    <div class="modal-overlay" id="shop-overlay" onclick="closeShopOutside(event)">
         <div id="shop-modal">
-            <button id="close-shop" onclick="closeShop()">X</button>
+            <button class="close-modal" onclick="closeShop()">X</button>
             <h2>🛒 חנות דמויות</h2>
             <div class="shop-coins" id="shop-coins">🪙 <span id="shop-coins-val">0</span></div>
             <div class="characters-grid" id="characters-grid"></div>
+        </div>
+    </div>
+
+    <!-- Upgrade Modal -->
+    <div class="modal-overlay" id="upgrade-overlay" onclick="closeUpgradeOutside(event)">
+        <div id="upgrade-modal">
+            <button class="close-modal" onclick="closeUpgrade()">X</button>
+            <h2>⬆ שדרוג דמות</h2>
+            <div class="shop-coins">🪙 <span id="upgrade-coins-val">0</span></div>
+            <div class="upgrade-char-info" id="upgrade-char-emoji"></div>
+            <div class="upgrade-char-name" id="upgrade-char-name"></div>
+            <div class="upgrade-list" id="upgrade-list"></div>
         </div>
     </div>
 
@@ -437,11 +746,34 @@
             coins: 0,
             totalPopped: 0,
             level: 1,
+            lives: 100,
             combo: 0,
             comboTimer: null,
             selectedChar: 0,
             ownedChars: [0],
+            gameOver: false,
+            levelPopped: 0,      // balloons popped in current level
+            totalCoinsEarned: 0,  // for game over stats
+            // Character upgrades: { charId: { popRadius: level, speed: level, bonusCoins: level } }
+            upgrades: {},
         };
+
+        // ========================
+        // LEVEL DEFINITIONS
+        // ========================
+        function getLevelConfig(level) {
+            return {
+                target: 10 + level * 5,                          // balloons needed to advance
+                spawnRate: Math.max(800, 2000 - level * 80),     // ms between auto-spawns
+                balloonSpeed: 1.2 + level * 0.15,                // base balloon rise speed
+                waveSize: 5 + Math.floor(level * 1.5),           // balloons per wave
+                toughChance: Math.min(0.35, 0.07 + level * 0.02), // tough balloon %
+                goldenChance: Math.min(0.15, 0.08 + level * 0.005), // golden balloon %
+                bombChance: Math.min(0.12, level >= 5 ? 0.02 + (level - 5) * 0.01 : 0), // bomb balloon (new!)
+                livesReward: level >= 3 ? Math.floor(level / 3) : 0, // bonus lives on level complete
+                coinBonus: level * 2,                             // bonus coins on level complete
+            };
+        }
 
         // ========================
         // CHARACTERS
@@ -458,6 +790,59 @@
         ];
 
         // ========================
+        // UPGRADE SYSTEM
+        // ========================
+        const UPGRADE_MAX_LEVEL = 5;
+        const upgradeTypes = [
+            {
+                key: 'popRadius',
+                name: 'טווח פיצוץ',
+                icon: '🎯',
+                desc: (lvl) => `+${lvl * 8} לטווח`,
+                baseCost: 30,
+                costMult: 1.8,
+                apply: (char, lvl) => char.popRadius + lvl * 8,
+            },
+            {
+                key: 'speed',
+                name: 'מהירות תנועה',
+                icon: '💨',
+                desc: (lvl) => `+${(lvl * 0.3).toFixed(1)} למהירות`,
+                baseCost: 25,
+                costMult: 1.7,
+                apply: (char, lvl) => char.speed + lvl * 0.3,
+            },
+            {
+                key: 'bonusCoins',
+                name: 'מטבעות בונוס',
+                icon: '🪙',
+                desc: (lvl) => `+${lvl} מטבעות לבלון`,
+                baseCost: 40,
+                costMult: 2.0,
+                apply: (char, lvl) => char.bonusCoins + lvl,
+            },
+        ];
+
+        function getUpgradeLevel(charId, key) {
+            if (!state.upgrades[charId]) return 0;
+            return state.upgrades[charId][key] || 0;
+        }
+
+        function getUpgradeCost(upgradeType, currentLevel) {
+            return Math.floor(upgradeType.baseCost * Math.pow(upgradeType.costMult, currentLevel));
+        }
+
+        function getCharStats(charId) {
+            const base = characters[charId];
+            const result = { ...base };
+            upgradeTypes.forEach(u => {
+                const lvl = getUpgradeLevel(charId, u.key);
+                result[u.key] = u.apply(base, lvl);
+            });
+            return result;
+        }
+
+        // ========================
         // BALLOONS
         // ========================
         const BALLOON_COLORS = [
@@ -470,11 +855,12 @@
 
         class Balloon {
             constructor() {
+                const cfg = getLevelConfig(state.level);
                 this.x = Math.random() * (W - 80) + 40;
                 this.y = H + 60;
                 this.radius = 22 + Math.random() * 18;
                 this.color = BALLOON_COLORS[Math.floor(Math.random() * BALLOON_COLORS.length)];
-                this.speedY = -(1.2 + Math.random() * 2.5);
+                this.speedY = -(cfg.balloonSpeed + Math.random() * 1.5);
                 this.speedX = (Math.random() - 0.5) * 1.5;
                 this.wobbleOffset = Math.random() * Math.PI * 2;
                 this.wobbleSpeed = 0.02 + Math.random() * 0.03;
@@ -485,19 +871,25 @@
                 this.coins = 1;
                 this.hp = 1;
 
-                // Special balloons
+                // Special balloons based on level config
                 const roll = Math.random();
-                if (roll < 0.08) {
+                if (roll < cfg.goldenChance) {
                     this.type = 'golden';
                     this.color = '#FFD700';
                     this.coins = 5;
                     this.radius += 5;
-                } else if (roll < 0.15) {
+                } else if (roll < cfg.goldenChance + cfg.toughChance) {
                     this.type = 'tough';
                     this.color = '#78909C';
-                    this.hp = 2;
+                    this.hp = 2 + Math.floor(state.level / 5);
                     this.coins = 3;
                     this.radius += 3;
+                } else if (roll < cfg.goldenChance + cfg.toughChance + cfg.bombChance) {
+                    this.type = 'bomb';
+                    this.color = '#212121';
+                    this.coins = 0;
+                    this.radius += 2;
+                    this.speedY *= 0.8; // bombs float slower
                 }
             }
 
@@ -509,7 +901,13 @@
                 if (this.x < this.radius) this.speedX = Math.abs(this.speedX);
                 if (this.x > W - this.radius) this.speedX = -Math.abs(this.speedX);
 
-                if (this.y < -60) this.alive = false;
+                // Balloon escaped off top
+                if (this.y < -60) {
+                    this.alive = false;
+                    if (this.type !== 'bomb') {
+                        loseLife(1);
+                    }
+                }
             }
 
             draw(ctx) {
@@ -573,12 +971,18 @@
                     ctx.textBaseline = 'middle';
                     ctx.fillStyle = 'white';
                     ctx.fillText(this.hp.toString(), this.x, this.y);
+                } else if (this.type === 'bomb') {
+                    ctx.font = `${this.radius * 0.7}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('💣', this.x, this.y);
                 }
 
                 ctx.restore();
             }
 
             darken(hex, amount) {
+                if (hex.startsWith('rgb')) return hex;
                 let r = parseInt(hex.slice(1, 3), 16);
                 let g = parseInt(hex.slice(3, 5), 16);
                 let b = parseInt(hex.slice(5, 7), 16);
@@ -602,7 +1006,7 @@
         };
 
         function drawPlayer() {
-            const char = characters[state.selectedChar];
+            const char = getCharStats(state.selectedChar);
             const size = 40;
 
             // Smooth follow cursor
@@ -647,6 +1051,56 @@
         }
 
         // ========================
+        // LIVES SYSTEM
+        // ========================
+        function loseLife(amount) {
+            if (state.gameOver) return;
+            state.lives -= amount;
+
+            // Flash red
+            const flash = document.getElementById('life-lost-flash');
+            flash.classList.remove('show');
+            void flash.offsetWidth;
+            flash.classList.add('show');
+            setTimeout(() => flash.classList.remove('show'), 300);
+
+            if (state.lives <= 0) {
+                state.lives = 0;
+                gameOver();
+            }
+            updateHUD();
+        }
+
+        function gameOver() {
+            state.gameOver = true;
+            document.getElementById('go-level').textContent = state.level;
+            document.getElementById('go-popped').textContent = state.totalPopped;
+            document.getElementById('go-coins').textContent = state.totalCoinsEarned;
+            document.getElementById('game-over-overlay').classList.add('active');
+        }
+
+        function restartGame() {
+            state.coins = 0;
+            state.totalPopped = 0;
+            state.level = 1;
+            state.lives = 100;
+            state.combo = 0;
+            state.comboTimer = null;
+            state.gameOver = false;
+            state.levelPopped = 0;
+            state.totalCoinsEarned = 0;
+            state.selectedChar = 0;
+            state.ownedChars = [0];
+            state.upgrades = {};
+            balloons = [];
+            document.getElementById('game-over-overlay').classList.remove('active');
+            document.getElementById('combo-display').classList.remove('active');
+            updateHUD();
+            updateLevelInfo();
+            setTimeout(spawnWave, 500);
+        }
+
+        // ========================
         // INPUT
         // ========================
         canvas.addEventListener('mousemove', (e) => {
@@ -661,22 +1115,23 @@
         }, { passive: false });
 
         canvas.addEventListener('click', (e) => {
-            tryPop(e.clientX, e.clientY);
+            if (!state.gameOver) tryPop(e.clientX, e.clientY);
         });
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            player.targetX = e.touches[0].clientX;
-            player.targetY = e.touches[0].clientY;
-            tryPop(e.touches[0].clientX, e.touches[0].clientY);
+            if (!state.gameOver) {
+                player.targetX = e.touches[0].clientX;
+                player.targetY = e.touches[0].clientY;
+                tryPop(e.touches[0].clientX, e.touches[0].clientY);
+            }
         }, { passive: false });
 
         // ========================
         // POP MECHANIC
         // ========================
         function tryPop(mx, my) {
-            const char = characters[state.selectedChar];
-            let popped = false;
+            const char = getCharStats(state.selectedChar);
 
             player.attacking = true;
             player.attackTimer = 0;
@@ -690,10 +1145,18 @@
                 const dist = Math.sqrt(dx * dx + dy * dy);
 
                 if (dist < char.popRadius + b.radius) {
+                    // Bomb balloon - lose 3 lives!
+                    if (b.type === 'bomb') {
+                        b.alive = false;
+                        loseLife(3);
+                        createPopEffect(b.x, b.y, -3, b.color, true);
+                        createParticles(b.x, b.y, '#FF0000', 12);
+                        continue;
+                    }
+
                     b.hp--;
                     if (b.hp <= 0) {
                         b.alive = false;
-                        popped = true;
 
                         // Combo
                         state.combo++;
@@ -707,6 +1170,8 @@
                         const coinEarned = b.coins + char.bonusCoins + Math.floor(comboMultiplier / 3);
                         state.coins += coinEarned;
                         state.totalPopped++;
+                        state.levelPopped++;
+                        state.totalCoinsEarned += coinEarned;
 
                         // Effects
                         createPopEffect(b.x, b.y, coinEarned, b.color);
@@ -731,10 +1196,15 @@
             updateHUD();
         }
 
-        function createPopEffect(x, y, coins, color) {
+        function createPopEffect(x, y, coins, color, isNegative) {
             const el = document.createElement('div');
             el.className = 'pop-effect';
-            el.textContent = `+${coins} 🪙`;
+            if (isNegative) {
+                el.textContent = `💣 -${Math.abs(coins)} ❤️`;
+                el.style.color = '#FF0000';
+            } else {
+                el.textContent = `+${coins} 🪙`;
+            }
             el.style.left = x + 'px';
             el.style.top = y + 'px';
             document.body.appendChild(el);
@@ -764,41 +1234,75 @@
         // SPAWN WAVES
         // ========================
         function spawnWave() {
-            const count = 5 + Math.floor(state.level * 1.5);
-            for (let i = 0; i < count; i++) {
+            if (state.gameOver) return;
+            const cfg = getLevelConfig(state.level);
+            for (let i = 0; i < cfg.waveSize; i++) {
                 setTimeout(() => {
-                    const b = new Balloon();
-                    balloons.push(b);
+                    if (!state.gameOver) {
+                        const b = new Balloon();
+                        balloons.push(b);
+                    }
                 }, i * 150);
             }
         }
 
-        // Auto-spawn some balloons periodically
-        setInterval(() => {
-            if (balloons.filter(b => b.alive).length < 5) {
-                const b = new Balloon();
-                balloons.push(b);
-            }
-        }, 2000);
+        // Auto-spawn some balloons periodically (rate based on level)
+        let autoSpawnTimer = null;
+        function startAutoSpawn() {
+            clearInterval(autoSpawnTimer);
+            const cfg = getLevelConfig(state.level);
+            autoSpawnTimer = setInterval(() => {
+                if (state.gameOver) return;
+                if (balloons.filter(b => b.alive).length < 8 + state.level) {
+                    const b = new Balloon();
+                    balloons.push(b);
+                }
+            }, cfg.spawnRate);
+        }
+        startAutoSpawn();
 
         // ========================
         // LEVEL SYSTEM
         // ========================
         function checkLevel() {
-            const newLevel = 1 + Math.floor(state.totalPopped / 20);
-            if (newLevel > state.level) {
-                state.level = newLevel;
+            const cfg = getLevelConfig(state.level);
+            if (state.levelPopped >= cfg.target) {
+                state.level++;
+                state.levelPopped = 0;
+
+                // Level rewards
+                const newCfg = getLevelConfig(state.level);
+                const prevCfg = cfg;
+                if (prevCfg.livesReward > 0) {
+                    state.lives = Math.min(100, state.lives + prevCfg.livesReward);
+                }
+                state.coins += prevCfg.coinBonus;
+                state.totalCoinsEarned += prevCfg.coinBonus;
+
                 showLevelUp();
+                startAutoSpawn(); // update spawn rate
+                updateLevelInfo();
             }
         }
 
         function showLevelUp() {
             const el = document.getElementById('level-up');
-            el.textContent = `🎉 רמה ${state.level}! 🎉`;
+            const cfg = getLevelConfig(state.level - 1);
+            let bonusText = '';
+            if (cfg.livesReward > 0) bonusText += ` +${cfg.livesReward}❤️`;
+            if (cfg.coinBonus > 0) bonusText += ` +${cfg.coinBonus}🪙`;
+            el.textContent = `🎉 שלב ${state.level}! 🎉${bonusText}`;
             el.classList.remove('show');
-            void el.offsetWidth; // reflow
+            void el.offsetWidth;
             el.classList.add('show');
             setTimeout(() => el.classList.remove('show'), 1500);
+        }
+
+        function updateLevelInfo() {
+            const cfg = getLevelConfig(state.level);
+            const infoBar = document.getElementById('level-info-bar');
+            const remaining = cfg.target - state.levelPopped;
+            infoBar.textContent = `שלב ${state.level} | עוד ${remaining} בלונים לשלב הבא`;
         }
 
         // ========================
@@ -808,6 +1312,14 @@
             document.getElementById('coins-display').textContent = state.coins;
             document.getElementById('popped-display').textContent = state.totalPopped;
             document.getElementById('level-display').textContent = state.level;
+            document.getElementById('lives-display').textContent = state.lives;
+
+            // Level progress
+            const cfg = getLevelConfig(state.level);
+            const pct = Math.min(100, (state.levelPopped / cfg.target) * 100);
+            document.getElementById('level-progress-fill').style.width = pct + '%';
+
+            updateLevelInfo();
         }
 
         // ========================
@@ -835,6 +1347,7 @@
                 const owned = state.ownedChars.includes(char.id);
                 const selected = state.selectedChar === char.id;
                 const canAfford = state.coins >= char.price;
+                const stats = getCharStats(char.id);
 
                 const card = document.createElement('div');
                 card.className = `char-card ${owned ? 'owned' : 'locked'} ${selected ? 'selected' : ''}`;
@@ -854,7 +1367,7 @@
                     <div class="char-preview">${char.emoji}</div>
                     <div class="char-name">${char.name}</div>
                     <div class="char-desc">${char.desc}</div>
-                    <div class="char-desc">טווח: ${char.popRadius} | מהירות: x${char.speed}</div>
+                    <div class="char-desc">טווח: ${Math.round(stats.popRadius)} | מהירות: x${stats.speed.toFixed(1)} | בונוס: +${stats.bonusCoins}</div>
                     ${statusHTML}
                 `;
 
@@ -886,6 +1399,84 @@
         }
 
         // ========================
+        // UPGRADE MODAL
+        // ========================
+        function openUpgrade() {
+            document.getElementById('upgrade-overlay').classList.add('active');
+            document.getElementById('upgrade-coins-val').textContent = state.coins;
+            renderUpgrades();
+        }
+
+        function closeUpgrade() {
+            document.getElementById('upgrade-overlay').classList.remove('active');
+        }
+
+        function closeUpgradeOutside(e) {
+            if (e.target === document.getElementById('upgrade-overlay')) closeUpgrade();
+        }
+
+        function renderUpgrades() {
+            const charId = state.selectedChar;
+            const char = characters[charId];
+            document.getElementById('upgrade-char-emoji').textContent = char.emoji;
+            document.getElementById('upgrade-char-name').textContent = char.name;
+            document.getElementById('upgrade-coins-val').textContent = state.coins;
+
+            const list = document.getElementById('upgrade-list');
+            list.innerHTML = '';
+
+            upgradeTypes.forEach(u => {
+                const currentLevel = getUpgradeLevel(charId, u.key);
+                const cost = getUpgradeCost(u, currentLevel);
+                const isMaxed = currentLevel >= UPGRADE_MAX_LEVEL;
+                const canAfford = state.coins >= cost;
+
+                const item = document.createElement('div');
+                item.className = 'upgrade-item';
+
+                // Level dots
+                let dotsHTML = '';
+                for (let i = 0; i < UPGRADE_MAX_LEVEL; i++) {
+                    dotsHTML += `<div class="upgrade-dot ${i < currentLevel ? 'filled' : ''}"></div>`;
+                }
+
+                let btnHTML = '';
+                if (isMaxed) {
+                    btnHTML = `<span class="upgrade-maxed">✓ מקסימום</span>`;
+                } else {
+                    btnHTML = `<button class="upgrade-buy-btn" ${!canAfford ? 'disabled' : ''} onclick="buyUpgrade('${u.key}')">${cost} 🪙 שדרג</button>`;
+                }
+
+                item.innerHTML = `
+                    <div class="upgrade-info">
+                        <div class="upgrade-name">${u.icon} ${u.name}</div>
+                        <div class="upgrade-detail">${u.desc(currentLevel + (isMaxed ? 0 : 1))}</div>
+                        <div class="upgrade-level-dots">${dotsHTML}</div>
+                    </div>
+                    ${btnHTML}
+                `;
+
+                list.appendChild(item);
+            });
+        }
+
+        function buyUpgrade(key) {
+            const charId = state.selectedChar;
+            const upgradeType = upgradeTypes.find(u => u.key === key);
+            const currentLevel = getUpgradeLevel(charId, key);
+            const cost = getUpgradeCost(upgradeType, currentLevel);
+
+            if (currentLevel >= UPGRADE_MAX_LEVEL || state.coins < cost) return;
+
+            state.coins -= cost;
+            if (!state.upgrades[charId]) state.upgrades[charId] = {};
+            state.upgrades[charId][key] = currentLevel + 1;
+
+            updateHUD();
+            renderUpgrades();
+        }
+
+        // ========================
         // DECORATIVE CLOUDS
         // ========================
         function spawnCloud() {
@@ -899,7 +1490,6 @@
             cloud.addEventListener('animationend', () => cloud.remove());
         }
 
-        // Spawn clouds periodically
         setInterval(spawnCloud, 8000);
         spawnCloud();
         setTimeout(spawnCloud, 2000);
@@ -915,7 +1505,7 @@
             for (let i = balloons.length - 1; i >= 0; i--) {
                 const b = balloons[i];
                 if (b.alive) {
-                    b.update();
+                    if (!state.gameOver) b.update();
                     b.draw(ctx);
                 } else {
                     balloons.splice(i, 1);
@@ -923,7 +1513,7 @@
             }
 
             // Draw player
-            drawPlayer();
+            if (!state.gameOver) drawPlayer();
 
             requestAnimationFrame(gameLoop);
         }
@@ -931,6 +1521,7 @@
         // Start
         gameLoop();
         updateHUD();
+        updateLevelInfo();
 
         // Spawn initial balloons
         setTimeout(spawnWave, 500);

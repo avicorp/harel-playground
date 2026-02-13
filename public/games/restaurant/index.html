@@ -1,0 +1,908 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robot Chef</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #f5f5f5;
+      overflow: hidden;
+      height: 100vh;
+      width: 100vw;
+      user-select: none;
+    }
+
+    /* ── Start Screen ── */
+    #start-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      text-align: center;
+    }
+
+    #start-screen h1 {
+      font-size: 3.5rem;
+      margin-bottom: 0.3rem;
+      background: linear-gradient(90deg, #e94560, #ff6b81);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #start-screen .subtitle {
+      font-size: 1.2rem;
+      color: #a0a0b0;
+      margin-bottom: 2rem;
+    }
+
+    #start-screen .robot-icon {
+      font-size: 6rem;
+      margin-bottom: 1rem;
+      animation: bobble 2s ease-in-out infinite;
+    }
+
+    @keyframes bobble {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    .btn {
+      padding: 14px 40px;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(233, 69, 96, 0.4);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #e94560, #ff6b81);
+      color: #fff;
+    }
+
+    .hidden { display: none !important; }
+
+    /* ── Phase Header ── */
+    .phase-header {
+      text-align: center;
+      padding: 12px;
+      background: rgba(0,0,0,0.3);
+    }
+
+    .phase-header h2 {
+      font-size: 1.5rem;
+      color: #ff6b81;
+    }
+
+    .phase-header p {
+      color: #a0a0b0;
+      font-size: 0.95rem;
+    }
+
+    /* ── Grocery Phase ── */
+    #grocery-screen {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    }
+
+    .grocery-area {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    .shelf {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 12px;
+      padding: 16px;
+      overflow-y: auto;
+      align-content: start;
+    }
+
+    .grocery-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255,255,255,0.07);
+      border: 2px solid transparent;
+      border-radius: 14px;
+      padding: 12px 6px;
+      cursor: pointer;
+      transition: transform 0.15s, border-color 0.2s, background 0.2s;
+    }
+
+    .grocery-item:hover {
+      background: rgba(255,255,255,0.12);
+      transform: scale(1.06);
+    }
+
+    .grocery-item.selected {
+      border-color: #e94560;
+      background: rgba(233, 69, 96, 0.15);
+    }
+
+    .grocery-item .emoji {
+      font-size: 2.6rem;
+    }
+
+    .grocery-item .name {
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: #ccc;
+    }
+
+    .basket-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      background: rgba(0,0,0,0.4);
+      min-height: 64px;
+    }
+
+    .basket-items {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      flex: 1;
+    }
+
+    .basket-items .basket-chip {
+      background: rgba(233, 69, 96, 0.25);
+      border: 1px solid #e94560;
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    .basket-chip:hover { opacity: 0.7; }
+
+    .basket-chip .remove { color: #ff6b81; font-weight: bold; }
+
+    .basket-count {
+      color: #a0a0b0;
+      font-size: 0.85rem;
+      margin-right: 12px;
+      white-space: nowrap;
+    }
+
+    /* ── Cutting Phase ── */
+    #cutting-screen {
+      display: none;
+      flex-direction: column;
+      height: 100vh;
+      background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+    }
+
+    .cutting-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .cutting-board {
+      width: min(500px, 90vw);
+      height: min(340px, 50vh);
+      background: linear-gradient(135deg, #c8a06e, #a67c52);
+      border-radius: 24px;
+      border: 6px solid #8b5e3c;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+
+    .cutting-board::before {
+      content: '';
+      position: absolute;
+      inset: 8px;
+      border: 2px dashed rgba(0,0,0,0.15);
+      border-radius: 18px;
+      pointer-events: none;
+    }
+
+    .current-ingredient {
+      font-size: 5rem;
+      transition: transform 0.2s;
+      cursor: pointer;
+      position: absolute;
+      z-index: 2;
+    }
+
+    .cut-line {
+      position: absolute;
+      background: rgba(255,255,255,0.5);
+      z-index: 3;
+      pointer-events: none;
+      border-radius: 2px;
+    }
+
+    .cut-piece {
+      position: absolute;
+      font-size: 2.2rem;
+      transition: transform 0.5s ease-out, opacity 0.5s ease-out;
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    .cut-style-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .cut-btn {
+      padding: 10px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      background: rgba(255,255,255,0.08);
+      color: #f5f5f5;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .cut-btn:hover {
+      background: rgba(233, 69, 96, 0.3);
+      border-color: #e94560;
+      transform: scale(1.05);
+    }
+
+    .cut-btn.active {
+      background: rgba(233, 69, 96, 0.4);
+      border-color: #e94560;
+    }
+
+    .ingredient-queue {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+      background: rgba(0,0,0,0.2);
+      padding: 8px 16px;
+      border-radius: 12px;
+    }
+
+    .queue-item {
+      font-size: 1.8rem;
+      opacity: 0.4;
+      transition: opacity 0.3s;
+    }
+
+    .queue-item.current { opacity: 1; }
+    .queue-item.done { opacity: 0.15; }
+
+    .cut-feedback {
+      position: absolute;
+      top: 10px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #ffda79;
+      opacity: 0;
+      transition: opacity 0.3s;
+      z-index: 10;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.5);
+    }
+
+    .cut-feedback.show { opacity: 1; }
+
+    /* ── Serving / Scoring Phase ── */
+    #score-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      text-align: center;
+      gap: 20px;
+    }
+
+    .serving-robot {
+      font-size: 6rem;
+      animation: bobble 2s ease-in-out infinite;
+    }
+
+    .dish-display {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: center;
+      background: rgba(255,255,255,0.05);
+      padding: 16px 24px;
+      border-radius: 16px;
+      max-width: 400px;
+    }
+
+    .dish-piece {
+      font-size: 1.8rem;
+    }
+
+    .score-reveal {
+      font-size: 2rem;
+      color: #ff6b81;
+      opacity: 0;
+      transition: opacity 0.6s;
+    }
+
+    .score-reveal.show { opacity: 1; }
+
+    .score-stars {
+      font-size: 2.5rem;
+      letter-spacing: 6px;
+    }
+
+    .score-number {
+      font-size: 3.5rem;
+      font-weight: bold;
+      background: linear-gradient(90deg, #ffda79, #e94560);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .score-breakdown {
+      text-align: left;
+      background: rgba(255,255,255,0.05);
+      padding: 16px 24px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      color: #a0a0b0;
+      line-height: 1.8;
+    }
+
+    .score-breakdown span { color: #ffda79; font-weight: bold; }
+
+    .robot-comment {
+      font-size: 1.15rem;
+      font-style: italic;
+      color: #a0a0b0;
+      max-width: 360px;
+    }
+
+    /* ── Knife cursor during cutting ── */
+    #cutting-screen .cutting-board {
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%94%AA%3C/text%3E%3C/svg%3E") 4 4, crosshair;
+    }
+
+    /* ── Animations ── */
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px) rotate(-2deg); }
+      75% { transform: translateX(6px) rotate(2deg); }
+    }
+
+    .shake { animation: shake 0.3s ease-in-out; }
+
+    @keyframes pop-in {
+      0% { transform: scale(0); opacity: 0; }
+      70% { transform: scale(1.2); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .pop-in { animation: pop-in 0.4s ease-out forwards; }
+
+    @keyframes float-up {
+      0% { transform: translateY(0); opacity: 1; }
+      100% { transform: translateY(-60px); opacity: 0; }
+    }
+
+    .float-up { animation: float-up 1s ease-out forwards; }
+
+    @keyframes robot-eat {
+      0% { transform: scale(1); }
+      30% { transform: scale(1.15) rotate(-5deg); }
+      60% { transform: scale(0.95) rotate(5deg); }
+      100% { transform: scale(1) rotate(0deg); }
+    }
+
+    .robot-eat { animation: robot-eat 0.8s ease-in-out; }
+  </style>
+</head>
+<body>
+
+  <!-- ══════ START SCREEN ══════ -->
+  <div id="start-screen">
+    <div class="robot-icon">🤖</div>
+    <h1>Robot Chef</h1>
+    <p class="subtitle">Pick ingredients, chop them up, and impress the robot judge!</p>
+    <br />
+    <button class="btn btn-primary" id="btn-start">Start Cooking!</button>
+  </div>
+
+  <!-- ══════ GROCERY PHASE ══════ -->
+  <div id="grocery-screen" class="hidden">
+    <div class="phase-header">
+      <h2>Step 1: Pick Your Ingredients</h2>
+      <p>Choose 3 - 6 fruits and vegetables for your dish</p>
+    </div>
+    <div class="grocery-area">
+      <div class="shelf" id="shelf"></div>
+    </div>
+    <div class="basket-bar">
+      <div class="basket-items" id="basket-items"></div>
+      <span class="basket-count" id="basket-count">0 / 6</span>
+      <button class="btn btn-primary" id="btn-to-cutting" disabled>Next: Cut &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ══════ CUTTING PHASE ══════ -->
+  <div id="cutting-screen" class="hidden">
+    <div class="phase-header">
+      <h2>Step 2: Chop Your Ingredients</h2>
+      <p>Pick a cut style, then click the ingredient to chop!</p>
+    </div>
+    <div class="cutting-area">
+      <div class="cut-feedback" id="cut-feedback"></div>
+      <div class="cutting-board" id="cutting-board">
+        <div class="current-ingredient" id="current-ingredient"></div>
+      </div>
+      <div class="cut-style-buttons" id="cut-style-buttons">
+        <button class="cut-btn active" data-cut="slice">Slice</button>
+        <button class="cut-btn" data-cut="dice">Dice</button>
+        <button class="cut-btn" data-cut="julienne">Julienne</button>
+      </div>
+      <div class="ingredient-queue" id="ingredient-queue"></div>
+    </div>
+  </div>
+
+  <!-- ══════ SCORE SCREEN ══════ -->
+  <div id="score-screen" class="hidden">
+    <div class="serving-robot" id="serving-robot">🤖</div>
+    <h2 id="score-title">The robot is tasting your dish...</h2>
+    <div class="dish-display" id="dish-display"></div>
+    <div class="score-reveal" id="score-reveal">
+      <div class="score-stars" id="score-stars"></div>
+      <div class="score-number" id="score-number"></div>
+    </div>
+    <div class="score-breakdown hidden" id="score-breakdown"></div>
+    <div class="robot-comment hidden" id="robot-comment"></div>
+    <button class="btn btn-primary hidden" id="btn-restart">Play Again</button>
+  </div>
+
+  <script>
+    /* ═══════════════════════════════════════
+       DATA
+    ═══════════════════════════════════════ */
+    const INGREDIENTS = [
+      // Fruits
+      { emoji: '🍎', name: 'Apple',      type: 'fruit',  tier: 2 },
+      { emoji: '🍌', name: 'Banana',     type: 'fruit',  tier: 1 },
+      { emoji: '🍇', name: 'Grapes',     type: 'fruit',  tier: 2 },
+      { emoji: '🍓', name: 'Strawberry', type: 'fruit',  tier: 3 },
+      { emoji: '🍊', name: 'Orange',     type: 'fruit',  tier: 2 },
+      { emoji: '🍋', name: 'Lemon',      type: 'fruit',  tier: 1 },
+      { emoji: '🍑', name: 'Peach',      type: 'fruit',  tier: 3 },
+      { emoji: '🍍', name: 'Pineapple',  type: 'fruit',  tier: 3 },
+      { emoji: '🥝', name: 'Kiwi',       type: 'fruit',  tier: 2 },
+      { emoji: '🫐', name: 'Blueberry',  type: 'fruit',  tier: 3 },
+      { emoji: '🥭', name: 'Mango',      type: 'fruit',  tier: 3 },
+      { emoji: '🍉', name: 'Watermelon', type: 'fruit',  tier: 2 },
+      // Vegetables
+      { emoji: '🥕', name: 'Carrot',     type: 'veggie', tier: 2 },
+      { emoji: '🥒', name: 'Cucumber',   type: 'veggie', tier: 1 },
+      { emoji: '🍅', name: 'Tomato',     type: 'veggie', tier: 2 },
+      { emoji: '🫑', name: 'Pepper',     type: 'veggie', tier: 2 },
+      { emoji: '🥦', name: 'Broccoli',   type: 'veggie', tier: 2 },
+      { emoji: '🌽', name: 'Corn',       type: 'veggie', tier: 1 },
+      { emoji: '🥬', name: 'Lettuce',    type: 'veggie', tier: 1 },
+      { emoji: '🧅', name: 'Onion',      type: 'veggie', tier: 1 },
+      { emoji: '🥑', name: 'Avocado',    type: 'veggie', tier: 3 },
+      { emoji: '🍆', name: 'Eggplant',   type: 'veggie', tier: 2 },
+      { emoji: '🌶️', name: 'Chili',      type: 'veggie', tier: 2 },
+      { emoji: '🧄', name: 'Garlic',     type: 'veggie', tier: 1 },
+    ];
+
+    // Best cut for each ingredient (affects score)
+    const BEST_CUTS = {
+      'Apple': 'slice', 'Banana': 'slice', 'Grapes': 'dice',
+      'Strawberry': 'slice', 'Orange': 'slice', 'Lemon': 'slice',
+      'Peach': 'slice', 'Pineapple': 'dice', 'Kiwi': 'slice',
+      'Blueberry': 'dice', 'Mango': 'dice', 'Watermelon': 'slice',
+      'Carrot': 'julienne', 'Cucumber': 'slice', 'Tomato': 'dice',
+      'Pepper': 'julienne', 'Broccoli': 'dice', 'Corn': 'slice',
+      'Lettuce': 'julienne', 'Onion': 'dice', 'Avocado': 'slice',
+      'Eggplant': 'slice', 'Chili': 'julienne', 'Garlic': 'dice',
+    };
+
+    // Combo bonuses: mixing types scores better
+    const ROBOT_COMMENTS = {
+      high:   [
+        '"Magnificent! My circuits are overloading with flavor!"',
+        '"This is... *chef\'s kiss*... perfection in a plate!"',
+        '"My taste sensors have never been happier!"',
+        '"Outstanding! I\'m saving this recipe to my hard drive!"',
+      ],
+      medium: [
+        '"Not bad! My processors are mildly impressed."',
+        '"A decent dish. I\'ve tasted worse... and better."',
+        '"Interesting choices. My taste buds are intrigued."',
+        '"Solid effort! My satisfaction meter reads: moderate."',
+      ],
+      low:    [
+        '"Hmm... my error-handling module just kicked in."',
+        '"I think my taste sensors need recalibrating after that."',
+        '"Bold choices, I\'ll give you that... but bold isn\'t always good."',
+        '"My culinary database has no record of this combination."',
+      ],
+    };
+
+    /* ═══════════════════════════════════════
+       STATE
+    ═══════════════════════════════════════ */
+    let basket = [];          // array of ingredient objects
+    let cutResults = [];      // { ingredient, cutStyle, score }
+    let currentCutIndex = 0;
+    let selectedCutStyle = 'slice';
+    let cuttingInProgress = false;
+
+    /* ═══════════════════════════════════════
+       ELEMENTS
+    ═══════════════════════════════════════ */
+    const $startScreen   = document.getElementById('start-screen');
+    const $groceryScreen = document.getElementById('grocery-screen');
+    const $cuttingScreen = document.getElementById('cutting-screen');
+    const $scoreScreen   = document.getElementById('score-screen');
+    const $shelf         = document.getElementById('shelf');
+    const $basketItems   = document.getElementById('basket-items');
+    const $basketCount   = document.getElementById('basket-count');
+    const $btnToCutting  = document.getElementById('btn-to-cutting');
+    const $board         = document.getElementById('cutting-board');
+    const $currentIng    = document.getElementById('current-ingredient');
+    const $queue         = document.getElementById('ingredient-queue');
+    const $cutFeedback   = document.getElementById('cut-feedback');
+    const $cutButtons    = document.getElementById('cut-style-buttons');
+
+    /* ═══════════════════════════════════════
+       START
+    ═══════════════════════════════════════ */
+    document.getElementById('btn-start').addEventListener('click', () => {
+      $startScreen.classList.add('hidden');
+      $groceryScreen.style.display = 'flex';
+      buildShelf();
+    });
+
+    /* ═══════════════════════════════════════
+       GROCERY PHASE
+    ═══════════════════════════════════════ */
+    function buildShelf() {
+      $shelf.innerHTML = '';
+      INGREDIENTS.forEach((ing, i) => {
+        const div = document.createElement('div');
+        div.className = 'grocery-item';
+        div.dataset.index = i;
+        div.innerHTML = `<span class="emoji">${ing.emoji}</span><span class="name">${ing.name}</span>`;
+        div.addEventListener('click', () => toggleIngredient(i, div));
+        $shelf.appendChild(div);
+      });
+    }
+
+    function toggleIngredient(index, el) {
+      const ing = INGREDIENTS[index];
+      const inBasket = basket.findIndex(b => b.name === ing.name);
+      if (inBasket !== -1) {
+        basket.splice(inBasket, 1);
+        el.classList.remove('selected');
+      } else {
+        if (basket.length >= 6) return; // max 6
+        basket.push({ ...ing });
+        el.classList.add('selected');
+      }
+      updateBasketUI();
+    }
+
+    function updateBasketUI() {
+      $basketItems.innerHTML = '';
+      basket.forEach((ing, i) => {
+        const chip = document.createElement('div');
+        chip.className = 'basket-chip pop-in';
+        chip.innerHTML = `${ing.emoji} ${ing.name} <span class="remove">&times;</span>`;
+        chip.addEventListener('click', () => {
+          basket.splice(i, 1);
+          // deselect on shelf
+          document.querySelectorAll('.grocery-item').forEach(el => {
+            if (INGREDIENTS[el.dataset.index].name === ing.name) {
+              el.classList.remove('selected');
+            }
+          });
+          updateBasketUI();
+        });
+        $basketItems.appendChild(chip);
+      });
+      $basketCount.textContent = `${basket.length} / 6`;
+      $btnToCutting.disabled = basket.length < 3;
+    }
+
+    $btnToCutting.addEventListener('click', () => {
+      if (basket.length < 3) return;
+      $groceryScreen.style.display = 'none';
+      $cuttingScreen.style.display = 'flex';
+      startCuttingPhase();
+    });
+
+    /* ═══════════════════════════════════════
+       CUTTING PHASE
+    ═══════════════════════════════════════ */
+    function startCuttingPhase() {
+      cutResults = [];
+      currentCutIndex = 0;
+      buildQueue();
+      showCurrentIngredient();
+    }
+
+    function buildQueue() {
+      $queue.innerHTML = '';
+      basket.forEach((ing, i) => {
+        const span = document.createElement('span');
+        span.className = 'queue-item' + (i === 0 ? ' current' : '');
+        span.textContent = ing.emoji;
+        span.id = `q-${i}`;
+        $queue.appendChild(span);
+      });
+    }
+
+    function showCurrentIngredient() {
+      if (currentCutIndex >= basket.length) {
+        // All cut — move to scoring
+        setTimeout(() => goToScoring(), 600);
+        return;
+      }
+      const ing = basket[currentCutIndex];
+      $currentIng.textContent = ing.emoji;
+      $currentIng.style.transform = 'scale(1)';
+      $currentIng.style.opacity = '1';
+      cuttingInProgress = false;
+
+      // Clear old pieces
+      $board.querySelectorAll('.cut-piece, .cut-line').forEach(el => el.remove());
+    }
+
+    // Cut style selection
+    $cutButtons.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cut-btn');
+      if (!btn) return;
+      $cutButtons.querySelectorAll('.cut-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedCutStyle = btn.dataset.cut;
+    });
+
+    // Click to cut
+    $board.addEventListener('click', (e) => {
+      if (cuttingInProgress || currentCutIndex >= basket.length) return;
+      cuttingInProgress = true;
+
+      const ing = basket[currentCutIndex];
+      const bestCut = BEST_CUTS[ing.name] || 'slice';
+      const isGoodCut = selectedCutStyle === bestCut;
+
+      // Visual: show cut lines
+      showCutAnimation(selectedCutStyle, isGoodCut);
+
+      // Score this cut
+      let cutScore = ing.tier * 10; // base from ingredient tier
+      if (isGoodCut) {
+        cutScore += 15; // bonus for right cut
+      } else {
+        cutScore += 5;  // small bonus anyway
+      }
+
+      cutResults.push({
+        ingredient: ing,
+        cutStyle: selectedCutStyle,
+        bestCut: bestCut,
+        isGoodCut,
+        score: cutScore,
+      });
+
+      // Feedback
+      showFeedback(isGoodCut
+        ? `Perfect ${selectedCutStyle}!`
+        : `${selectedCutStyle.charAt(0).toUpperCase() + selectedCutStyle.slice(1)}ed! (Try ${bestCut} next time)`
+      , isGoodCut);
+
+      // Update queue
+      const qCurrent = document.getElementById(`q-${currentCutIndex}`);
+      if (qCurrent) { qCurrent.classList.remove('current'); qCurrent.classList.add('done'); }
+      currentCutIndex++;
+      const qNext = document.getElementById(`q-${currentCutIndex}`);
+      if (qNext) qNext.classList.add('current');
+
+      // Next ingredient after animation
+      setTimeout(() => showCurrentIngredient(), 900);
+    });
+
+    function showCutAnimation(style, isGood) {
+      const boardRect = $board.getBoundingClientRect();
+      const cx = boardRect.width / 2;
+      const cy = boardRect.height / 2;
+
+      // Shake the board
+      $board.classList.add('shake');
+      setTimeout(() => $board.classList.remove('shake'), 300);
+
+      // Hide the main ingredient
+      $currentIng.style.transform = 'scale(0)';
+      $currentIng.style.opacity = '0';
+
+      const ing = basket[currentCutIndex >= basket.length ? basket.length - 1 : currentCutIndex];
+
+      // Create cut pieces
+      let pieces = [];
+      if (style === 'slice') {
+        // 2 halves flying apart
+        pieces = [
+          { x: cx - 50, y: cy, dx: -40, dy: -20 },
+          { x: cx + 10, y: cy, dx: 40, dy: 20 },
+        ];
+        addCutLine(cx, cy - 50, 3, 100, 0);
+      } else if (style === 'dice') {
+        // 4 small pieces
+        pieces = [
+          { x: cx - 30, y: cy - 30, dx: -30, dy: -30 },
+          { x: cx + 10, y: cy - 30, dx: 30, dy: -30 },
+          { x: cx - 30, y: cy + 10, dx: -30, dy: 30 },
+          { x: cx + 10, y: cy + 10, dx: 30, dy: 30 },
+        ];
+        addCutLine(cx, cy - 50, 3, 100, 0);
+        addCutLine(cx - 50, cy, 100, 3, 0);
+      } else if (style === 'julienne') {
+        // 3 strips
+        pieces = [
+          { x: cx - 40, y: cy, dx: -35, dy: -10 },
+          { x: cx,      y: cy, dx: 0,   dy: -25 },
+          { x: cx + 40, y: cy, dx: 35,  dy: -10 },
+        ];
+        addCutLine(cx - 20, cy - 50, 2, 100, 0);
+        addCutLine(cx + 20, cy - 50, 2, 100, 0);
+      }
+
+      pieces.forEach((p, i) => {
+        const el = document.createElement('div');
+        el.className = 'cut-piece';
+        el.textContent = ing.emoji;
+        el.style.left = p.x + 'px';
+        el.style.top = p.y + 'px';
+        el.style.fontSize = style === 'dice' ? '1.6rem' : '2.2rem';
+        $board.appendChild(el);
+
+        requestAnimationFrame(() => {
+          el.style.transform = `translate(${p.dx}px, ${p.dy}px)`;
+          el.style.opacity = '0.3';
+        });
+      });
+    }
+
+    function addCutLine(x, y, w, h, rot) {
+      const line = document.createElement('div');
+      line.className = 'cut-line';
+      line.style.left = x + 'px';
+      line.style.top = y + 'px';
+      line.style.width = w + 'px';
+      line.style.height = h + 'px';
+      line.style.transform = `rotate(${rot}deg)`;
+      $board.appendChild(line);
+      setTimeout(() => line.style.opacity = '0', 400);
+    }
+
+    function showFeedback(text, isGood) {
+      $cutFeedback.textContent = (isGood ? '⭐ ' : '') + text;
+      $cutFeedback.style.color = isGood ? '#ffda79' : '#a0a0b0';
+      $cutFeedback.classList.add('show');
+      setTimeout(() => $cutFeedback.classList.remove('show'), 1200);
+    }
+
+    /* ═══════════════════════════════════════
+       SCORING PHASE
+    ═══════════════════════════════════════ */
+    function goToScoring() {
+      $cuttingScreen.style.display = 'none';
+      $scoreScreen.style.display = 'flex';
+
+      // Show dish pieces
+      const $dish = document.getElementById('dish-display');
+      $dish.innerHTML = '';
+      cutResults.forEach(r => {
+        const span = document.createElement('span');
+        span.className = 'dish-piece pop-in';
+        span.textContent = r.ingredient.emoji;
+        $dish.appendChild(span);
+      });
+
+      // Robot eat animation
+      const $robot = document.getElementById('serving-robot');
+      setTimeout(() => {
+        $robot.classList.add('robot-eat');
+        setTimeout(() => $robot.classList.remove('robot-eat'), 800);
+      }, 800);
+
+      // Calculate score
+      setTimeout(() => revealScore(), 2200);
+    }
+
+    function revealScore() {
+      // Ingredient score
+      const ingredientScore = cutResults.reduce((sum, r) => sum + r.ingredient.tier * 10, 0);
+
+      // Cutting score
+      const perfectCuts = cutResults.filter(r => r.isGoodCut).length;
+      const cuttingScore = perfectCuts * 15 + (cutResults.length - perfectCuts) * 5;
+
+      // Variety bonus
+      const types = new Set(cutResults.map(r => r.ingredient.type));
+      const varietyBonus = types.size > 1 ? 15 : 0;
+
+      // Unique ingredients bonus
+      const uniqueNames = new Set(cutResults.map(r => r.ingredient.name));
+      const uniqueBonus = uniqueNames.size >= 5 ? 10 : (uniqueNames.size >= 4 ? 5 : 0);
+
+      const totalRaw = ingredientScore + cuttingScore + varietyBonus + uniqueBonus;
+
+      // Normalize to 0-100
+      // Max possible: 6 tier-3 ingredients = 180, 6 perfect cuts = 90, variety = 15, unique = 10 → 295
+      const maxPossible = 295;
+      const finalScore = Math.min(100, Math.round((totalRaw / maxPossible) * 100));
+
+      // Stars (out of 5)
+      const stars = finalScore >= 90 ? 5 : finalScore >= 75 ? 4 : finalScore >= 55 ? 3 : finalScore >= 35 ? 2 : 1;
+
+      // UI
+      document.getElementById('score-title').textContent = 'The robot has spoken!';
+      const $reveal = document.getElementById('score-reveal');
+      $reveal.classList.add('show');
+      document.getElementById('score-stars').textContent = '⭐'.repeat(stars) + '☆'.repeat(5 - stars);
+      document.getElementById('score-number').textContent = finalScore + ' / 100';
+
+      // Breakdown
+      const $breakdown = document.getElementById('score-breakdown');
+      $breakdown.classList.remove('hidden');
+      $breakdown.innerHTML = `
+        Ingredient quality: <span>+${ingredientScore}</span><br>
+        Cutting technique (${perfectCuts}/${cutResults.length} perfect): <span>+${cuttingScore}</span><br>
+        ${varietyBonus > 0 ? `Mix of fruits & veggies: <span>+${varietyBonus}</span><br>` : ''}
+        ${uniqueBonus > 0 ? `Variety bonus: <span>+${uniqueBonus}</span><br>` : ''}
+      `;
+
+      // Robot comment
+      const tier = finalScore >= 70 ? 'high' : finalScore >= 40 ? 'medium' : 'low';
+      const comments = ROBOT_COMMENTS[tier];
+      const $comment = document.getElementById('robot-comment');
+      $comment.classList.remove('hidden');
+      $comment.textContent = comments[Math.floor(Math.random() * comments.length)];
+
+      // Restart button
+      const $restart = document.getElementById('btn-restart');
+      $restart.classList.remove('hidden');
+      $restart.addEventListener('click', () => {
+        location.reload();
+      });
+    }
+  </script>
+</body>
+</html>

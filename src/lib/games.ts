@@ -32,6 +32,14 @@ export const games: Game[] = [
     description: "Swipe to slice flying fruits! Avoid bombs and chain combos for high scores.",
     path: "/games/fruit-ninja/index.html",
   },
+  {
+    slug: "restaurant",
+    title: "Robot Chef",
+    titleHe: "שף רובוט",
+    emoji: "🤖",
+    description: "Pick ingredients, chop them on a cutting board, and serve to a robot judge!",
+    path: "/games/restaurant/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

@@ -1,42 +1,61 @@
 # Harel Playground
 
-This is Harel's collection of fun games and projects. Everything is built with plain HTML, CSS, and JavaScript -- no fancy setup needed. Just open a file in your browser and play!
+A game portal built with Next.js. The homepage shows the latest game fullscreen with a nav bar for switching between games.
 
-## How This Repo Is Organized
-
-Each game or project lives in **its own folder**. Inside each folder there is always an `index.html` file -- that's the file you open to run the game. Some games also have extra files like `style.css` (for how it looks) and `game.js` or `script.js` (for how it works). All of a game's files stay together in the same folder.
-
-At the very top of the repo there is a **main `index.html`** file. This is the homepage -- it shows a nice card for every game with a link to play it.
+## Repo Structure
 
 ```
 harel-playground/
-  index.html          <-- homepage with links to all games
-  README.md           <-- description of the repo
-  CLAUDE.md           <-- this file (rules for working here)
-  space-shooter/      <-- space shooting game
-    index.html
-    style.css
-    game.js
-  balloon-popper/     <-- balloon popping game
-    index.html
-  animated-site/      <-- animated portfolio website
-    index.html
-    style.css
-    script.js
+  package.json             <-- Node project config
+  next.config.ts           <-- Next.js config (static export)
+  tsconfig.json            <-- TypeScript config
+  src/
+    app/
+      layout.tsx           <-- root layout
+      page.tsx             <-- homepage (shows latest game)
+      globals.css          <-- global styles
+      games/[slug]/
+        page.tsx           <-- dynamic game page
+    components/
+      Navbar.tsx           <-- nav bar with game menu
+      GameFrame.tsx        <-- iframe wrapper for games
+    lib/
+      games.ts             <-- game registry (add new games here)
+  public/
+    games/
+      space-shooter/       <-- space shooting game (HTML/CSS/JS)
+      balloon-popper/      <-- balloon popping game (HTML/CSS/JS)
+  .github/
+    workflows/
+      deploy.yml           <-- CI/CD: build + deploy to GitHub Pages
+  SETUP.md                 <-- deployment & custom domain instructions
+  README.md
+  CLAUDE.md                <-- this file
 ```
 
 ## Rules for Working in This Repo
 
-1. **Work directly on `main`** -- no extra branches, no pull requests. Just push straight to `main`.
-2. **When you add a new game**, you must do two extra things:
-   - Add a link to it in the **root `index.html`** (the homepage) so people can find it.
-   - Add a short description of it in **`README.md`**.
-3. **Keep each game in its own folder** with its own `index.html`.
+1. **When adding a new game:**
+   - Put game files in `public/games/<game-name>/` with an `index.html`
+   - Add an entry to the `games` array in `src/lib/games.ts`
+   - The last entry in the array is the "latest" game shown on the homepage
+2. **Keep games as plain HTML/CSS/JS** — they run in iframes, no build step needed for game code.
+3. **Don't modify game HTML files** to add framework dependencies — games must work standalone.
 
-## The Games So Far
+## Games
 
 | Folder | What Is It? |
 |---|---|
-| `space-shooter/` | A space shooting game -- fly a spaceship and blast enemies! |
-| `balloon-popper/` | Pop as many balloons as you can! |
-| `animated-site/` | A portfolio website with cool animations. |
+| `public/games/space-shooter/` | Fly a spaceship and blast enemies! |
+| `public/games/balloon-popper/` | Pop as many balloons as you can! |
+
+## Development
+
+```bash
+npm install
+npm run dev
+```
+
+## Deployment
+
+Push to `main` triggers GitHub Actions to build and deploy to GitHub Pages. See `SETUP.md` for custom domain setup.

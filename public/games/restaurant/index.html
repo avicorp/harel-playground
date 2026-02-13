@@ -585,6 +585,7 @@
     ═══════════════════════════════════════ */
     document.getElementById('btn-start').addEventListener('click', () => {
       $startScreen.classList.add('hidden');
+      $groceryScreen.classList.remove('hidden');
       $groceryScreen.style.display = 'flex';
       buildShelf();
     });
@@ -643,6 +644,7 @@
     $btnToCutting.addEventListener('click', () => {
       if (basket.length < 3) return;
       $groceryScreen.style.display = 'none';
+      $cuttingScreen.classList.remove('hidden');
       $cuttingScreen.style.display = 'flex';
       startCuttingPhase();
     });
@@ -823,6 +825,7 @@
     ═══════════════════════════════════════ */
     function goToScoring() {
       $cuttingScreen.style.display = 'none';
+      $scoreScreen.classList.remove('hidden');
       $scoreScreen.style.display = 'flex';
 
       // Show dish pieces

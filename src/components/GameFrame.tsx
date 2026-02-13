@@ -2,11 +2,13 @@
 
 import { type Game } from "@/lib/games";
 
+const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
+
 export default function GameFrame({ game }: { game: Game }) {
   return (
     <div style={styles.container}>
       <iframe
-        src={game.path}
+        src={`${basePath}${game.path}`}
         style={styles.iframe}
         title={game.title}
         allow="autoplay"

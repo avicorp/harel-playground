@@ -24,6 +24,14 @@ export const games: Game[] = [
     description: "Pop as many balloons as you can! Upgrade characters and unlock new abilities.",
     path: "/games/balloon-popper/index.html",
   },
+  {
+    slug: "fruit-ninja",
+    title: "Fruit Ninja",
+    titleHe: "חותך פירות",
+    emoji: "🍉",
+    description: "Swipe to slice flying fruits! Avoid bombs and chain combos for high scores.",
+    path: "/games/fruit-ninja/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

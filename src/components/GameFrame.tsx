@@ -2,11 +2,13 @@
 
 import { type Game } from "@/lib/games";
 
+const basePath = process.env.NODE_ENV === "production" ? "/harel-playground" : "";
+
 export default function GameFrame({ game }: { game: Game }) {
   return (
     <div style={styles.container}>
       <iframe
-        src={game.path}
+        src={`${basePath}${game.path}`}
         style={styles.iframe}
         title={game.title}
         allow="autoplay"

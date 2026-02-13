@@ -1,9 +1,26 @@
-# harel-playground
+# Harel Playground
 
-This repository contains sample code by Harel. Each app is typically a single HTML file kept inside its own directory. When a project requires additional assets such as images, stylesheets, or scripts, they will be stored alongside the HTML file in that directory.
+A game portal built with Next.js. The main page shows the latest game, and a nav bar menu lets you switch between all available games.
 
-## Projects
+## Games
 
-- **animated-site** – a single-page portfolio with an animated gradient background, interactive carousel controls, and SEO-friendly markup
-- **balloon-popper** – a balloon popping game
-- **space-shooter** – a simple JavaScript arcade game
+| Game | Description |
+|------|-------------|
+| **Space Shooter** 🚀 | Fly a spaceship and blast enemies in space |
+| **Balloon Popper** 🎈 | Pop balloons, upgrade characters, unlock abilities |
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+See [SETUP.md](./SETUP.md) for deployment and custom domain instructions.
+
+## How It Works
+
+- Next.js serves the portal with a nav bar and game menu
+- Each game is plain HTML/CSS/JS in `public/games/` embedded via iframe
+- The latest game in `src/lib/games.ts` is shown on the homepage
+- CI/CD via GitHub Actions deploys to GitHub Pages on push to `main`

@@ -202,6 +202,76 @@
     .mode-name { font-size: 1.05em; font-weight: 700; }
     .mode-desc { font-size: 0.85em; color: var(--text-light); margin-top: 2px; }
 
+    /* ===== ROUND SELECT ===== */
+    .round-grid {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+    .round-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 14px 24px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 3px solid transparent;
+      min-width: 90px;
+    }
+    .round-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .round-card.selected {
+      border-color: var(--primary);
+      background: #E8F0FE;
+    }
+    .round-card .round-number {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: var(--primary);
+      display: block;
+    }
+    .round-card .round-label {
+      font-size: 0.85em;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+
+    /* ===== ROUND BANNER ===== */
+    .round-banner {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      animation: fadeIn 0.3s ease;
+    }
+    .round-banner-content {
+      background: white;
+      border-radius: 24px;
+      padding: 40px 50px;
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      animation: popCorrect 0.4s ease;
+    }
+    .round-banner-emoji { font-size: 3em; margin-bottom: 10px; }
+    .round-banner-title {
+      font-size: 1.8em;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .round-banner-sub {
+      font-size: 1.1em;
+      color: var(--text-light);
+      margin-top: 5px;
+    }
+
     /* ===== START BUTTON ===== */
     .start-btn {
       background: linear-gradient(135deg, var(--success), #45a049);
@@ -533,6 +603,9 @@
   <div class="section-label">בחר סוג משחק 🎮</div>
   <div class="mode-grid" id="mode-grid"></div>
 
+  <div class="section-label">כמה סיבובים? 🔄</div>
+  <div class="round-grid" id="round-grid"></div>
+
   <button class="start-btn" id="start-btn" disabled onclick="startGame()">!יאללה נתחיל 🚀</button>
 </div>
 
@@ -544,6 +617,7 @@
     <div class="score-display">⭐ <span id="score">0</span></div>
   </div>
 
+  <div class="progress-text" id="round-text" style="margin-top:10px; font-weight:700; color:var(--primary);"></div>
   <div class="progress-bar-container">
     <div class="bar-wrap">
       <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
@@ -727,16 +801,20 @@ const MODES = [
   },
 ];
 
-const QUESTIONS_PER_ROUND = 10;
+const WORDS_PER_ROUND = 10;
 const OPTIONS_COUNT = 4;
+const ROUND_OPTIONS = [1, 3, 5];
 
 // ============================================================
 //  STATE
 // ============================================================
 let selectedTopic = null;
 let selectedMode = null;
-let currentWords = [];
-let currentQuestionIndex = 0;
+let selectedRounds = null;
+let currentRound = 0;
+let questionQueue = [];
+let questionIndex = 0;
+let totalQuestionsAnswered = 0;
 let score = 0;
 let correctCount = 0;
 let isAnswered = false;
@@ -795,6 +873,22 @@ function buildWelcome() {
     card.addEventListener('click', () => selectMode(mode.id));
     modeGrid.appendChild(card);
   });
+
+  // Round selector
+  const roundGrid = document.getElementById('round-grid');
+  roundGrid.innerHTML = '';
+
+  ROUND_OPTIONS.forEach(num => {
+    const card = document.createElement('div');
+    card.className = 'round-card';
+    card.dataset.rounds = num;
+    card.innerHTML = `
+      <span class="round-number">${num}</span>
+      <div class="round-label">${num === 1 ? 'סיבוב' : 'סיבובים'}</div>
+    `;
+    card.addEventListener('click', () => selectRounds(num));
+    roundGrid.appendChild(card);
+  });
 }
 
 function selectTopic(id) {
@@ -813,49 +907,104 @@ function selectMode(id) {
   updateStartBtn();
 }
 
+function selectRounds(num) {
+  selectedRounds = num;
+  document.querySelectorAll('.round-card').forEach(c => {
+    c.classList.toggle('selected', parseInt(c.dataset.rounds) === num);
+  });
+  updateStartBtn();
+}
+
 function updateStartBtn() {
-  document.getElementById('start-btn').disabled = !(selectedTopic && selectedMode);
+  document.getElementById('start-btn').disabled = !(selectedTopic && selectedMode && selectedRounds);
 }
 
 // ============================================================
 //  GAME LOGIC
 // ============================================================
 function startGame() {
-  if (!selectedTopic || !selectedMode) return;
+  if (!selectedTopic || !selectedMode || !selectedRounds) return;
 
-  const topic = TOPICS.find(t => t.id === selectedTopic);
-  const topicWords = [...topic.words];
-  shuffleArray(topicWords);
-  currentWords = topicWords.slice(0, QUESTIONS_PER_ROUND);
-  currentQuestionIndex = 0;
+  currentRound = 0;
   score = 0;
   correctCount = 0;
+  totalQuestionsAnswered = 0;
 
+  const topic = TOPICS.find(t => t.id === selectedTopic);
   const modeObj = MODES.find(m => m.id === selectedMode);
   document.getElementById('game-header-title').textContent =
     `${topic.icon} ${topic.nameHe} - ${modeObj.nameHe}`;
   document.getElementById('score').textContent = '0';
 
   showScreen('game-screen');
-  showQuestion();
+  startNextRound();
 }
 
-function showQuestion() {
-  if (currentQuestionIndex >= currentWords.length) {
+function startNextRound() {
+  currentRound++;
+
+  if (currentRound > selectedRounds) {
     showResults();
     return;
   }
 
+  const topic = TOPICS.find(t => t.id === selectedTopic);
+  const topicWords = [...topic.words];
+  shuffleArray(topicWords);
+  questionQueue = topicWords.slice(0, WORDS_PER_ROUND);
+  questionIndex = 0;
+
+  // Show round banner if more than 1 round
+  if (selectedRounds > 1) {
+    showRoundBanner(currentRound, selectedRounds, () => {
+      showQuestion();
+    });
+  } else {
+    showQuestion();
+  }
+}
+
+function showRoundBanner(round, total, callback) {
+  const banner = document.createElement('div');
+  banner.className = 'round-banner';
+  banner.innerHTML = `
+    <div class="round-banner-content">
+      <div class="round-banner-emoji">🏁</div>
+      <div class="round-banner-title">סיבוב ${round} מתוך ${total}</div>
+      <div class="round-banner-sub">!יאללה</div>
+    </div>
+  `;
+  document.body.appendChild(banner);
+  setTimeout(() => {
+    banner.remove();
+    callback();
+  }, 1500);
+}
+
+function showQuestion() {
+  if (questionIndex >= questionQueue.length) {
+    startNextRound();
+    return;
+  }
+
   isAnswered = false;
-  const word = currentWords[currentQuestionIndex];
+  const word = questionQueue[questionIndex];
   const topic = TOPICS.find(t => t.id === selectedTopic);
   const allWords = topic.words;
 
-  // progress
-  const pct = ((currentQuestionIndex) / currentWords.length) * 100;
-  document.getElementById('progress-bar').style.width = pct + '%';
+  // progress within current round
+  const roundProgress = (questionIndex / questionQueue.length) * 100;
+  document.getElementById('progress-bar').style.width = roundProgress + '%';
   document.getElementById('progress-text').textContent =
-    `שאלה ${currentQuestionIndex + 1} מתוך ${currentWords.length}`;
+    `שאלה ${questionIndex + 1} מתוך ${questionQueue.length}`;
+
+  // round indicator
+  if (selectedRounds > 1) {
+    document.getElementById('round-text').textContent =
+      `סיבוב ${currentRound} מתוך ${selectedRounds}`;
+  } else {
+    document.getElementById('round-text').textContent = '';
+  }
 
   // build distractors
   const distractors = allWords
@@ -911,25 +1060,18 @@ function showQuestion() {
     const btn = document.createElement('button');
     btn.className = 'option-btn';
 
-    let displayText = '';
-    let speakerLang = '';
-    let speakerText = '';
-
     if (selectedMode === 'image-to-english') {
-      displayText = opt.en;
       btn.innerHTML = `
         <button class="option-speaker" onclick="event.stopPropagation(); speakEnglish('${escapeQuotes(opt.en)}')" title="Listen">🔊</button>
         <span class="option-emoji">${opt.emoji}</span>
         <span class="option-text english">${opt.en}</span>
       `;
     } else if (selectedMode === 'english-to-hebrew') {
-      displayText = opt.he;
       btn.innerHTML = `
         <button class="option-speaker" onclick="event.stopPropagation(); speakHebrew('${escapeQuotes(opt.he)}')" title="שמע">🔊</button>
         <span class="option-text hebrew">${opt.he}</span>
       `;
     } else {
-      displayText = opt.en;
       btn.innerHTML = `
         <button class="option-speaker" onclick="event.stopPropagation(); speakEnglish('${escapeQuotes(opt.en)}')" title="Listen">🔊</button>
         <span class="option-text english">${opt.en}</span>
@@ -949,6 +1091,7 @@ function handleAnswer(btn, chosen, correct, optGrid) {
 
   const isCorrect = chosen.en === correct.en;
   const area = document.getElementById('question-area');
+  totalQuestionsAnswered++;
 
   if (isCorrect) {
     btn.classList.add('correct');
@@ -966,9 +1109,7 @@ function handleAnswer(btn, chosen, correct, optGrid) {
     btn.classList.add('wrong');
     // highlight the correct one
     optGrid.querySelectorAll('.option-btn').forEach(b => {
-      const optText = selectedMode === 'english-to-hebrew'
-        ? b.querySelector('.option-text')?.textContent
-        : b.querySelector('.option-text')?.textContent;
+      const optText = b.querySelector('.option-text')?.textContent;
       const correctText = selectedMode === 'english-to-hebrew' ? correct.he : correct.en;
       if (optText === correctText) {
         b.classList.add('correct');
@@ -981,10 +1122,13 @@ function handleAnswer(btn, chosen, correct, optGrid) {
     area.appendChild(fb);
 
     speakEnglish(correct.en);
+
+    // Re-add wrong answer to end of queue for another try
+    questionQueue.push(correct);
   }
 
   setTimeout(() => {
-    currentQuestionIndex++;
+    questionIndex++;
     showQuestion();
   }, 2000);
 }
@@ -995,7 +1139,7 @@ function handleAnswer(btn, chosen, correct, optGrid) {
 function showResults() {
   document.getElementById('progress-bar').style.width = '100%';
 
-  const pct = currentWords.length > 0 ? (correctCount / currentWords.length) : 0;
+  const pct = totalQuestionsAnswered > 0 ? (correctCount / totalQuestionsAnswered) : 0;
   const starCount = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0;
 
   let emoji = '🎉';
@@ -1020,7 +1164,7 @@ function showResults() {
   document.getElementById('results-title').textContent = title;
   document.getElementById('results-subtitle').textContent = subtitle;
   document.getElementById('stat-correct').textContent = correctCount;
-  document.getElementById('stat-total').textContent = currentWords.length;
+  document.getElementById('stat-total').textContent = totalQuestionsAnswered;
 
   const starsHtml = [1,2,3].map(i =>
     `<span class="star ${i <= starCount ? 'earned' : ''}" style="animation-delay: ${i * 0.2}s">⭐</span>`

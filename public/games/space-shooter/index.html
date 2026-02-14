@@ -6,17 +6,72 @@
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+<!-- Start Screen -->
 <div id="start-screen">
-  <h1>Space Shooter</h1>
-  <p>Select your ship:</p>
-  <button class="ship-select" data-color="cyan">Cyan</button>
-  <button class="ship-select" data-color="magenta">Magenta</button>
-  <button class="ship-select" data-color="orange">Orange</button>
-  <br><br>
-  <button id="start-btn">Start Game</button>
+  <div class="title-container">
+    <h1>SPACE SHOOTER</h1>
+    <p class="subtitle">Defend the galaxy</p>
+  </div>
+  <div class="ship-selection">
+    <p class="select-label">Choose your ship:</p>
+    <div class="ship-buttons">
+      <button class="ship-select" data-color="cyan">
+        <span class="ship-preview" style="color:cyan">&#9650;</span>
+        <span class="ship-name">Phantom</span>
+      </button>
+      <button class="ship-select" data-color="magenta">
+        <span class="ship-preview" style="color:magenta">&#9650;</span>
+        <span class="ship-name">Viper</span>
+      </button>
+      <button class="ship-select" data-color="orange">
+        <span class="ship-preview" style="color:orange">&#9650;</span>
+        <span class="ship-name">Blaze</span>
+      </button>
+    </div>
+  </div>
+  <button id="start-btn">LAUNCH</button>
+  <div class="controls-info">
+    <p><strong>Controls:</strong></p>
+    <p>Arrow keys / WASD - Move</p>
+    <p>Space - Fire</p>
+    <p>P / Esc - Pause</p>
+  </div>
 </div>
-<button id="mute-btn">Mute</button>
+
+<!-- Game Canvas -->
 <canvas id="game" width="800" height="600" style="display:none"></canvas>
+
+<!-- Mute Button -->
+<button id="mute-btn" style="display:none">&#128266;</button>
+
+<!-- Pause Overlay -->
+<div id="pause-overlay" style="display:none">
+  <h2>PAUSED</h2>
+  <p>Press P or Esc to resume</p>
+</div>
+
+<!-- Game Over Screen -->
+<div id="gameover-screen" style="display:none">
+  <h2>GAME OVER</h2>
+  <p id="new-highscore" style="display:none">NEW HIGH SCORE!</p>
+  <div class="stats-grid">
+    <div class="stat">
+      <span class="stat-label">Score</span>
+      <span class="stat-value" id="final-score">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Best</span>
+      <span class="stat-value" id="high-score">0</span>
+    </div>
+    <div class="stat">
+      <span class="stat-label">Level</span>
+      <span class="stat-value" id="final-level">1</span>
+    </div>
+  </div>
+  <button id="restart-btn">PLAY AGAIN</button>
+</div>
+
 <script src="game.js"></script>
 </body>
 </html>

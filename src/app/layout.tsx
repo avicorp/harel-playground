@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Harel Playground",
-  description: "A collection of fun games by Harel",
+  title: "מגרש המשחקים של הראל",
+  description: "אוסף משחקים כיפיים מאת הראל",
 };
 
 export default function RootLayout({
@@ -12,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="he" dir="rtl">
       <body
         style={{
           display: "flex",

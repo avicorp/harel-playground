@@ -4,6 +4,7 @@ export interface Game {
   titleHe: string;
   emoji: string;
   description: string;
+  descriptionHe: string;
   path: string;
 }
 
@@ -14,6 +15,7 @@ export const games: Game[] = [
     titleHe: "יריות בחלל",
     emoji: "🚀",
     description: "Fly a spaceship and blast enemies in space!",
+    descriptionHe: "טוסו בחללית והשמידו אויבים בחלל!",
     path: "/games/space-shooter/index.html",
   },
   {
@@ -22,6 +24,7 @@ export const games: Game[] = [
     titleHe: "פוצץ בלונים",
     emoji: "🎈",
     description: "Pop as many balloons as you can! Upgrade characters and unlock new abilities.",
+    descriptionHe: "פוצצו כמה שיותר בלונים! שדרגו דמויות ופתחו יכולות חדשות.",
     path: "/games/balloon-popper/index.html",
   },
   {
@@ -30,6 +33,7 @@ export const games: Game[] = [
     titleHe: "חותך פירות",
     emoji: "🍉",
     description: "Swipe to slice flying fruits! Avoid bombs and chain combos for high scores.",
+    descriptionHe: "החליקו כדי לחתוך פירות מעופפים! הימנעו מפצצות ושרשרו קומבואים לניקוד גבוה.",
     path: "/games/fruit-ninja/index.html",
   },
   {
@@ -38,6 +42,7 @@ export const games: Game[] = [
     titleHe: "שף רובוט",
     emoji: "🤖",
     description: "Pick ingredients, chop them on a cutting board, and serve to a robot judge!",
+    descriptionHe: "בחרו מרכיבים, חתכו אותם על קרש חיתוך והגישו לשופט הרובוט!",
     path: "/games/restaurant/index.html",
   },
   {
@@ -46,6 +51,7 @@ export const games: Game[] = [
     titleHe: "לומדים אנגלית",
     emoji: "📚",
     description: "Learn English words with pictures, sounds, and Hebrew translations!",
+    descriptionHe: "למדו מילים באנגלית עם תמונות, צלילים ותרגומים לעברית!",
     path: "/games/english-learning/index.html",
   },
 ];

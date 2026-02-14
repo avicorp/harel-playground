@@ -22,17 +22,17 @@ export default function Navbar({ currentSlug }: { currentSlug?: string }) {
     <nav style={styles.nav}>
       <Link href="/" style={styles.brand}>
         <span style={styles.brandIcon}>🎮</span>
-        <span style={styles.brandText}>Harel Playground</span>
+        <span style={styles.brandText}>מגרש המשחקים של הראל</span>
       </Link>
 
       <div ref={menuRef} style={styles.menuWrapper}>
         <button
           style={styles.menuButton}
           onClick={() => setMenuOpen(!menuOpen)}
-          aria-label="Game menu"
+          aria-label="תפריט משחקים"
         >
-          <span>Games</span>
-          <span style={{ fontSize: 12, marginRight: 4 }}>
+          <span>משחקים</span>
+          <span style={{ fontSize: 12, marginInlineEnd: 4 }}>
             {menuOpen ? "▲" : "▼"}
           </span>
         </button>
@@ -53,8 +53,8 @@ export default function Navbar({ currentSlug }: { currentSlug?: string }) {
               >
                 <span style={styles.gameEmoji}>{game.emoji}</span>
                 <div>
-                  <div style={styles.gameTitle}>{game.title}</div>
-                  <div style={styles.gameDesc}>{game.titleHe}</div>
+                  <div style={styles.gameTitle}>{game.titleHe}</div>
+                  <div style={styles.gameDesc}>{game.descriptionHe}</div>
                 </div>
               </Link>
             ))}
@@ -113,7 +113,7 @@ const styles: Record<string, React.CSSProperties> = {
   dropdown: {
     position: "absolute",
     top: "calc(100% + 8px)",
-    right: 0,
+    insetInlineEnd: 0,
     background: "var(--bg-card)",
     border: "1px solid rgba(233, 69, 96, 0.3)",
     borderRadius: 12,
@@ -133,7 +133,7 @@ const styles: Record<string, React.CSSProperties> = {
   },
   dropdownItemActive: {
     background: "rgba(233, 69, 96, 0.2)",
-    borderLeft: "3px solid var(--accent)",
+    borderInlineStart: "3px solid var(--accent)",
   },
   gameEmoji: {
     fontSize: 28,

@@ -10,7 +10,7 @@ export default function GameFrame({ game }: { game: Game }) {
       <iframe
         src={`${basePath}${game.path}`}
         style={styles.iframe}
-        title={game.title}
+        title={game.titleHe}
         allow="autoplay"
       />
     </div>

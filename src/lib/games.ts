@@ -40,6 +40,14 @@ export const games: Game[] = [
     description: "Pick ingredients, chop them on a cutting board, and serve to a robot judge!",
     path: "/games/restaurant/index.html",
   },
+  {
+    slug: "english-learning",
+    title: "Learn English",
+    titleHe: "לומדים אנגלית",
+    emoji: "📚",
+    description: "Learn English words with pictures, sounds, and Hebrew translations!",
+    path: "/games/english-learning/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>לומדים אנגלית! - Learn English!</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --primary: #4A90D9;
+      --primary-dark: #3570B0;
+      --success: #4CAF50;
+      --error: #E74C3C;
+      --gold: #FFD700;
+      --bg: #F0F4FF;
+      --card-bg: #FFFFFF;
+      --text: #333;
+      --text-light: #666;
+      --shadow: 0 4px 15px rgba(0,0,0,0.1);
+      --shadow-hover: 0 8px 25px rgba(0,0,0,0.15);
+      --radius: 16px;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ===== SCREENS ===== */
+    .screen {
+      display: none;
+      width: 100%;
+      min-height: 100vh;
+      animation: fadeIn 0.3s ease;
+    }
+    .screen.active { display: flex; flex-direction: column; align-items: center; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      width: 100%;
+      background: linear-gradient(135deg, var(--primary), #6C5CE7);
+      color: white;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .header-title {
+      font-size: 1.3em;
+      font-weight: 700;
+    }
+    .header-btn {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 1em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .header-btn:hover { background: rgba(255,255,255,0.35); }
+
+    /* ===== WELCOME SCREEN ===== */
+    #welcome-screen {
+      justify-content: center;
+      padding: 30px 20px;
+      background: linear-gradient(180deg, #E8F0FE 0%, #F0F4FF 100%);
+    }
+    .welcome-title {
+      font-size: 2.5em;
+      font-weight: 800;
+      color: var(--primary);
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    .welcome-subtitle {
+      font-size: 1.3em;
+      color: var(--text-light);
+      margin-bottom: 30px;
+      text-align: center;
+    }
+    .welcome-mascot {
+      font-size: 5em;
+      margin-bottom: 20px;
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    /* ===== TOPIC GRID ===== */
+    .section-label {
+      font-size: 1.2em;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 15px;
+      text-align: center;
+    }
+    .topic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      width: 100%;
+      max-width: 700px;
+      padding: 0 10px;
+      margin-bottom: 30px;
+    }
+    .topic-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 18px 10px;
+      text-align: center;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 3px solid transparent;
+      position: relative;
+    }
+    .topic-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-hover);
+    }
+    .topic-card.selected {
+      border-color: var(--primary);
+      background: #E8F0FE;
+    }
+    .topic-card .topic-icon {
+      font-size: 2.5em;
+      margin-bottom: 6px;
+      display: block;
+    }
+    .topic-card .topic-name-he {
+      font-size: 1em;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .topic-card .topic-name-en {
+      font-size: 0.8em;
+      color: var(--text-light);
+      margin-top: 2px;
+    }
+    .topic-card .speaker-btn-mini {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: none;
+      border: none;
+      font-size: 1.1em;
+      cursor: pointer;
+      opacity: 0.5;
+      transition: opacity 0.2s;
+    }
+    .topic-card .speaker-btn-mini:hover { opacity: 1; }
+
+    /* ===== MODE SELECT ===== */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+      padding: 0 10px;
+      margin-bottom: 20px;
+    }
+    .mode-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 3px solid transparent;
+    }
+    .mode-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-hover);
+    }
+    .mode-card.selected {
+      border-color: var(--primary);
+      background: #E8F0FE;
+    }
+    .mode-icon { font-size: 2em; }
+    .mode-info { text-align: right; }
+    .mode-name { font-size: 1.05em; font-weight: 700; }
+    .mode-desc { font-size: 0.85em; color: var(--text-light); margin-top: 2px; }
+
+    /* ===== START BUTTON ===== */
+    .start-btn {
+      background: linear-gradient(135deg, var(--success), #45a049);
+      color: white;
+      border: none;
+      padding: 16px 50px;
+      font-size: 1.3em;
+      font-weight: 700;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(76,175,80,0.4);
+      transition: transform 0.2s, box-shadow 0.2s;
+      margin-top: 10px;
+    }
+    .start-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(76,175,80,0.5);
+    }
+    .start-btn:disabled {
+      background: #ccc;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ===== GAME SCREEN ===== */
+    #game-screen { padding-bottom: 30px; }
+
+    .progress-bar-container {
+      width: 100%;
+      max-width: 600px;
+      height: 12px;
+      background: #E0E0E0;
+      border-radius: 6px;
+      margin: 20px auto 10px;
+      overflow: hidden;
+      padding: 0 20px;
+    }
+    .progress-bar-container .bar-wrap {
+      width: 100%;
+      height: 100%;
+      background: #E0E0E0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), #6C5CE7);
+      border-radius: 6px;
+      transition: width 0.4s ease;
+    }
+    .progress-text {
+      text-align: center;
+      font-size: 0.9em;
+      color: var(--text-light);
+      margin-bottom: 15px;
+    }
+
+    .score-display {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.1em;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    /* ===== QUESTION AREA ===== */
+    .question-area {
+      width: 100%;
+      max-width: 600px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .prompt-card {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 25px 30px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      margin-bottom: 25px;
+      width: 100%;
+      position: relative;
+    }
+    .prompt-emoji {
+      font-size: 4em;
+      margin-bottom: 10px;
+      display: block;
+    }
+    .prompt-word {
+      font-size: 2em;
+      font-weight: 800;
+    }
+    .prompt-word.english { direction: ltr; }
+    .prompt-word.hebrew { direction: rtl; }
+
+    .speaker-btn {
+      background: var(--primary);
+      border: none;
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      font-size: 1.4em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 10px;
+      transition: transform 0.2s, background 0.2s;
+      box-shadow: 0 3px 10px rgba(74,144,217,0.3);
+    }
+    .speaker-btn:hover {
+      transform: scale(1.1);
+      background: var(--primary-dark);
+    }
+    .speaker-btn:active { transform: scale(0.95); }
+
+    /* ===== ANSWER OPTIONS ===== */
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+    }
+    .option-btn {
+      background: var(--card-bg);
+      border: 3px solid #E0E0E0;
+      border-radius: var(--radius);
+      padding: 18px 12px;
+      text-align: center;
+      cursor: pointer;
+      font-size: 1.15em;
+      font-weight: 600;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
+    .option-btn:hover {
+      border-color: var(--primary);
+      transform: scale(1.03);
+    }
+    .option-btn .option-emoji { font-size: 1.8em; }
+    .option-btn .option-text { font-size: 1em; }
+    .option-btn .option-text.english { direction: ltr; }
+    .option-btn .option-text.hebrew { direction: rtl; }
+
+    .option-btn .option-speaker {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      background: none;
+      border: none;
+      font-size: 1em;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .option-btn .option-speaker:hover { opacity: 1; }
+
+    .option-btn.correct {
+      border-color: var(--success);
+      background: #E8F5E9;
+      animation: popCorrect 0.4s ease;
+    }
+    .option-btn.wrong {
+      border-color: var(--error);
+      background: #FFEBEE;
+      animation: shake 0.4s ease;
+    }
+
+    @keyframes popCorrect {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.08); }
+      100% { transform: scale(1); }
+    }
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-8px); }
+      75% { transform: translateX(8px); }
+    }
+
+    /* ===== FEEDBACK ===== */
+    .feedback {
+      margin-top: 20px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      font-size: 1.2em;
+      font-weight: 700;
+      text-align: center;
+      animation: fadeIn 0.3s ease;
+    }
+    .feedback.correct {
+      background: #E8F5E9;
+      color: var(--success);
+    }
+    .feedback.wrong {
+      background: #FFEBEE;
+      color: var(--error);
+    }
+
+    /* ===== RESULTS SCREEN ===== */
+    #results-screen {
+      justify-content: center;
+      padding: 30px 20px;
+    }
+    .results-card {
+      background: var(--card-bg);
+      border-radius: 24px;
+      padding: 35px 30px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      max-width: 450px;
+      width: 100%;
+    }
+    .results-emoji { font-size: 4em; margin-bottom: 10px; }
+    .results-title { font-size: 1.8em; font-weight: 800; margin-bottom: 5px; }
+    .results-subtitle { font-size: 1.1em; color: var(--text-light); margin-bottom: 20px; }
+    .results-stats {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-bottom: 25px;
+    }
+    .stat { text-align: center; }
+    .stat-value {
+      font-size: 2.2em;
+      font-weight: 800;
+      color: var(--primary);
+    }
+    .stat-label {
+      font-size: 0.85em;
+      color: var(--text-light);
+    }
+
+    .stars-container {
+      margin: 15px 0 20px;
+      font-size: 2.5em;
+    }
+    .star { opacity: 0.2; transition: opacity 0.3s; }
+    .star.earned { opacity: 1; animation: starPop 0.4s ease; }
+    @keyframes starPop {
+      0% { transform: scale(0); opacity: 0; }
+      50% { transform: scale(1.3); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .results-btns {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .results-btn {
+      padding: 12px 28px;
+      border: none;
+      border-radius: 50px;
+      font-size: 1.05em;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+    .results-btn:hover { transform: scale(1.05); }
+    .results-btn.primary-btn {
+      background: linear-gradient(135deg, var(--primary), #6C5CE7);
+      color: white;
+    }
+    .results-btn.secondary-btn {
+      background: #E0E0E0;
+      color: var(--text);
+    }
+
+    /* ===== CONFETTI ===== */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 999;
+    }
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      top: -10px;
+      animation: confettiFall 3s ease-in forwards;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 480px) {
+      .welcome-title { font-size: 1.8em; }
+      .welcome-mascot { font-size: 3.5em; }
+      .topic-grid { grid-template-columns: repeat(2, 1fr); }
+      .options-grid { grid-template-columns: 1fr 1fr; }
+      .prompt-emoji { font-size: 3em; }
+      .prompt-word { font-size: 1.5em; }
+      .option-btn { padding: 14px 8px; font-size: 1em; }
+    }
+
+    @media (min-width: 768px) {
+      .topic-grid { grid-template-columns: repeat(5, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ==================== WELCOME SCREEN ==================== -->
+<div id="welcome-screen" class="screen active">
+  <div class="welcome-mascot">📚</div>
+  <div class="welcome-title">!לומדים אנגלית</div>
+  <div class="welcome-subtitle">Learn English Words!</div>
+
+  <div class="section-label">בחר נושא 📌</div>
+  <div class="topic-grid" id="topic-grid"></div>
+
+  <div class="section-label">בחר סוג משחק 🎮</div>
+  <div class="mode-grid" id="mode-grid"></div>
+
+  <button class="start-btn" id="start-btn" disabled onclick="startGame()">!יאללה נתחיל 🚀</button>
+</div>
+
+<!-- ==================== GAME SCREEN ==================== -->
+<div id="game-screen" class="screen">
+  <div class="header">
+    <button class="header-btn" onclick="goHome()">🏠 חזרה</button>
+    <div class="header-title" id="game-header-title"></div>
+    <div class="score-display">⭐ <span id="score">0</span></div>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="bar-wrap">
+      <div class="progress-bar" id="progress-bar" style="width: 0%"></div>
+    </div>
+  </div>
+  <div class="progress-text" id="progress-text"></div>
+
+  <div class="question-area" id="question-area"></div>
+</div>
+
+<!-- ==================== RESULTS SCREEN ==================== -->
+<div id="results-screen" class="screen">
+  <div class="results-card">
+    <div class="results-emoji" id="results-emoji">🎉</div>
+    <div class="results-title" id="results-title">!כל הכבוד</div>
+    <div class="results-subtitle" id="results-subtitle">סיימת את המשחק</div>
+
+    <div class="stars-container" id="stars-container"></div>
+
+    <div class="results-stats">
+      <div class="stat">
+        <div class="stat-value" id="stat-correct">0</div>
+        <div class="stat-label">תשובות נכונות</div>
+      </div>
+      <div class="stat">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">שאלות</div>
+      </div>
+    </div>
+
+    <div class="results-btns">
+      <button class="results-btn primary-btn" onclick="replayGame()">🔄 שחק שוב</button>
+      <button class="results-btn secondary-btn" onclick="goHome()">🏠 חזרה</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== CONFETTI ==================== -->
+<div class="confetti-container" id="confetti-container"></div>
+
+<script>
+// ============================================================
+//  WORD DATA - 5 topics, each with emoji, english, hebrew
+// ============================================================
+const TOPICS = [
+  {
+    id: "fruits-vegetables",
+    nameHe: "פירות וירקות",
+    nameEn: "Fruits & Vegetables",
+    icon: "🍎",
+    words: [
+      { emoji: "🍎", en: "Apple", he: "תפוח" },
+      { emoji: "🍌", en: "Banana", he: "בננה" },
+      { emoji: "🍊", en: "Orange", he: "תפוז" },
+      { emoji: "🍇", en: "Grapes", he: "ענבים" },
+      { emoji: "🍓", en: "Strawberry", he: "תות" },
+      { emoji: "🍉", en: "Watermelon", he: "אבטיח" },
+      { emoji: "🍋", en: "Lemon", he: "לימון" },
+      { emoji: "🍑", en: "Peach", he: "אפרסק" },
+      { emoji: "🥕", en: "Carrot", he: "גזר" },
+      { emoji: "🥒", en: "Cucumber", he: "מלפפון" },
+      { emoji: "🍅", en: "Tomato", he: "עגבנייה" },
+      { emoji: "🥦", en: "Broccoli", he: "ברוקולי" },
+      { emoji: "🌽", en: "Corn", he: "תירס" },
+      { emoji: "🥔", en: "Potato", he: "תפוח אדמה" },
+      { emoji: "🧅", en: "Onion", he: "בצל" },
+    ]
+  },
+  {
+    id: "general-foods",
+    nameHe: "אוכל",
+    nameEn: "General Foods",
+    icon: "🍕",
+    words: [
+      { emoji: "🍕", en: "Pizza", he: "פיצה" },
+      { emoji: "🍔", en: "Hamburger", he: "המבורגר" },
+      { emoji: "🌭", en: "Hot Dog", he: "נקניקייה" },
+      { emoji: "🍞", en: "Bread", he: "לחם" },
+      { emoji: "🧀", en: "Cheese", he: "גבינה" },
+      { emoji: "🥚", en: "Egg", he: "ביצה" },
+      { emoji: "🍚", en: "Rice", he: "אורז" },
+      { emoji: "🍝", en: "Pasta", he: "פסטה" },
+      { emoji: "🍦", en: "Ice Cream", he: "גלידה" },
+      { emoji: "🍪", en: "Cookie", he: "עוגייה" },
+      { emoji: "🍰", en: "Cake", he: "עוגה" },
+      { emoji: "🍫", en: "Chocolate", he: "שוקולד" },
+      { emoji: "🥛", en: "Milk", he: "חלב" },
+      { emoji: "🧃", en: "Juice", he: "מיץ" },
+      { emoji: "💧", en: "Water", he: "מים" },
+    ]
+  },
+  {
+    id: "house",
+    nameHe: "בית",
+    nameEn: "House",
+    icon: "🏠",
+    words: [
+      { emoji: "🚪", en: "Door", he: "דלת" },
+      { emoji: "🪟", en: "Window", he: "חלון" },
+      { emoji: "🛏️", en: "Bed", he: "מיטה" },
+      { emoji: "🪑", en: "Chair", he: "כיסא" },
+      { emoji: "🛋️", en: "Sofa", he: "ספה" },
+      { emoji: "📺", en: "Television", he: "טלוויזיה" },
+      { emoji: "🪥", en: "Toothbrush", he: "מברשת שיניים" },
+      { emoji: "🛁", en: "Bathtub", he: "אמבטיה" },
+      { emoji: "💡", en: "Light", he: "אור" },
+      { emoji: "🪞", en: "Mirror", he: "מראה" },
+      { emoji: "🧸", en: "Teddy Bear", he: "דובי" },
+      { emoji: "📖", en: "Book", he: "ספר" },
+      { emoji: "⏰", en: "Clock", he: "שעון" },
+      { emoji: "🖥️", en: "Computer", he: "מחשב" },
+      { emoji: "🔑", en: "Key", he: "מפתח" },
+    ]
+  },
+  {
+    id: "playground",
+    nameHe: "גן משחקים",
+    nameEn: "Playground",
+    icon: "🎡",
+    words: [
+      { emoji: "⚽", en: "Ball", he: "כדור" },
+      { emoji: "🚲", en: "Bicycle", he: "אופניים" },
+      { emoji: "🛝", en: "Slide", he: "מגלשה" },
+      { emoji: "🎡", en: "Ferris Wheel", he: "גלגל ענק" },
+      { emoji: "🪁", en: "Kite", he: "עפיפון" },
+      { emoji: "🧩", en: "Puzzle", he: "פאזל" },
+      { emoji: "🎨", en: "Paint", he: "צבע" },
+      { emoji: "🖍️", en: "Crayon", he: "צבע שעווה" },
+      { emoji: "🪣", en: "Bucket", he: "דלי" },
+      { emoji: "🏃", en: "Running", he: "ריצה" },
+      { emoji: "🤸", en: "Gymnastics", he: "התעמלות" },
+      { emoji: "🎯", en: "Target", he: "מטרה" },
+      { emoji: "🎈", en: "Balloon", he: "בלון" },
+      { emoji: "🪀", en: "Yo-Yo", he: "יויו" },
+      { emoji: "🎠", en: "Carousel", he: "קרוסלה" },
+    ]
+  },
+  {
+    id: "transportation",
+    nameHe: "תחבורה",
+    nameEn: "Transportation",
+    icon: "🚗",
+    words: [
+      { emoji: "🚗", en: "Car", he: "מכונית" },
+      { emoji: "🚌", en: "Bus", he: "אוטובוס" },
+      { emoji: "🚂", en: "Train", he: "רכבת" },
+      { emoji: "✈️", en: "Airplane", he: "מטוס" },
+      { emoji: "🚢", en: "Ship", he: "ספינה" },
+      { emoji: "🚁", en: "Helicopter", he: "מסוק" },
+      { emoji: "🚀", en: "Rocket", he: "טיל" },
+      { emoji: "🛵", en: "Scooter", he: "קטנוע" },
+      { emoji: "🚒", en: "Fire Truck", he: "כבאית" },
+      { emoji: "🚑", en: "Ambulance", he: "אמבולנס" },
+      { emoji: "🚓", en: "Police Car", he: "ניידת משטרה" },
+      { emoji: "🚜", en: "Tractor", he: "טרקטור" },
+      { emoji: "🚲", en: "Bicycle", he: "אופניים" },
+      { emoji: "🛴", en: "Kick Scooter", he: "קורקינט" },
+      { emoji: "🚕", en: "Taxi", he: "מונית" },
+    ]
+  }
+];
+
+const MODES = [
+  {
+    id: "image-to-english",
+    icon: "🖼️",
+    nameHe: "תמונה ← מילה באנגלית",
+    descHe: "רואים תמונה ובוחרים את המילה הנכונה באנגלית",
+  },
+  {
+    id: "english-to-hebrew",
+    icon: "🇬🇧",
+    nameHe: "אנגלית ← עברית",
+    descHe: "רואים מילה באנגלית ובוחרים את התרגום בעברית",
+  },
+  {
+    id: "hebrew-to-english",
+    icon: "🇮🇱",
+    nameHe: "עברית ← אנגלית",
+    descHe: "רואים מילה בעברית ובוחרים את התרגום באנגלית",
+  },
+];
+
+const QUESTIONS_PER_ROUND = 10;
+const OPTIONS_COUNT = 4;
+
+// ============================================================
+//  STATE
+// ============================================================
+let selectedTopic = null;
+let selectedMode = null;
+let currentWords = [];
+let currentQuestionIndex = 0;
+let score = 0;
+let correctCount = 0;
+let isAnswered = false;
+
+// ============================================================
+//  TEXT-TO-SPEECH
+// ============================================================
+function speak(text, lang) {
+  if (!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.lang = lang === 'he' ? 'he-IL' : 'en-US';
+  utter.rate = 0.85;
+  utter.pitch = 1.1;
+  window.speechSynthesis.speak(utter);
+}
+
+function speakEnglish(text) { speak(text, 'en'); }
+function speakHebrew(text) { speak(text, 'he'); }
+
+// ============================================================
+//  WELCOME SCREEN SETUP
+// ============================================================
+function buildWelcome() {
+  const topicGrid = document.getElementById('topic-grid');
+  topicGrid.innerHTML = '';
+
+  TOPICS.forEach(topic => {
+    const card = document.createElement('div');
+    card.className = 'topic-card';
+    card.dataset.id = topic.id;
+    card.innerHTML = `
+      <button class="speaker-btn-mini" onclick="event.stopPropagation(); speakEnglish('${topic.nameEn}')" title="Listen">🔊</button>
+      <span class="topic-icon">${topic.icon}</span>
+      <div class="topic-name-he">${topic.nameHe}</div>
+      <div class="topic-name-en">${topic.nameEn}</div>
+    `;
+    card.addEventListener('click', () => selectTopic(topic.id));
+    topicGrid.appendChild(card);
+  });
+
+  const modeGrid = document.getElementById('mode-grid');
+  modeGrid.innerHTML = '';
+
+  MODES.forEach(mode => {
+    const card = document.createElement('div');
+    card.className = 'mode-card';
+    card.dataset.id = mode.id;
+    card.innerHTML = `
+      <span class="mode-icon">${mode.icon}</span>
+      <div class="mode-info">
+        <div class="mode-name">${mode.nameHe}</div>
+        <div class="mode-desc">${mode.descHe}</div>
+      </div>
+    `;
+    card.addEventListener('click', () => selectMode(mode.id));
+    modeGrid.appendChild(card);
+  });
+}
+
+function selectTopic(id) {
+  selectedTopic = id;
+  document.querySelectorAll('.topic-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.id === id);
+  });
+  updateStartBtn();
+}
+
+function selectMode(id) {
+  selectedMode = id;
+  document.querySelectorAll('.mode-card').forEach(c => {
+    c.classList.toggle('selected', c.dataset.id === id);
+  });
+  updateStartBtn();
+}
+
+function updateStartBtn() {
+  document.getElementById('start-btn').disabled = !(selectedTopic && selectedMode);
+}
+
+// ============================================================
+//  GAME LOGIC
+// ============================================================
+function startGame() {
+  if (!selectedTopic || !selectedMode) return;
+
+  const topic = TOPICS.find(t => t.id === selectedTopic);
+  const topicWords = [...topic.words];
+  shuffleArray(topicWords);
+  currentWords = topicWords.slice(0, QUESTIONS_PER_ROUND);
+  currentQuestionIndex = 0;
+  score = 0;
+  correctCount = 0;
+
+  const modeObj = MODES.find(m => m.id === selectedMode);
+  document.getElementById('game-header-title').textContent =
+    `${topic.icon} ${topic.nameHe} - ${modeObj.nameHe}`;
+  document.getElementById('score').textContent = '0';
+
+  showScreen('game-screen');
+  showQuestion();
+}
+
+function showQuestion() {
+  if (currentQuestionIndex >= currentWords.length) {
+    showResults();
+    return;
+  }
+
+  isAnswered = false;
+  const word = currentWords[currentQuestionIndex];
+  const topic = TOPICS.find(t => t.id === selectedTopic);
+  const allWords = topic.words;
+
+  // progress
+  const pct = ((currentQuestionIndex) / currentWords.length) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-text').textContent =
+    `שאלה ${currentQuestionIndex + 1} מתוך ${currentWords.length}`;
+
+  // build distractors
+  const distractors = allWords
+    .filter(w => w.en !== word.en)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, OPTIONS_COUNT - 1);
+  const options = [...distractors, word];
+  shuffleArray(options);
+
+  const area = document.getElementById('question-area');
+  area.innerHTML = '';
+
+  // === PROMPT ===
+  const promptCard = document.createElement('div');
+  promptCard.className = 'prompt-card';
+
+  if (selectedMode === 'image-to-english') {
+    promptCard.innerHTML = `
+      <span class="prompt-emoji">${word.emoji}</span>
+      <div style="font-size:1.1em; color:var(--text-light);">?מה זה באנגלית</div>
+      <button class="speaker-btn" onclick="speakHebrew('${escapeQuotes(word.he)}')" title="שמע בעברית">🔊</button>
+    `;
+  } else if (selectedMode === 'english-to-hebrew') {
+    promptCard.innerHTML = `
+      <span class="prompt-emoji">${word.emoji}</span>
+      <div class="prompt-word english">${word.en}</div>
+      <div style="font-size:1.1em; color:var(--text-light); margin-top:5px;">?מה זה בעברית</div>
+      <button class="speaker-btn" onclick="speakEnglish('${escapeQuotes(word.en)}')" title="Listen in English">🔊</button>
+    `;
+  } else {
+    promptCard.innerHTML = `
+      <span class="prompt-emoji">${word.emoji}</span>
+      <div class="prompt-word hebrew">${word.he}</div>
+      <div style="font-size:1.1em; color:var(--text-light); margin-top:5px;">?מה זה באנגלית</div>
+      <button class="speaker-btn" onclick="speakHebrew('${escapeQuotes(word.he)}')" title="שמע בעברית">🔊</button>
+    `;
+  }
+
+  area.appendChild(promptCard);
+
+  // auto-speak the prompt
+  if (selectedMode === 'english-to-hebrew') {
+    speakEnglish(word.en);
+  } else if (selectedMode === 'hebrew-to-english') {
+    speakHebrew(word.he);
+  }
+
+  // === OPTIONS ===
+  const optGrid = document.createElement('div');
+  optGrid.className = 'options-grid';
+
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+
+    let displayText = '';
+    let speakerLang = '';
+    let speakerText = '';
+
+    if (selectedMode === 'image-to-english') {
+      displayText = opt.en;
+      btn.innerHTML = `
+        <button class="option-speaker" onclick="event.stopPropagation(); speakEnglish('${escapeQuotes(opt.en)}')" title="Listen">🔊</button>
+        <span class="option-emoji">${opt.emoji}</span>
+        <span class="option-text english">${opt.en}</span>
+      `;
+    } else if (selectedMode === 'english-to-hebrew') {
+      displayText = opt.he;
+      btn.innerHTML = `
+        <button class="option-speaker" onclick="event.stopPropagation(); speakHebrew('${escapeQuotes(opt.he)}')" title="שמע">🔊</button>
+        <span class="option-text hebrew">${opt.he}</span>
+      `;
+    } else {
+      displayText = opt.en;
+      btn.innerHTML = `
+        <button class="option-speaker" onclick="event.stopPropagation(); speakEnglish('${escapeQuotes(opt.en)}')" title="Listen">🔊</button>
+        <span class="option-text english">${opt.en}</span>
+      `;
+    }
+
+    btn.addEventListener('click', () => handleAnswer(btn, opt, word, optGrid));
+    optGrid.appendChild(btn);
+  });
+
+  area.appendChild(optGrid);
+}
+
+function handleAnswer(btn, chosen, correct, optGrid) {
+  if (isAnswered) return;
+  isAnswered = true;
+
+  const isCorrect = chosen.en === correct.en;
+  const area = document.getElementById('question-area');
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    score += 10;
+    correctCount++;
+    document.getElementById('score').textContent = score;
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback correct';
+    fb.textContent = '!🎉 נכון! כל הכבוד';
+    area.appendChild(fb);
+
+    speakEnglish(correct.en);
+  } else {
+    btn.classList.add('wrong');
+    // highlight the correct one
+    optGrid.querySelectorAll('.option-btn').forEach(b => {
+      const optText = selectedMode === 'english-to-hebrew'
+        ? b.querySelector('.option-text')?.textContent
+        : b.querySelector('.option-text')?.textContent;
+      const correctText = selectedMode === 'english-to-hebrew' ? correct.he : correct.en;
+      if (optText === correctText) {
+        b.classList.add('correct');
+      }
+    });
+
+    const fb = document.createElement('div');
+    fb.className = 'feedback wrong';
+    fb.innerHTML = `לא נכון 😕 התשובה הנכונה: <strong>${correct.en}</strong> = <strong>${correct.he}</strong>`;
+    area.appendChild(fb);
+
+    speakEnglish(correct.en);
+  }
+
+  setTimeout(() => {
+    currentQuestionIndex++;
+    showQuestion();
+  }, 2000);
+}
+
+// ============================================================
+//  RESULTS
+// ============================================================
+function showResults() {
+  document.getElementById('progress-bar').style.width = '100%';
+
+  const pct = currentWords.length > 0 ? (correctCount / currentWords.length) : 0;
+  const starCount = pct >= 0.9 ? 3 : pct >= 0.7 ? 2 : pct >= 0.4 ? 1 : 0;
+
+  let emoji = '🎉';
+  let title = '!מדהים! כל הכבוד';
+  let subtitle = 'אתה כוכב באנגלית!';
+
+  if (pct < 0.4) {
+    emoji = '💪';
+    title = '!אל תוותר';
+    subtitle = 'נסה שוב, אתה יכול לעשות את זה!';
+  } else if (pct < 0.7) {
+    emoji = '😊';
+    title = '!לא רע';
+    subtitle = 'כמעט שם, נסה שוב!';
+  } else if (pct < 0.9) {
+    emoji = '🌟';
+    title = '!יופי';
+    subtitle = 'עבודה מצוינת!';
+  }
+
+  document.getElementById('results-emoji').textContent = emoji;
+  document.getElementById('results-title').textContent = title;
+  document.getElementById('results-subtitle').textContent = subtitle;
+  document.getElementById('stat-correct').textContent = correctCount;
+  document.getElementById('stat-total').textContent = currentWords.length;
+
+  const starsHtml = [1,2,3].map(i =>
+    `<span class="star ${i <= starCount ? 'earned' : ''}" style="animation-delay: ${i * 0.2}s">⭐</span>`
+  ).join('');
+  document.getElementById('stars-container').innerHTML = starsHtml;
+
+  showScreen('results-screen');
+
+  if (pct >= 0.7) {
+    launchConfetti();
+  }
+}
+
+function replayGame() {
+  startGame();
+}
+
+function goHome() {
+  showScreen('welcome-screen');
+}
+
+// ============================================================
+//  UTILITIES
+// ============================================================
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function shuffleArray(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function escapeQuotes(str) {
+  return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
+}
+
+function launchConfetti() {
+  const container = document.getElementById('confetti-container');
+  container.innerHTML = '';
+  const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FDCB6E', '#6C5CE7', '#FF85A1', '#2ECC71'];
+
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 2 + 's';
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.width = (6 + Math.random() * 8) + 'px';
+    piece.style.height = (6 + Math.random() * 8) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    container.appendChild(piece);
+  }
+
+  setTimeout(() => { container.innerHTML = ''; }, 4000);
+}
+
+// ============================================================
+//  INIT
+// ============================================================
+buildWelcome();
+</script>
+</body>
+</html>

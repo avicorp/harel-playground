@@ -48,6 +48,14 @@ export const games: Game[] = [
     description: "Learn English words with pictures, sounds, and Hebrew translations!",
     path: "/games/english-learning/index.html",
   },
+  {
+    slug: "division-practice",
+    title: "Division Practice",
+    titleHe: "תרגול חילוק",
+    emoji: "➗",
+    description: "Practice division with numbers from 1 to 100! Choose easy, medium, or hard difficulty.",
+    path: "/games/division-practice/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

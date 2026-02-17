@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import SessionProvider from "@/components/SessionProvider";
 
 export const metadata: Metadata = {
   title: "Harel Playground",
-  description: "A collection of fun games by Harel",
+  description: "A game portal with private UUID-based page links",
 };
 
 export default function RootLayout({
@@ -21,7 +22,7 @@ export default function RootLayout({
           overflow: "hidden",
         }}
       >
-        {children}
+        <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
   );

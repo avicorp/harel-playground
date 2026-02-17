@@ -11,7 +11,9 @@ harel-playground/
   tsconfig.json            <-- TypeScript config
   .env.example             <-- required environment variables
   data/
-    pages.json             <-- published pages database (UUID/email mappings)
+    users/                   <-- per-user page storage (loaded via PRs)
+      john-at-gmail-com/     <-- directory per user (email-slug)
+        <uuid>.json          <-- one JSON file per published page
   src/
     app/
       layout.tsx           <-- root layout (wraps SessionProvider)
@@ -39,7 +41,7 @@ harel-playground/
     lib/
       games.ts             <-- game registry (add new games here)
       auth.ts              <-- NextAuth configuration
-      pages-db.ts          <-- JSON file-based pages database
+      pages-db.ts          <-- per-user directory-based pages database
   public/
     games/
       space-shooter/       <-- space shooting game (HTML/CSS/JS)
@@ -61,8 +63,9 @@ harel-playground/
 ### Publishing a Page
 1. User goes to `/publish`
 2. Selects a game, names the page, enters their email
-3. System generates a UUID and creates the page entry in `data/pages.json`
+3. System generates a UUID and saves `data/users/<email-slug>/<uuid>.json`
 4. User receives a unique link: `/p/<uuid>`
+5. The new page file is committed to the repo via a PR
 
 ### Viewing a Page
 - Pages are accessed via `/p/<uuid>` — only people with the link can view them

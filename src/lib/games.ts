@@ -56,6 +56,14 @@ export const games: Game[] = [
     description: "Practice division with numbers from 1 to 100! Choose easy, medium, or hard difficulty.",
     path: "/games/division-practice/index.html",
   },
+  {
+    slug: "ninja-turtle",
+    title: "Ninja Turtles",
+    titleHe: "צבי הנינג'ה",
+    emoji: "🐢",
+    description: "Choose your Ninja Turtle and smash bricks in the old neighborhood! Cowabunga!",
+    path: "/games/ninja-turtle/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

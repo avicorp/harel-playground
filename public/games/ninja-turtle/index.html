@@ -1,0 +1,1611 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>צבי הנינג'ה - פורצי הלבנים</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    @font-face {
+      font-family: 'GameFont';
+      src: local('Arial Black'), local('Impact'), local('Arial');
+    }
+
+    body {
+      background: #1a1a2e;
+      font-family: 'GameFont', 'Arial Black', Impact, sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    canvas {
+      display: none;
+      border-radius: 8px;
+      cursor: none;
+    }
+
+    /* CHARACTER SELECT SCREEN */
+    #selectScreen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg, #0d0d1a 0%, #1a3a1a 50%, #0d0d1a 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #selectScreen::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.03) 2px, rgba(0,255,0,0.03) 4px);
+      pointer-events: none;
+    }
+
+    .title-container {
+      text-align: center;
+      margin-bottom: 10px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .game-title {
+      font-size: clamp(28px, 5vw, 56px);
+      color: #4caf50;
+      text-shadow: 0 0 20px #4caf50, 0 0 40px #2e7d32, 3px 3px 0 #1b5e20;
+      letter-spacing: 3px;
+      animation: titleGlow 2s ease-in-out infinite alternate;
+    }
+
+    .game-subtitle {
+      font-size: clamp(16px, 3vw, 28px);
+      color: #ff9800;
+      text-shadow: 0 0 10px #ff9800, 2px 2px 0 #e65100;
+      margin-top: 5px;
+    }
+
+    @keyframes titleGlow {
+      from { text-shadow: 0 0 20px #4caf50, 0 0 40px #2e7d32, 3px 3px 0 #1b5e20; }
+      to { text-shadow: 0 0 30px #66bb6a, 0 0 60px #43a047, 3px 3px 0 #1b5e20; }
+    }
+
+    .choose-text {
+      font-size: clamp(14px, 2.5vw, 22px);
+      color: #fff;
+      margin-bottom: 15px;
+      text-shadow: 0 0 10px rgba(255,255,255,0.5);
+      z-index: 1;
+    }
+
+    .turtles-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: clamp(8px, 2vw, 20px);
+      padding: 0 10px;
+      max-width: 900px;
+      width: 100%;
+      z-index: 1;
+    }
+
+    .turtle-card {
+      background: rgba(0, 0, 0, 0.6);
+      border: 3px solid #333;
+      border-radius: 16px;
+      padding: clamp(10px, 2vw, 20px);
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .turtle-card:hover {
+      transform: translateY(-5px) scale(1.05);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .turtle-card.leo { border-color: #2196f3; }
+    .turtle-card.leo:hover { background: rgba(33,150,243,0.2); box-shadow: 0 0 30px rgba(33,150,243,0.4); }
+    .turtle-card.raph { border-color: #f44336; }
+    .turtle-card.raph:hover { background: rgba(244,67,54,0.2); box-shadow: 0 0 30px rgba(244,67,54,0.4); }
+    .turtle-card.donnie { border-color: #9c27b0; }
+    .turtle-card.donnie:hover { background: rgba(156,39,176,0.2); box-shadow: 0 0 30px rgba(156,39,176,0.4); }
+    .turtle-card.mikey { border-color: #ff9800; }
+    .turtle-card.mikey:hover { background: rgba(255,152,0,0.2); box-shadow: 0 0 30px rgba(255,152,0,0.4); }
+
+    .turtle-avatar {
+      width: clamp(50px, 10vw, 100px);
+      height: clamp(50px, 10vw, 100px);
+      border-radius: 50%;
+      margin: 0 auto 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(28px, 5vw, 50px);
+      position: relative;
+    }
+
+    .turtle-card.leo .turtle-avatar { background: radial-gradient(circle, #2196f3 0%, #0d47a1 100%); }
+    .turtle-card.raph .turtle-avatar { background: radial-gradient(circle, #f44336 0%, #b71c1c 100%); }
+    .turtle-card.donnie .turtle-avatar { background: radial-gradient(circle, #9c27b0 0%, #4a148c 100%); }
+    .turtle-card.mikey .turtle-avatar { background: radial-gradient(circle, #ff9800 0%, #e65100 100%); }
+
+    .turtle-name {
+      font-size: clamp(11px, 2vw, 18px);
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .turtle-card.leo .turtle-name { color: #64b5f6; }
+    .turtle-card.raph .turtle-name { color: #ef5350; }
+    .turtle-card.donnie .turtle-name { color: #ce93d8; }
+    .turtle-card.mikey .turtle-name { color: #ffb74d; }
+
+    .turtle-weapon {
+      font-size: clamp(9px, 1.5vw, 13px);
+      color: #aaa;
+      margin-bottom: 6px;
+    }
+
+    .turtle-power {
+      font-size: clamp(8px, 1.3vw, 11px);
+      color: #4caf50;
+      background: rgba(76,175,80,0.15);
+      border-radius: 8px;
+      padding: 4px 6px;
+      display: inline-block;
+    }
+
+    /* GAME OVER / WIN SCREEN */
+    #gameOverScreen, #winScreen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .end-title {
+      font-size: clamp(32px, 6vw, 64px);
+      margin-bottom: 15px;
+    }
+
+    #gameOverScreen .end-title { color: #f44336; text-shadow: 0 0 30px #f44336; }
+    #winScreen .end-title { color: #4caf50; text-shadow: 0 0 30px #4caf50; }
+
+    .end-score {
+      font-size: clamp(18px, 3vw, 32px);
+      color: #fff;
+      margin-bottom: 25px;
+    }
+
+    .end-btn {
+      font-family: 'GameFont', 'Arial Black', Impact, sans-serif;
+      font-size: clamp(16px, 2.5vw, 24px);
+      padding: 12px 40px;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      color: #fff;
+      background: linear-gradient(135deg, #4caf50, #2e7d32);
+      box-shadow: 0 4px 15px rgba(76,175,80,0.4);
+      transition: all 0.3s;
+      margin: 5px;
+    }
+
+    .end-btn:hover { transform: scale(1.1); box-shadow: 0 6px 20px rgba(76,175,80,0.6); }
+    .end-btn.back-btn { background: linear-gradient(135deg, #ff9800, #e65100); box-shadow: 0 4px 15px rgba(255,152,0,0.4); }
+    .end-btn.back-btn:hover { box-shadow: 0 6px 20px rgba(255,152,0,0.6); }
+
+    /* LEVEL TRANSITION */
+    #levelTransition {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.9);
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+    }
+
+    .level-text {
+      font-size: clamp(36px, 6vw, 72px);
+      color: #4caf50;
+      text-shadow: 0 0 30px #4caf50;
+      animation: levelPulse 0.5s ease-in-out infinite alternate;
+    }
+
+    @keyframes levelPulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.1); }
+    }
+
+    /* HUD */
+    #hud {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      color: #fff;
+      font-size: clamp(12px, 2vw, 18px);
+      text-align: center;
+      text-shadow: 0 0 10px rgba(0,0,0,0.8);
+      pointer-events: none;
+      direction: rtl;
+    }
+
+    #hud .hud-row {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .hud-item {
+      background: rgba(0,0,0,0.6);
+      padding: 5px 12px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+
+    .lives-display { color: #f44336; }
+    .score-display { color: #ffeb3b; }
+    .level-display { color: #4caf50; }
+    .power-display { color: #2196f3; }
+    .power-bar {
+      display: inline-block;
+      width: 60px;
+      height: 8px;
+      background: #333;
+      border-radius: 4px;
+      overflow: hidden;
+      vertical-align: middle;
+      margin-right: 5px;
+    }
+    .power-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s;
+    }
+
+    /* MOBILE CONTROLS */
+    #mobileControls {
+      display: none;
+      position: fixed;
+      bottom: 10px;
+      left: 0; right: 0;
+      z-index: 50;
+      justify-content: center;
+      gap: 15px;
+      pointer-events: none;
+    }
+
+    .mobile-btn {
+      pointer-events: all;
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      border: 2px solid rgba(255,255,255,0.3);
+      background: rgba(0,0,0,0.4);
+      color: #fff;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: none;
+    }
+
+    .mobile-btn:active { background: rgba(255,255,255,0.2); }
+    .mobile-btn.power-btn {
+      background: rgba(76,175,80,0.4);
+      border-color: #4caf50;
+      font-size: 16px;
+      width: 60px;
+      height: 60px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CHARACTER SELECT -->
+  <div id="selectScreen">
+    <div class="title-container">
+      <div class="game-title">🐢 צבי הנינג'ה 🐢</div>
+      <div class="game-subtitle">⚔️ פורצי הלבנים ⚔️</div>
+    </div>
+    <div class="choose-text">בחר את הצב שלך!</div>
+    <div class="turtles-grid">
+      <div class="turtle-card leo" onclick="selectTurtle('leo')">
+        <div class="turtle-avatar">🐢</div>
+        <div class="turtle-name">לאונרדו</div>
+        <div class="turtle-weapon">⚔️ חרבות קטאנה</div>
+        <div class="turtle-power">כדור חותך</div>
+      </div>
+      <div class="turtle-card raph" onclick="selectTurtle('raph')">
+        <div class="turtle-avatar">🐢</div>
+        <div class="turtle-name">רפאל</div>
+        <div class="turtle-weapon">🗡️ סאי</div>
+        <div class="turtle-power">כדור אש</div>
+      </div>
+      <div class="turtle-card donnie" onclick="selectTurtle('donnie')">
+        <div class="turtle-avatar">🐢</div>
+        <div class="turtle-name">דונטלו</div>
+        <div class="turtle-weapon">🏑 מקל בו</div>
+        <div class="turtle-power">3 כדורים</div>
+      </div>
+      <div class="turtle-card mikey" onclick="selectTurtle('mikey')">
+        <div class="turtle-avatar">🐢</div>
+        <div class="turtle-name">מיכלאנג'לו</div>
+        <div class="turtle-weapon">⛓️ נונצ'אקו</div>
+        <div class="turtle-power">משוגע מהיר</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GAME CANVAS -->
+  <canvas id="gameCanvas"></canvas>
+
+  <!-- HUD -->
+  <div id="hud">
+    <div class="hud-row">
+      <div class="hud-item lives-display" id="livesDisplay">❤️ x3</div>
+      <div class="hud-item score-display" id="scoreDisplay">🏆 0</div>
+      <div class="hud-item level-display" id="levelDisplay">שלב 1</div>
+      <div class="hud-item power-display" id="powerDisplay">
+        <div class="power-bar"><div class="power-fill" id="powerFill" style="width:0%;background:#4caf50"></div></div>
+        כוח
+      </div>
+    </div>
+  </div>
+
+  <!-- MOBILE CONTROLS -->
+  <div id="mobileControls">
+    <div class="mobile-btn" id="btnLeft">◀</div>
+    <div class="mobile-btn power-btn" id="btnPower">⚡</div>
+    <div class="mobile-btn" id="btnRight">▶</div>
+  </div>
+
+  <!-- LEVEL TRANSITION -->
+  <div id="levelTransition">
+    <div class="level-text" id="levelText"></div>
+  </div>
+
+  <!-- GAME OVER -->
+  <div id="gameOverScreen">
+    <div class="end-title">💀 המשחק נגמר!</div>
+    <div class="end-score" id="gameOverScore"></div>
+    <div>
+      <button class="end-btn" onclick="restartGame()">🔄 שחק שוב</button>
+      <button class="end-btn back-btn" onclick="backToSelect()">🐢 בחר צב</button>
+    </div>
+  </div>
+
+  <!-- WIN SCREEN -->
+  <div id="winScreen">
+    <div class="end-title">🎉 קאוואבנגה!</div>
+    <div class="end-score" id="winScore"></div>
+    <div>
+      <button class="end-btn" onclick="restartGame()">🔄 שחק שוב</button>
+      <button class="end-btn back-btn" onclick="backToSelect()">🐢 בחר צב</button>
+    </div>
+  </div>
+
+  <script>
+    // ==================== GAME CONFIG ====================
+    const TURTLE_DATA = {
+      leo: {
+        name: 'לאונרדו',
+        color: '#2196f3',
+        darkColor: '#0d47a1',
+        bandana: '#1565c0',
+        weapon: 'קטאנה',
+        powerName: 'כדור חותך',
+        speed: 1.0,
+        paddleWidth: 1.0,
+        powerType: 'slice' // ball cuts through bricks
+      },
+      raph: {
+        name: 'רפאל',
+        color: '#f44336',
+        darkColor: '#b71c1c',
+        bandana: '#c62828',
+        weapon: 'סאי',
+        powerName: 'כדור אש',
+        speed: 1.0,
+        paddleWidth: 0.9,
+        powerType: 'fireball' // explosive ball
+      },
+      donnie: {
+        name: 'דונטלו',
+        color: '#9c27b0',
+        darkColor: '#4a148c',
+        bandana: '#7b1fa2',
+        weapon: 'מקל בו',
+        powerName: '3 כדורים',
+        speed: 1.0,
+        paddleWidth: 1.15,
+        powerType: 'multiball' // splits into 3 balls
+      },
+      mikey: {
+        name: "מיכלאנג'לו",
+        color: '#ff9800',
+        darkColor: '#e65100',
+        bandana: '#ef6c00',
+        weapon: "נונצ'אקו",
+        powerName: 'משוגע מהיר',
+        speed: 1.2,
+        paddleWidth: 1.0,
+        powerType: 'speed' // super fast ball + paddle
+      }
+    };
+
+    // ==================== GAME STATE ====================
+    let canvas, ctx;
+    let selectedTurtle = null;
+    let gameRunning = false;
+    let animFrameId = null;
+    let isMobile = false;
+
+    let score = 0;
+    let lives = 3;
+    let level = 1;
+    let maxLevel = 5;
+    let powerMeter = 0;
+    let powerActive = false;
+    let powerTimer = 0;
+    let combo = 0;
+    let comboTimer = 0;
+
+    // Paddle
+    let paddle = { x: 0, y: 0, w: 0, h: 0, speed: 0, targetX: 0 };
+
+    // Ball(s)
+    let balls = [];
+
+    // Bricks
+    let bricks = [];
+
+    // Particles
+    let particles = [];
+
+    // Falling power-ups
+    let powerUps = [];
+
+    // Keys
+    let keys = { left: false, right: false };
+
+    // Screen shake
+    let shakeX = 0, shakeY = 0, shakeIntensity = 0;
+
+    // Background buildings
+    let buildings = [];
+
+    // Stars / sewer drips
+    let bgEffects = [];
+
+    // ==================== LEVEL DEFINITIONS ====================
+    function getLevelBricks(lvl) {
+      const layouts = [];
+      const cols = Math.min(10, 6 + lvl);
+      const rows = Math.min(8, 3 + lvl);
+
+      const brickW = (canvas.width - 40) / cols;
+      const brickH = Math.min(28, canvas.height * 0.035);
+      const offsetX = 20;
+      const offsetY = 60;
+
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          let hp = 1;
+          let type = 'normal';
+
+          // Level patterns
+          if (lvl === 1) {
+            hp = r < 2 ? 1 : 1;
+          } else if (lvl === 2) {
+            hp = r < 1 ? 2 : 1;
+            if (r === 0 && c % 2 === 0) type = 'metal';
+          } else if (lvl === 3) {
+            hp = r < 2 ? 2 : 1;
+            if ((r + c) % 4 === 0) type = 'metal';
+            if (r === 0) hp = 3;
+          } else if (lvl === 4) {
+            hp = r < 3 ? 2 : 1;
+            if (r < 2 && c % 3 === 0) type = 'metal';
+            if (r === 0) hp = 3;
+            // Diamond gap
+            const mid = Math.floor(cols / 2);
+            const dist = Math.abs(c - mid);
+            if (r >= 2 && r <= 4 && dist <= (r - 2)) continue;
+          } else if (lvl === 5) {
+            hp = r < 2 ? 3 : 2;
+            if (c % 2 === 0 && r % 2 === 0) type = 'metal';
+            if (r === 0) hp = 4;
+            // TMNT pattern - leave gaps for letter shapes
+            if (r >= 3 && r <= 5) {
+              const pattern = getTMNTPattern(r - 3, c, cols);
+              if (!pattern) continue;
+              type = 'green';
+              hp = 2;
+            }
+          }
+
+          layouts.push({
+            x: offsetX + c * brickW,
+            y: offsetY + r * brickH + r * 3,
+            w: brickW - 3,
+            h: brickH,
+            hp: hp,
+            maxHp: hp,
+            type: type,
+            hit: false,
+            hitTimer: 0
+          });
+        }
+      }
+      return layouts;
+    }
+
+    function getTMNTPattern(row, col, cols) {
+      // Simple "TMNT" pattern in the bricks
+      const mid = Math.floor(cols / 2);
+      // Just make a cool pattern instead of actual letters
+      return (col + row) % 2 === 0;
+    }
+
+    // ==================== INIT ====================
+    function selectTurtle(id) {
+      selectedTurtle = TURTLE_DATA[id];
+      selectedTurtle.id = id;
+      document.getElementById('selectScreen').style.display = 'none';
+      initGame();
+    }
+
+    function initGame() {
+      canvas = document.getElementById('gameCanvas');
+      ctx = canvas.getContext('2d');
+
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+
+      isMobile = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+      score = 0;
+      lives = 3;
+      level = 1;
+      powerMeter = 0;
+      powerActive = false;
+      combo = 0;
+
+      generateBackground();
+      startLevel(level);
+
+      // Input
+      document.addEventListener('keydown', onKeyDown);
+      document.addEventListener('keyup', onKeyUp);
+      canvas.addEventListener('mousemove', onMouseMove);
+      canvas.addEventListener('click', onClick);
+      canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+      canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+
+      if (isMobile) {
+        setupMobileControls();
+      }
+
+      canvas.style.display = 'block';
+      document.getElementById('hud').style.display = 'block';
+      if (isMobile) document.getElementById('mobileControls').style.display = 'flex';
+
+      gameRunning = true;
+      gameLoop();
+    }
+
+    function resizeCanvas() {
+      if (!canvas) return;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+
+    function generateBackground() {
+      buildings = [];
+      bgEffects = [];
+
+      // Generate NYC-style buildings
+      const numBuildings = Math.floor(canvas.width / 60) + 2;
+      for (let i = 0; i < numBuildings; i++) {
+        const w = 40 + Math.random() * 50;
+        const h = 100 + Math.random() * 200;
+        buildings.push({
+          x: i * 60 - 10,
+          y: canvas.height - h,
+          w: w,
+          h: h,
+          color: `hsl(${20 + Math.random() * 20}, ${10 + Math.random() * 15}%, ${8 + Math.random() * 12}%)`,
+          windows: []
+        });
+        // Add windows
+        const wCols = Math.floor(w / 15);
+        const wRows = Math.floor(h / 20);
+        for (let wr = 0; wr < wRows; wr++) {
+          for (let wc = 0; wc < wCols; wc++) {
+            if (Math.random() > 0.3) {
+              buildings[i].windows.push({
+                x: 5 + wc * 15,
+                y: 10 + wr * 20,
+                lit: Math.random() > 0.5,
+                flicker: Math.random()
+              });
+            }
+          }
+        }
+      }
+
+      // Sewer grate effects
+      for (let i = 0; i < 15; i++) {
+        bgEffects.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height - 20 + Math.random() * 20,
+          size: 2 + Math.random() * 3,
+          speed: 0.5 + Math.random() * 1,
+          alpha: Math.random()
+        });
+      }
+    }
+
+    // ==================== LEVEL START ====================
+    function startLevel(lvl) {
+      bricks = getLevelBricks(lvl);
+      balls = [];
+      powerUps = [];
+      powerActive = false;
+      powerTimer = 0;
+
+      const pw = canvas.width * 0.13 * selectedTurtle.paddleWidth;
+      const ph = Math.max(14, canvas.height * 0.02);
+      paddle.w = pw;
+      paddle.h = ph;
+      paddle.x = (canvas.width - pw) / 2;
+      paddle.y = canvas.height - ph - 40;
+      paddle.speed = canvas.width * 0.012 * selectedTurtle.speed;
+      paddle.targetX = paddle.x;
+
+      spawnBall();
+      updateHUD();
+
+      // Show level transition
+      showLevelTransition(lvl);
+    }
+
+    function spawnBall() {
+      const speed = (3 + level * 0.5) * (canvas.height / 600);
+      const angle = -Math.PI / 2 + (Math.random() - 0.5) * 0.5;
+      balls.push({
+        x: paddle.x + paddle.w / 2,
+        y: paddle.y - 10,
+        r: Math.max(6, canvas.width * 0.008),
+        dx: Math.cos(angle) * speed,
+        dy: Math.sin(angle) * speed,
+        speed: speed,
+        attached: true,
+        trail: [],
+        powered: false
+      });
+    }
+
+    function showLevelTransition(lvl) {
+      const el = document.getElementById('levelTransition');
+      const text = document.getElementById('levelText');
+      const levelNames = ['', 'הביוב', 'הסמטה', 'גג הבניין', 'מפעל שרדר', 'מאורת שרדר'];
+      text.textContent = `שלב ${lvl} - ${levelNames[lvl] || ''}`;
+      el.style.display = 'flex';
+      setTimeout(() => { el.style.display = 'none'; }, 1800);
+    }
+
+    // ==================== INPUT ====================
+    function onKeyDown(e) {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = true;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = true;
+      if (e.key === ' ') launchBallOrPower();
+    }
+
+    function onKeyUp(e) {
+      if (e.key === 'ArrowLeft' || e.key === 'a') keys.left = false;
+      if (e.key === 'ArrowRight' || e.key === 'd') keys.right = false;
+    }
+
+    function onMouseMove(e) {
+      paddle.targetX = e.clientX - paddle.w / 2;
+    }
+
+    function onClick(e) {
+      launchBallOrPower();
+    }
+
+    function onTouchMove(e) {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        paddle.targetX = e.touches[0].clientX - paddle.w / 2;
+      }
+    }
+
+    function onTouchStart(e) {
+      e.preventDefault();
+      if (e.touches.length > 0) {
+        paddle.targetX = e.touches[0].clientX - paddle.w / 2;
+      }
+      launchBallOrPower();
+    }
+
+    function setupMobileControls() {
+      const btnLeft = document.getElementById('btnLeft');
+      const btnRight = document.getElementById('btnRight');
+      const btnPower = document.getElementById('btnPower');
+
+      let leftInterval, rightInterval;
+
+      btnLeft.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.left = true;
+        leftInterval = setInterval(() => { keys.left = true; }, 16);
+      });
+      btnLeft.addEventListener('touchend', () => {
+        keys.left = false;
+        clearInterval(leftInterval);
+      });
+
+      btnRight.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys.right = true;
+        rightInterval = setInterval(() => { keys.right = true; }, 16);
+      });
+      btnRight.addEventListener('touchend', () => {
+        keys.right = false;
+        clearInterval(rightInterval);
+      });
+
+      btnPower.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        activatePower();
+      });
+    }
+
+    function launchBallOrPower() {
+      let launched = false;
+      for (const ball of balls) {
+        if (ball.attached) {
+          ball.attached = false;
+          launched = true;
+        }
+      }
+      if (!launched && powerMeter >= 100) {
+        activatePower();
+      }
+    }
+
+    // ==================== POWER SYSTEM ====================
+    function activatePower() {
+      if (powerMeter < 100 || powerActive) return;
+      powerMeter = 0;
+      powerActive = true;
+      powerTimer = 300; // frames
+      shakeIntensity = 8;
+
+      // Create activation particles
+      for (let i = 0; i < 30; i++) {
+        spawnParticle(paddle.x + paddle.w / 2, paddle.y, selectedTurtle.color, 3 + Math.random() * 4, 80);
+      }
+
+      switch (selectedTurtle.powerType) {
+        case 'slice':
+          // Ball becomes a blade - cuts through bricks
+          balls.forEach(b => b.powered = true);
+          break;
+        case 'fireball':
+          // Ball becomes explosive
+          balls.forEach(b => b.powered = true);
+          break;
+        case 'multiball':
+          // Split each ball into 3
+          const newBalls = [];
+          balls.forEach(b => {
+            for (let i = 0; i < 2; i++) {
+              const angle = Math.atan2(b.dy, b.dx) + (i === 0 ? -0.4 : 0.4);
+              newBalls.push({
+                x: b.x,
+                y: b.y,
+                r: b.r,
+                dx: Math.cos(angle) * b.speed,
+                dy: Math.sin(angle) * b.speed,
+                speed: b.speed,
+                attached: false,
+                trail: [],
+                powered: true
+              });
+            }
+          });
+          balls.push(...newBalls);
+          break;
+        case 'speed':
+          // Super fast paddle + ball
+          paddle.speed *= 2;
+          balls.forEach(b => {
+            b.speed *= 1.5;
+            const angle = Math.atan2(b.dy, b.dx);
+            b.dx = Math.cos(angle) * b.speed;
+            b.dy = Math.sin(angle) * b.speed;
+            b.powered = true;
+          });
+          break;
+      }
+    }
+
+    function deactivatePower() {
+      powerActive = false;
+      balls.forEach(b => b.powered = false);
+
+      if (selectedTurtle.powerType === 'speed') {
+        paddle.speed = canvas.width * 0.012 * selectedTurtle.speed;
+        balls.forEach(b => {
+          b.speed = (3 + level * 0.5) * (canvas.height / 600);
+          const angle = Math.atan2(b.dy, b.dx);
+          b.dx = Math.cos(angle) * b.speed;
+          b.dy = Math.sin(angle) * b.speed;
+        });
+      }
+    }
+
+    // ==================== GAME LOOP ====================
+    function gameLoop() {
+      if (!gameRunning) return;
+      update();
+      draw();
+      animFrameId = requestAnimationFrame(gameLoop);
+    }
+
+    function update() {
+      // Paddle movement
+      if (keys.left) paddle.targetX = paddle.x - paddle.speed * 1.2;
+      if (keys.right) paddle.targetX = paddle.x + paddle.speed * 1.2;
+
+      // Smooth paddle movement
+      paddle.x += (paddle.targetX - paddle.x) * 0.25;
+      paddle.x = Math.max(0, Math.min(canvas.width - paddle.w, paddle.x));
+
+      // Combo timer
+      if (comboTimer > 0) {
+        comboTimer--;
+        if (comboTimer <= 0) combo = 0;
+      }
+
+      // Power timer
+      if (powerActive) {
+        powerTimer--;
+        if (powerTimer <= 0) deactivatePower();
+      }
+
+      // Screen shake
+      if (shakeIntensity > 0) {
+        shakeX = (Math.random() - 0.5) * shakeIntensity;
+        shakeY = (Math.random() - 0.5) * shakeIntensity;
+        shakeIntensity *= 0.9;
+        if (shakeIntensity < 0.5) { shakeIntensity = 0; shakeX = 0; shakeY = 0; }
+      }
+
+      // Update balls
+      for (let i = balls.length - 1; i >= 0; i--) {
+        const ball = balls[i];
+
+        if (ball.attached) {
+          ball.x = paddle.x + paddle.w / 2;
+          ball.y = paddle.y - ball.r - 2;
+          continue;
+        }
+
+        // Trail
+        ball.trail.push({ x: ball.x, y: ball.y });
+        if (ball.trail.length > 8) ball.trail.shift();
+
+        ball.x += ball.dx;
+        ball.y += ball.dy;
+
+        // Wall collisions
+        if (ball.x - ball.r < 0) { ball.x = ball.r; ball.dx = Math.abs(ball.dx); }
+        if (ball.x + ball.r > canvas.width) { ball.x = canvas.width - ball.r; ball.dx = -Math.abs(ball.dx); }
+        if (ball.y - ball.r < 0) { ball.y = ball.r; ball.dy = Math.abs(ball.dy); }
+
+        // Fall off bottom
+        if (ball.y > canvas.height + 20) {
+          balls.splice(i, 1);
+          if (balls.length === 0) {
+            loseLife();
+          }
+          continue;
+        }
+
+        // Paddle collision
+        if (ball.dy > 0 &&
+            ball.y + ball.r > paddle.y &&
+            ball.y - ball.r < paddle.y + paddle.h &&
+            ball.x > paddle.x - ball.r &&
+            ball.x < paddle.x + paddle.w + ball.r) {
+
+          const hitPos = (ball.x - paddle.x) / paddle.w; // 0 to 1
+          const angle = -Math.PI / 2 + (hitPos - 0.5) * 1.2; // -1.1 to -0.5 rad
+          const speed = ball.speed * (powerActive && selectedTurtle.powerType === 'speed' ? 1.5 : 1);
+
+          ball.dx = Math.cos(angle) * speed;
+          ball.dy = Math.sin(angle) * speed;
+          ball.y = paddle.y - ball.r - 1;
+
+          // Spawn hit particles
+          for (let p = 0; p < 5; p++) {
+            spawnParticle(ball.x, ball.y, selectedTurtle.color, 2, 20);
+          }
+        }
+
+        // Brick collision
+        for (let j = bricks.length - 1; j >= 0; j--) {
+          const brick = bricks[j];
+          if (ballBrickCollision(ball, brick)) {
+            handleBrickHit(ball, brick, j);
+          }
+        }
+      }
+
+      // Power-ups
+      for (let i = powerUps.length - 1; i >= 0; i--) {
+        const pu = powerUps[i];
+        pu.y += 2;
+        pu.angle += 0.05;
+        if (pu.y > canvas.height) {
+          powerUps.splice(i, 1);
+          continue;
+        }
+        // Collect
+        if (pu.x > paddle.x && pu.x < paddle.x + paddle.w &&
+            pu.y > paddle.y && pu.y < paddle.y + paddle.h) {
+          applyPowerUp(pu);
+          powerUps.splice(i, 1);
+        }
+      }
+
+      // Particles
+      for (let i = particles.length - 1; i >= 0; i--) {
+        const p = particles[i];
+        p.x += p.dx;
+        p.y += p.dy;
+        p.dy += 0.1; // gravity
+        p.life--;
+        p.alpha = p.life / p.maxLife;
+        if (p.life <= 0) particles.splice(i, 1);
+      }
+
+      // Background effects
+      bgEffects.forEach(e => {
+        e.y -= e.speed;
+        e.alpha = 0.3 + Math.sin(Date.now() * 0.003 + e.x) * 0.2;
+        if (e.y < canvas.height - 40) {
+          e.y = canvas.height;
+          e.x = Math.random() * canvas.width;
+        }
+      });
+
+      // Brick hit animations
+      bricks.forEach(b => {
+        if (b.hitTimer > 0) b.hitTimer--;
+      });
+
+      // Check level complete
+      const breakable = bricks.filter(b => b.type !== 'metal' || b.hp <= 0);
+      const remaining = bricks.filter(b => b.type !== 'metal' && b.hp > 0);
+      if (remaining.length === 0 && bricks.length > 0) {
+        nextLevel();
+      }
+
+      updateHUD();
+    }
+
+    function ballBrickCollision(ball, brick) {
+      if (brick.hp <= 0) return false;
+      const closestX = Math.max(brick.x, Math.min(ball.x, brick.x + brick.w));
+      const closestY = Math.max(brick.y, Math.min(ball.y, brick.y + brick.h));
+      const dx = ball.x - closestX;
+      const dy = ball.y - closestY;
+      return (dx * dx + dy * dy) < (ball.r * ball.r);
+    }
+
+    function handleBrickHit(ball, brick, brickIndex) {
+      if (brick.type === 'metal' && !powerActive) {
+        // Reflect but don't destroy
+        reflectBall(ball, brick);
+        brick.hitTimer = 10;
+        spawnParticle(ball.x, ball.y, '#888', 2, 15);
+        return;
+      }
+
+      brick.hp--;
+      brick.hitTimer = 10;
+
+      // Combo
+      combo++;
+      comboTimer = 60;
+      const comboMultiplier = Math.min(combo, 10);
+
+      // Score
+      const baseScore = 10 * (brick.maxHp - brick.hp + 1);
+      score += baseScore * comboMultiplier;
+
+      // Power meter
+      powerMeter = Math.min(100, powerMeter + 5 + combo);
+
+      // Particles
+      const brickColor = getBrickColor(brick);
+      for (let i = 0; i < 8; i++) {
+        spawnParticle(
+          brick.x + brick.w / 2,
+          brick.y + brick.h / 2,
+          brickColor,
+          2 + Math.random() * 3,
+          30 + Math.random() * 20
+        );
+      }
+
+      if (brick.hp <= 0) {
+        // Brick destroyed
+        bricks.splice(brickIndex, 1);
+        shakeIntensity = Math.min(shakeIntensity + 3, 10);
+
+        // Brick debris particles
+        for (let i = 0; i < 12; i++) {
+          spawnParticle(
+            brick.x + Math.random() * brick.w,
+            brick.y + Math.random() * brick.h,
+            brickColor,
+            3 + Math.random() * 4,
+            40 + Math.random() * 30
+          );
+        }
+
+        // Random power-up drop
+        if (Math.random() < 0.12) {
+          const types = ['life', 'wide', 'slow'];
+          powerUps.push({
+            x: brick.x + brick.w / 2,
+            y: brick.y + brick.h / 2,
+            type: types[Math.floor(Math.random() * types.length)],
+            angle: 0
+          });
+        }
+
+        // Fireball explosion
+        if (powerActive && selectedTurtle.powerType === 'fireball') {
+          // Destroy adjacent bricks
+          const bx = brick.x + brick.w / 2;
+          const by = brick.y + brick.h / 2;
+          for (let k = bricks.length - 1; k >= 0; k--) {
+            const b2 = bricks[k];
+            const dist = Math.hypot(b2.x + b2.w / 2 - bx, b2.y + b2.h / 2 - by);
+            if (dist < 80 && b2.hp > 0) {
+              b2.hp = 0;
+              score += 15;
+              for (let p = 0; p < 6; p++) {
+                spawnParticle(b2.x + b2.w / 2, b2.y + b2.h / 2, '#ff5722', 3, 25);
+              }
+              bricks.splice(k, 1);
+            }
+          }
+          shakeIntensity = 12;
+        }
+      }
+
+      // Slice power - ball goes through
+      if (powerActive && selectedTurtle.powerType === 'slice') {
+        // Don't reflect
+        return;
+      }
+
+      reflectBall(ball, brick);
+    }
+
+    function reflectBall(ball, brick) {
+      const bCX = brick.x + brick.w / 2;
+      const bCY = brick.y + brick.h / 2;
+      const dx = ball.x - bCX;
+      const dy = ball.y - bCY;
+
+      if (Math.abs(dx / brick.w) > Math.abs(dy / brick.h)) {
+        ball.dx = dx > 0 ? Math.abs(ball.dx) : -Math.abs(ball.dx);
+      } else {
+        ball.dy = dy > 0 ? Math.abs(ball.dy) : -Math.abs(ball.dy);
+      }
+    }
+
+    function getBrickColor(brick) {
+      if (brick.type === 'metal') return '#777';
+      if (brick.type === 'green') return '#4caf50';
+      const hpRatio = brick.hp / brick.maxHp;
+      if (brick.maxHp >= 3) {
+        if (hpRatio > 0.66) return '#f44336';
+        if (hpRatio > 0.33) return '#ff9800';
+        return '#ffeb3b';
+      }
+      if (brick.maxHp === 2) {
+        return hpRatio > 0.5 ? '#ff9800' : '#ffeb3b';
+      }
+      // Color by row position
+      const row = Math.floor((brick.y - 60) / 31);
+      const colors = ['#e74c3c', '#e67e22', '#f1c40f', '#2ecc71', '#3498db', '#9b59b6', '#e91e63', '#00bcd4'];
+      return colors[row % colors.length];
+    }
+
+    function applyPowerUp(pu) {
+      switch (pu.type) {
+        case 'life':
+          lives = Math.min(5, lives + 1);
+          break;
+        case 'wide':
+          paddle.w = Math.min(canvas.width * 0.25, paddle.w * 1.3);
+          break;
+        case 'slow':
+          balls.forEach(b => {
+            b.speed *= 0.8;
+            const angle = Math.atan2(b.dy, b.dx);
+            b.dx = Math.cos(angle) * b.speed;
+            b.dy = Math.sin(angle) * b.speed;
+          });
+          break;
+      }
+      // Collect effect
+      for (let i = 0; i < 15; i++) {
+        spawnParticle(pu.x, pu.y, '#4caf50', 2, 20);
+      }
+    }
+
+    function loseLife() {
+      lives--;
+      shakeIntensity = 15;
+
+      if (lives <= 0) {
+        gameOver();
+        return;
+      }
+
+      // Respawn ball
+      spawnBall();
+    }
+
+    function nextLevel() {
+      level++;
+      if (level > maxLevel) {
+        winGame();
+        return;
+      }
+      startLevel(level);
+    }
+
+    function gameOver() {
+      gameRunning = false;
+      cancelAnimationFrame(animFrameId);
+      document.getElementById('gameOverScore').textContent = `ניקוד: ${score}`;
+      document.getElementById('gameOverScreen').style.display = 'flex';
+    }
+
+    function winGame() {
+      gameRunning = false;
+      cancelAnimationFrame(animFrameId);
+      document.getElementById('winScore').textContent = `ניקוד סופי: ${score}`;
+      document.getElementById('winScreen').style.display = 'flex';
+    }
+
+    function restartGame() {
+      document.getElementById('gameOverScreen').style.display = 'none';
+      document.getElementById('winScreen').style.display = 'none';
+      score = 0;
+      lives = 3;
+      level = 1;
+      powerMeter = 0;
+      powerActive = false;
+      combo = 0;
+      particles = [];
+      powerUps = [];
+      balls = [];
+
+      generateBackground();
+      startLevel(level);
+      gameRunning = true;
+      gameLoop();
+    }
+
+    function backToSelect() {
+      document.getElementById('gameOverScreen').style.display = 'none';
+      document.getElementById('winScreen').style.display = 'none';
+      document.getElementById('hud').style.display = 'none';
+      document.getElementById('mobileControls').style.display = 'none';
+      canvas.style.display = 'none';
+      document.getElementById('selectScreen').style.display = 'flex';
+      gameRunning = false;
+      cancelAnimationFrame(animFrameId);
+    }
+
+    // ==================== PARTICLES ====================
+    function spawnParticle(x, y, color, size, life) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = 1 + Math.random() * 4;
+      particles.push({
+        x, y,
+        dx: Math.cos(angle) * speed,
+        dy: Math.sin(angle) * speed - 2,
+        size: size,
+        color: color,
+        life: life,
+        maxLife: life,
+        alpha: 1
+      });
+    }
+
+    // ==================== UPDATE HUD ====================
+    function updateHUD() {
+      document.getElementById('livesDisplay').textContent = `❤️ x${lives}`;
+      document.getElementById('scoreDisplay').textContent = `🏆 ${score}`;
+      document.getElementById('levelDisplay').textContent = `שלב ${level}`;
+      document.getElementById('powerFill').style.width = `${powerMeter}%`;
+      document.getElementById('powerFill').style.background = powerActive ? '#ff9800' : selectedTurtle.color;
+    }
+
+    // ==================== DRAW ====================
+    function draw() {
+      ctx.save();
+      ctx.translate(shakeX, shakeY);
+
+      // Background - night sky
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#0a0a1a');
+      gradient.addColorStop(0.5, '#1a1a2e');
+      gradient.addColorStop(1, '#2d1b0e');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(-10, -10, canvas.width + 20, canvas.height + 20);
+
+      // Stars
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      for (let i = 0; i < 50; i++) {
+        const sx = (i * 137.5) % canvas.width;
+        const sy = (i * 97.3) % (canvas.height * 0.4);
+        const ss = 1 + Math.sin(Date.now() * 0.001 + i) * 0.5;
+        ctx.beginPath();
+        ctx.arc(sx, sy, ss, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Moon
+      ctx.fillStyle = '#ffeebb';
+      ctx.beginPath();
+      ctx.arc(canvas.width * 0.15, canvas.height * 0.1, 30, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#0a0a1a';
+      ctx.beginPath();
+      ctx.arc(canvas.width * 0.15 - 10, canvas.height * 0.1 - 5, 25, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Buildings
+      buildings.forEach(b => {
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.w, b.h);
+
+        // Windows
+        b.windows.forEach(w => {
+          if (w.lit && Math.sin(Date.now() * 0.001 + w.flicker * 10) > -0.8) {
+            ctx.fillStyle = `rgba(255, 230, 150, ${0.4 + Math.sin(Date.now() * 0.002 + w.flicker * 5) * 0.2})`;
+          } else {
+            ctx.fillStyle = 'rgba(20, 20, 40, 0.8)';
+          }
+          ctx.fillRect(b.x + w.x, b.y + w.y, 8, 12);
+        });
+      });
+
+      // Street level
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, canvas.height - 25, canvas.width, 25);
+
+      // Sewer grate lines
+      ctx.strokeStyle = 'rgba(60,60,60,0.5)';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < canvas.width; i += 40) {
+        ctx.beginPath();
+        ctx.moveTo(i, canvas.height - 25);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+      }
+
+      // Green ooze
+      bgEffects.forEach(e => {
+        ctx.fillStyle = `rgba(76, 175, 80, ${e.alpha * 0.4})`;
+        ctx.beginPath();
+        ctx.arc(e.x, e.y, e.size, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      // ---- Draw bricks ----
+      bricks.forEach(brick => {
+        if (brick.hp <= 0) return;
+
+        const color = getBrickColor(brick);
+        const shake = brick.hitTimer > 0 ? (Math.random() - 0.5) * 4 : 0;
+
+        // Brick shadow
+        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillRect(brick.x + 2, brick.y + 2, brick.w, brick.h);
+
+        // Main brick
+        ctx.fillStyle = color;
+        ctx.fillRect(brick.x + shake, brick.y + shake, brick.w, brick.h);
+
+        // Brick highlight
+        ctx.fillStyle = 'rgba(255,255,255,0.15)';
+        ctx.fillRect(brick.x + shake, brick.y + shake, brick.w, brick.h * 0.4);
+
+        // Brick border
+        ctx.strokeStyle = 'rgba(0,0,0,0.3)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(brick.x + shake, brick.y + shake, brick.w, brick.h);
+
+        // Brick crack lines for damaged bricks
+        if (brick.hp < brick.maxHp) {
+          ctx.strokeStyle = 'rgba(0,0,0,0.5)';
+          ctx.lineWidth = 1.5;
+          const cx = brick.x + brick.w / 2 + shake;
+          const cy = brick.y + brick.h / 2 + shake;
+          for (let c = 0; c < brick.maxHp - brick.hp; c++) {
+            ctx.beginPath();
+            ctx.moveTo(cx + (c - 1) * 5, cy - 5);
+            ctx.lineTo(cx + c * 3, cy + 5);
+            ctx.stroke();
+          }
+        }
+
+        // Metal bricks get a shiny effect
+        if (brick.type === 'metal') {
+          ctx.fillStyle = 'rgba(255,255,255,0.1)';
+          ctx.fillRect(brick.x + shake + 2, brick.y + shake + 2, brick.w - 4, brick.h * 0.3);
+          // Bolt dots
+          ctx.fillStyle = '#555';
+          ctx.beginPath();
+          ctx.arc(brick.x + shake + 5, brick.y + shake + brick.h / 2, 2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(brick.x + shake + brick.w - 5, brick.y + shake + brick.h / 2, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      // ---- Draw power-ups ----
+      powerUps.forEach(pu => {
+        ctx.save();
+        ctx.translate(pu.x, pu.y);
+        ctx.rotate(pu.angle);
+
+        let emoji = '❤️';
+        if (pu.type === 'wide') emoji = '↔️';
+        if (pu.type === 'slow') emoji = '🐌';
+
+        ctx.font = '20px serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(emoji, 0, 0);
+
+        // Glow
+        ctx.shadowColor = '#4caf50';
+        ctx.shadowBlur = 10;
+        ctx.fillText(emoji, 0, 0);
+        ctx.shadowBlur = 0;
+
+        ctx.restore();
+      });
+
+      // ---- Draw paddle (turtle) ----
+      drawPaddle();
+
+      // ---- Draw balls ----
+      balls.forEach(ball => {
+        // Trail
+        ball.trail.forEach((t, idx) => {
+          const alpha = (idx / ball.trail.length) * 0.4;
+          const size = ball.r * (idx / ball.trail.length);
+          ctx.fillStyle = ball.powered
+            ? `rgba(${hexToRgb(selectedTurtle.color)}, ${alpha})`
+            : `rgba(200, 200, 200, ${alpha})`;
+          ctx.beginPath();
+          ctx.arc(t.x, t.y, size, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // Ball glow
+        if (ball.powered) {
+          ctx.shadowColor = selectedTurtle.color;
+          ctx.shadowBlur = 20;
+        }
+
+        // Ball body
+        const ballGrad = ctx.createRadialGradient(ball.x - 2, ball.y - 2, 1, ball.x, ball.y, ball.r);
+        if (ball.powered) {
+          ballGrad.addColorStop(0, '#fff');
+          ballGrad.addColorStop(0.5, selectedTurtle.color);
+          ballGrad.addColorStop(1, selectedTurtle.darkColor);
+        } else {
+          ballGrad.addColorStop(0, '#fff');
+          ballGrad.addColorStop(0.5, '#ccc');
+          ballGrad.addColorStop(1, '#888');
+        }
+        ctx.fillStyle = ballGrad;
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Fireball effect
+        if (ball.powered && selectedTurtle.powerType === 'fireball') {
+          for (let i = 0; i < 3; i++) {
+            ctx.fillStyle = `rgba(255, ${100 + Math.random() * 100}, 0, ${0.3 + Math.random() * 0.3})`;
+            ctx.beginPath();
+            ctx.arc(
+              ball.x + (Math.random() - 0.5) * 10,
+              ball.y + (Math.random() - 0.5) * 10,
+              ball.r * (0.5 + Math.random() * 0.8),
+              0, Math.PI * 2
+            );
+            ctx.fill();
+          }
+        }
+
+        // Slice effect
+        if (ball.powered && selectedTurtle.powerType === 'slice') {
+          ctx.strokeStyle = selectedTurtle.color;
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          const sliceAngle = Math.atan2(ball.dy, ball.dx);
+          ctx.moveTo(
+            ball.x - Math.cos(sliceAngle + Math.PI / 2) * ball.r * 2,
+            ball.y - Math.sin(sliceAngle + Math.PI / 2) * ball.r * 2
+          );
+          ctx.lineTo(
+            ball.x + Math.cos(sliceAngle + Math.PI / 2) * ball.r * 2,
+            ball.y + Math.sin(sliceAngle + Math.PI / 2) * ball.r * 2
+          );
+          ctx.stroke();
+        }
+
+        ctx.shadowBlur = 0;
+      });
+
+      // ---- Particles ----
+      particles.forEach(p => {
+        ctx.globalAlpha = p.alpha;
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * p.alpha, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.globalAlpha = 1;
+
+      // ---- Combo display ----
+      if (combo > 2 && comboTimer > 0) {
+        ctx.save();
+        ctx.font = `bold ${20 + combo * 2}px 'GameFont', Arial Black, sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.fillStyle = `rgba(255, 235, 59, ${comboTimer / 60})`;
+        ctx.shadowColor = '#ff9800';
+        ctx.shadowBlur = 10;
+        ctx.fillText(`x${combo} קומבו!`, canvas.width / 2, canvas.height / 2);
+        ctx.shadowBlur = 0;
+        ctx.restore();
+      }
+
+      // ---- Power active indicator ----
+      if (powerActive) {
+        ctx.strokeStyle = selectedTurtle.color;
+        ctx.lineWidth = 3;
+        ctx.shadowColor = selectedTurtle.color;
+        ctx.shadowBlur = 15;
+        ctx.strokeRect(5, 5, canvas.width - 10, canvas.height - 10);
+        ctx.shadowBlur = 0;
+      }
+
+      ctx.restore();
+    }
+
+    function drawPaddle() {
+      const px = paddle.x;
+      const py = paddle.y;
+      const pw = paddle.w;
+      const ph = paddle.h;
+
+      // Paddle glow
+      ctx.shadowColor = selectedTurtle.color;
+      ctx.shadowBlur = powerActive ? 20 : 8;
+
+      // Main paddle body (shell shape)
+      const paddleGrad = ctx.createLinearGradient(px, py, px, py + ph);
+      paddleGrad.addColorStop(0, selectedTurtle.color);
+      paddleGrad.addColorStop(0.5, selectedTurtle.darkColor);
+      paddleGrad.addColorStop(1, selectedTurtle.color);
+
+      ctx.fillStyle = paddleGrad;
+      ctx.beginPath();
+      ctx.roundRect(px, py, pw, ph, ph / 2);
+      ctx.fill();
+
+      // Shell pattern on paddle
+      ctx.fillStyle = 'rgba(0,0,0,0.2)';
+      const segments = 5;
+      for (let i = 1; i < segments; i++) {
+        const sx = px + (pw / segments) * i;
+        ctx.beginPath();
+        ctx.moveTo(sx, py + 2);
+        ctx.lineTo(sx, py + ph - 2);
+        ctx.lineWidth = 1;
+        ctx.strokeStyle = 'rgba(0,0,0,0.2)';
+        ctx.stroke();
+      }
+
+      // Turtle head in center
+      const headSize = Math.min(ph * 1.2, 20);
+      const headX = px + pw / 2;
+      const headY = py - headSize * 0.3;
+
+      // Head
+      ctx.fillStyle = '#4caf50';
+      ctx.beginPath();
+      ctx.arc(headX, headY, headSize * 0.5, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Bandana
+      ctx.fillStyle = selectedTurtle.bandana;
+      ctx.fillRect(headX - headSize * 0.55, headY - headSize * 0.15, headSize * 1.1, headSize * 0.3);
+
+      // Eyes
+      ctx.fillStyle = '#fff';
+      ctx.beginPath();
+      ctx.ellipse(headX - headSize * 0.2, headY - headSize * 0.05, headSize * 0.12, headSize * 0.15, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(headX + headSize * 0.2, headY - headSize * 0.05, headSize * 0.12, headSize * 0.15, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pupils
+      ctx.fillStyle = '#000';
+      ctx.beginPath();
+      ctx.arc(headX - headSize * 0.18, headY - headSize * 0.05, headSize * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(headX + headSize * 0.22, headY - headSize * 0.05, headSize * 0.06, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.shadowBlur = 0;
+    }
+
+    // ==================== UTILITIES ====================
+    function hexToRgb(hex) {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? `${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)}`
+        : '255, 255, 255';
+    }
+  </script>
+</body>
+</html>

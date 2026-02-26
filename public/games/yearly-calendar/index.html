@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>לוח שנה - חגים ומועדים</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #333;
+      overflow-x: hidden;
+    }
+
+    .header {
+      text-align: center;
+      padding: 20px 10px 10px;
+      color: white;
+    }
+
+    .header h1 {
+      font-size: 2.2em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      font-size: 1.1em;
+      opacity: 0.9;
+    }
+
+    .year-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      margin: 15px 0;
+    }
+
+    .year-nav button {
+      background: rgba(255,255,255,0.2);
+      border: 2px solid rgba(255,255,255,0.5);
+      color: white;
+      font-size: 1.5em;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .year-nav button:hover {
+      background: rgba(255,255,255,0.4);
+      transform: scale(1.1);
+    }
+
+    .year-nav .year-display {
+      font-size: 2em;
+      font-weight: bold;
+      color: white;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 15px;
+      padding: 15px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .month-card {
+      background: white;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .month-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.2);
+    }
+
+    .month-header {
+      padding: 12px;
+      text-align: center;
+      font-size: 1.3em;
+      font-weight: bold;
+      color: white;
+    }
+
+    .month-0 .month-header { background: #e74c3c; }
+    .month-1 .month-header { background: #e67e22; }
+    .month-2 .month-header { background: #f1c40f; color: #333; }
+    .month-3 .month-header { background: #2ecc71; }
+    .month-4 .month-header { background: #1abc9c; }
+    .month-5 .month-header { background: #3498db; }
+    .month-6 .month-header { background: #9b59b6; }
+    .month-7 .month-header { background: #e91e63; }
+    .month-8 .month-header { background: #ff9800; }
+    .month-9 .month-header { background: #00bcd4; }
+    .month-10 .month-header { background: #8bc34a; }
+    .month-11 .month-header { background: #607d8b; }
+
+    .weekday-row {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      background: #f8f9fa;
+      border-bottom: 1px solid #eee;
+    }
+
+    .weekday-row span {
+      text-align: center;
+      padding: 6px 2px;
+      font-size: 0.8em;
+      font-weight: bold;
+      color: #666;
+    }
+
+    .weekday-row span:first-child {
+      color: #e74c3c;
+    }
+
+    .weekday-row span:last-child {
+      color: #e74c3c;
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 1px;
+      padding: 5px;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      font-size: 0.95em;
+      position: relative;
+      cursor: default;
+      transition: background 0.2s;
+      min-height: 36px;
+    }
+
+    .day-cell:not(.empty):hover {
+      background: #f0f0f0;
+    }
+
+    .day-cell.today {
+      background: #667eea;
+      color: white;
+      font-weight: bold;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(102, 126, 234, 0.5);
+    }
+
+    .day-cell.holiday {
+      background: #fff3e0;
+      border: 2px solid #ff9800;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .day-cell.holiday.today {
+      background: #ff9800;
+      color: white;
+    }
+
+    .day-cell .holiday-dot {
+      width: 5px;
+      height: 5px;
+      background: #ff9800;
+      border-radius: 50%;
+      position: absolute;
+      bottom: 2px;
+    }
+
+    .day-cell.today .holiday-dot {
+      background: white;
+    }
+
+    .day-cell.shabbat {
+      color: #9b59b6;
+      font-weight: 600;
+    }
+
+    .day-cell.friday {
+      color: #3498db;
+    }
+
+    .month-holidays {
+      padding: 8px 12px;
+      border-top: 1px solid #eee;
+      background: #fffde7;
+    }
+
+    .month-holidays .holiday-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 0;
+      font-size: 0.85em;
+    }
+
+    .month-holidays .holiday-item .holiday-emoji {
+      font-size: 1.2em;
+    }
+
+    .month-holidays .holiday-item .holiday-date {
+      color: #888;
+      font-size: 0.85em;
+      min-width: 35px;
+    }
+
+    .month-holidays .holiday-item .holiday-name {
+      font-weight: 600;
+      color: #e65100;
+    }
+
+    /* Holiday tooltip */
+    .tooltip {
+      display: none;
+      position: fixed;
+      background: #333;
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.9em;
+      z-index: 1000;
+      pointer-events: none;
+      max-width: 250px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+
+    .tooltip.visible {
+      display: block;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 20px;
+      padding: 15px;
+      color: white;
+      font-size: 0.9em;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 14px;
+      height: 14px;
+      border-radius: 4px;
+    }
+
+    .legend-dot.today-dot {
+      background: #667eea;
+    }
+
+    .legend-dot.holiday-dot {
+      background: #fff3e0;
+      border: 2px solid #ff9800;
+    }
+
+    .legend-dot.shabbat-dot {
+      background: white;
+      color: #9b59b6;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7em;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.6em; }
+      .calendar-grid { gap: 10px; padding: 10px; }
+      .day-cell { font-size: 0.8em; min-height: 30px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>📅 לוח שנה</h1>
+    <p>חגים ומועדים בישראל</p>
+    <div class="year-nav">
+      <button id="prevYear">→</button>
+      <div class="year-display" id="yearDisplay"></div>
+      <button id="nextYear">←</button>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-dot today-dot"></div>
+      <span>היום</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot holiday-dot"></div>
+      <span>חג / מועד</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-dot shabbat-dot">ש</div>
+      <span>שבת</span>
+    </div>
+  </div>
+
+  <div class="calendar-grid" id="calendarGrid"></div>
+
+  <div class="tooltip" id="tooltip"></div>
+
+  <script>
+    const monthNames = [
+      'ינואר', 'פברואר', 'מרץ', 'אפריל', 'מאי', 'יוני',
+      'יולי', 'אוגוסט', 'ספטמבר', 'אוקטובר', 'נובמבר', 'דצמבר'
+    ];
+
+    const weekDays = ['א׳', 'ב׳', 'ג׳', 'ד׳', 'ה׳', 'ו׳', 'ש׳'];
+
+    // Israeli holidays database - approximate Gregorian dates
+    // These shift each year based on the Hebrew calendar
+    function getHolidays(year) {
+      // Holidays with approximate Gregorian dates for common years
+      // In a production app, you'd use a Hebrew calendar library
+      const holidaysByYear = {
+        2024: [
+          { month: 2, day: 24, name: 'פורים', emoji: '🎭' },
+          { month: 3, day: 23, name: 'ערב פסח', emoji: '🍷' },
+          { month: 3, day: 24, name: 'פסח', emoji: '🫓' },
+          { month: 3, day: 30, name: 'שביעי של פסח', emoji: '🫓' },
+          { month: 4, day: 6, name: 'יום השואה', emoji: '🕯️' },
+          { month: 4, day: 13, name: 'יום הזיכרון', emoji: '🕯️' },
+          { month: 4, day: 14, name: 'יום העצמאות', emoji: '🇮🇱' },
+          { month: 5, day: 26, name: 'ל"ג בעומר', emoji: '🔥' },
+          { month: 5, day: 12, name: 'שבועות', emoji: '🌾' },
+          { month: 9, day: 3, name: 'ראש השנה', emoji: '🍎' },
+          { month: 9, day: 4, name: 'ראש השנה ב׳', emoji: '🍯' },
+          { month: 9, day: 12, name: 'יום כיפור', emoji: '🕊️' },
+          { month: 9, day: 17, name: 'סוכות', emoji: '🛖' },
+          { month: 9, day: 24, name: 'שמחת תורה', emoji: '📜' },
+          { month: 11, day: 26, name: 'חנוכה (יום ראשון)', emoji: '🕎' },
+        ],
+        2025: [
+          { month: 2, day: 14, name: 'פורים', emoji: '🎭' },
+          { month: 3, day: 13, name: 'ערב פסח', emoji: '🍷' },
+          { month: 3, day: 14, name: 'פסח', emoji: '🫓' },
+          { month: 3, day: 20, name: 'שביעי של פסח', emoji: '🫓' },
+          { month: 3, day: 24, name: 'יום השואה', emoji: '🕯️' },
+          { month: 4, day: 1, name: 'יום הזיכרון', emoji: '🕯️' },
+          { month: 4, day: 2, name: 'יום העצמאות', emoji: '🇮🇱' },
+          { month: 4, day: 16, name: 'ל"ג בעומר', emoji: '🔥' },
+          { month: 5, day: 2, name: 'שבועות', emoji: '🌾' },
+          { month: 8, day: 23, name: 'ראש השנה', emoji: '🍎' },
+          { month: 8, day: 24, name: 'ראש השנה ב׳', emoji: '🍯' },
+          { month: 9, day: 1, name: 'יום כיפור', emoji: '🕊️' },
+          { month: 9, day: 6, name: 'סוכות', emoji: '🛖' },
+          { month: 9, day: 13, name: 'שמחת תורה', emoji: '📜' },
+          { month: 11, day: 15, name: 'חנוכה (יום ראשון)', emoji: '🕎' },
+        ],
+        2026: [
+          { month: 2, day: 3, name: 'פורים', emoji: '🎭' },
+          { month: 3, day: 2, name: 'ערב פסח', emoji: '🍷' },
+          { month: 3, day: 3, name: 'פסח', emoji: '🫓' },
+          { month: 3, day: 9, name: 'שביעי של פסח', emoji: '🫓' },
+          { month: 3, day: 14, name: 'יום השואה', emoji: '🕯️' },
+          { month: 3, day: 21, name: 'יום הזיכרון', emoji: '🕯️' },
+          { month: 3, day: 22, name: 'יום העצמאות', emoji: '🇮🇱' },
+          { month: 4, day: 5, name: 'ל"ג בעומר', emoji: '🔥' },
+          { month: 4, day: 22, name: 'שבועות', emoji: '🌾' },
+          { month: 8, day: 12, name: 'ראש השנה', emoji: '🍎' },
+          { month: 8, day: 13, name: 'ראש השנה ב׳', emoji: '🍯' },
+          { month: 8, day: 21, name: 'יום כיפור', emoji: '🕊️' },
+          { month: 8, day: 26, name: 'סוכות', emoji: '🛖' },
+          { month: 9, day: 3, name: 'שמחת תורה', emoji: '📜' },
+          { month: 11, day: 5, name: 'חנוכה (יום ראשון)', emoji: '🕎' },
+        ],
+        2027: [
+          { month: 2, day: 23, name: 'פורים', emoji: '🎭' },
+          { month: 3, day: 22, name: 'ערב פסח', emoji: '🍷' },
+          { month: 3, day: 23, name: 'פסח', emoji: '🫓' },
+          { month: 3, day: 29, name: 'שביעי של פסח', emoji: '🫓' },
+          { month: 4, day: 1, name: 'יום השואה', emoji: '🕯️' },
+          { month: 4, day: 8, name: 'יום הזיכרון', emoji: '🕯️' },
+          { month: 4, day: 9, name: 'יום העצמאות', emoji: '🇮🇱' },
+          { month: 4, day: 25, name: 'ל"ג בעומר', emoji: '🔥' },
+          { month: 5, day: 12, name: 'שבועות', emoji: '🌾' },
+          { month: 9, day: 2, name: 'ראש השנה', emoji: '🍎' },
+          { month: 9, day: 3, name: 'ראש השנה ב׳', emoji: '🍯' },
+          { month: 9, day: 11, name: 'יום כיפור', emoji: '🕊️' },
+          { month: 9, day: 16, name: 'סוכות', emoji: '🛖' },
+          { month: 9, day: 23, name: 'שמחת תורה', emoji: '📜' },
+          { month: 11, day: 25, name: 'חנוכה (יום ראשון)', emoji: '🕎' },
+        ],
+      };
+
+      // Fixed holidays that are always on the same Gregorian date
+      const fixedHolidays = [
+        { month: 0, day: 1, name: 'ראש השנה האזרחית', emoji: '🎉' },
+        { month: 4, day: 1, name: 'יום העבודה', emoji: '⚒️' },
+      ];
+
+      const holidays = [...fixedHolidays];
+
+      if (holidaysByYear[year]) {
+        holidays.push(...holidaysByYear[year]);
+      } else {
+        // Fallback approximate dates for years not in the database
+        holidays.push(
+          { month: 2, day: 15, name: 'פורים (משוער)', emoji: '🎭' },
+          { month: 3, day: 15, name: 'פסח (משוער)', emoji: '🫓' },
+          { month: 3, day: 21, name: 'שביעי של פסח (משוער)', emoji: '🫓' },
+          { month: 3, day: 25, name: 'יום השואה (משוער)', emoji: '🕯️' },
+          { month: 4, day: 3, name: 'יום הזיכרון (משוער)', emoji: '🕯️' },
+          { month: 4, day: 4, name: 'יום העצמאות (משוער)', emoji: '🇮🇱' },
+          { month: 4, day: 18, name: 'ל"ג בעומר (משוער)', emoji: '🔥' },
+          { month: 5, day: 5, name: 'שבועות (משוער)', emoji: '🌾' },
+          { month: 8, day: 15, name: 'ראש השנה (משוער)', emoji: '🍎' },
+          { month: 8, day: 16, name: 'ראש השנה ב׳ (משוער)', emoji: '🍯' },
+          { month: 8, day: 24, name: 'יום כיפור (משוער)', emoji: '🕊️' },
+          { month: 8, day: 29, name: 'סוכות (משוער)', emoji: '🛖' },
+          { month: 9, day: 6, name: 'שמחת תורה (משוער)', emoji: '📜' },
+          { month: 11, day: 15, name: 'חנוכה (משוער)', emoji: '🕎' },
+        );
+      }
+
+      return holidays;
+    }
+
+    let currentYear = new Date().getFullYear();
+    const today = new Date();
+
+    function buildCalendar(year) {
+      const grid = document.getElementById('calendarGrid');
+      grid.innerHTML = '';
+      document.getElementById('yearDisplay').textContent = year;
+
+      const holidays = getHolidays(year);
+
+      for (let month = 0; month < 12; month++) {
+        const card = document.createElement('div');
+        card.className = `month-card month-${month}`;
+
+        // Month header
+        const header = document.createElement('div');
+        header.className = 'month-header';
+        header.textContent = monthNames[month];
+        card.appendChild(header);
+
+        // Weekday row
+        const weekRow = document.createElement('div');
+        weekRow.className = 'weekday-row';
+        weekDays.forEach(d => {
+          const span = document.createElement('span');
+          span.textContent = d;
+          weekRow.appendChild(span);
+        });
+        card.appendChild(weekRow);
+
+        // Days
+        const daysGrid = document.createElement('div');
+        daysGrid.className = 'days-grid';
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // Empty cells for offset
+        for (let i = 0; i < firstDay; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'day-cell empty';
+          daysGrid.appendChild(empty);
+        }
+
+        // Day cells
+        for (let day = 1; day <= daysInMonth; day++) {
+          const cell = document.createElement('div');
+          cell.className = 'day-cell';
+
+          const date = new Date(year, month, day);
+          const dayOfWeek = date.getDay();
+
+          // Check if today
+          if (year === today.getFullYear() && month === today.getMonth() && day === today.getDate()) {
+            cell.classList.add('today');
+          }
+
+          // Check if Shabbat (Saturday)
+          if (dayOfWeek === 6) {
+            cell.classList.add('shabbat');
+          }
+
+          // Check if Friday
+          if (dayOfWeek === 5) {
+            cell.classList.add('friday');
+          }
+
+          // Check if holiday
+          const dayHolidays = holidays.filter(h => h.month === month && h.day === day);
+          if (dayHolidays.length > 0) {
+            cell.classList.add('holiday');
+            const names = dayHolidays.map(h => `${h.emoji} ${h.name}`).join('\n');
+            cell.setAttribute('data-holiday', names);
+
+            const dot = document.createElement('div');
+            dot.className = 'holiday-dot';
+            cell.appendChild(dot);
+
+            cell.addEventListener('mouseenter', showTooltip);
+            cell.addEventListener('mouseleave', hideTooltip);
+            cell.addEventListener('touchstart', showTooltip);
+          }
+
+          const num = document.createElement('span');
+          num.textContent = day;
+          cell.prepend(num);
+
+          daysGrid.appendChild(cell);
+        }
+
+        card.appendChild(daysGrid);
+
+        // Month holidays list
+        const monthHolidays = holidays.filter(h => h.month === month);
+        if (monthHolidays.length > 0) {
+          const holidaySection = document.createElement('div');
+          holidaySection.className = 'month-holidays';
+          monthHolidays.forEach(h => {
+            const item = document.createElement('div');
+            item.className = 'holiday-item';
+            item.innerHTML = `
+              <span class="holiday-emoji">${h.emoji}</span>
+              <span class="holiday-date">${h.day}</span>
+              <span class="holiday-name">${h.name}</span>
+            `;
+            holidaySection.appendChild(item);
+          });
+          card.appendChild(holidaySection);
+        }
+
+        grid.appendChild(card);
+      }
+    }
+
+    function showTooltip(e) {
+      const tooltip = document.getElementById('tooltip');
+      const text = e.currentTarget.getAttribute('data-holiday');
+      tooltip.textContent = text;
+      tooltip.classList.add('visible');
+
+      const rect = e.currentTarget.getBoundingClientRect();
+      tooltip.style.left = rect.left + rect.width / 2 - tooltip.offsetWidth / 2 + 'px';
+      tooltip.style.top = rect.top - tooltip.offsetHeight - 8 + 'px';
+    }
+
+    function hideTooltip() {
+      document.getElementById('tooltip').classList.remove('visible');
+    }
+
+    document.getElementById('prevYear').addEventListener('click', () => {
+      currentYear--;
+      buildCalendar(currentYear);
+    });
+
+    document.getElementById('nextYear').addEventListener('click', () => {
+      currentYear++;
+      buildCalendar(currentYear);
+    });
+
+    // Build initial calendar
+    buildCalendar(currentYear);
+  </script>
+</body>
+</html>

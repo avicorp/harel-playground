@@ -64,6 +64,14 @@ export const games: Game[] = [
     description: "Choose your Ninja Turtle and smash bricks in the old neighborhood! Cowabunga!",
     path: "/games/ninja-turtle/index.html",
   },
+  {
+    slug: "yearly-calendar",
+    title: "Yearly Calendar",
+    titleHe: "לוח שנה",
+    emoji: "📅",
+    description: "A beautiful yearly calendar with Israeli holidays and special dates!",
+    path: "/games/yearly-calendar/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

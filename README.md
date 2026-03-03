@@ -1,6 +1,7 @@
 # Harel Playground
 
-A game portal built with Next.js. The main page shows the latest game, and a nav bar menu lets you switch between all available games.
+A game portal built with Next.js for my children harel and yuval. The main page shows the latest game, and a nav bar menu lets you switch between all available games.
+The games are creaeted with claude code web.
 
 ## Games
 

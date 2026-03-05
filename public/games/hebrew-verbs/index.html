@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>לומדים גופים בפעלים</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Arial, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    color: #333;
+    overflow-x: hidden;
+  }
+
+  .container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    margin-bottom: 5px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+  }
+  .header p {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+
+  /* Progress bar */
+  .progress-bar-container {
+    background: rgba(255,255,255,0.3);
+    border-radius: 20px;
+    height: 12px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #f6d365, #fda085);
+    border-radius: 20px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+
+  /* Section labels */
+  .section-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .section-tab {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    background: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.6);
+    border: 2px solid transparent;
+    transition: all 0.3s;
+  }
+  .section-tab.active {
+    background: white;
+    color: #764ba2;
+    border-color: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  }
+  .section-tab.completed {
+    background: rgba(255,255,255,0.5);
+    color: #2e7d32;
+  }
+
+  /* Card */
+  .card {
+    background: white;
+    border-radius: 20px;
+    padding: 30px 25px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    animation: slideUp 0.4s ease;
+    position: relative;
+  }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Help button */
+  .help-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1.3rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+    z-index: 10;
+  }
+  .help-btn:hover { transform: scale(1.1); }
+
+  /* Help modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 100;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+  }
+  .modal-overlay.visible {
+    display: flex;
+  }
+  .modal {
+    background: white;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 550px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    position: relative;
+    animation: slideUp 0.3s ease;
+  }
+  .modal h2 {
+    color: #764ba2;
+    margin-bottom: 15px;
+    font-size: 1.4rem;
+  }
+  .modal table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 10px 0;
+  }
+  .modal th, .modal td {
+    padding: 8px 12px;
+    border: 1px solid #e0e0e0;
+    text-align: right;
+    font-size: 0.95rem;
+  }
+  .modal th {
+    background: #f3e5f5;
+    color: #6a1b9a;
+    font-weight: bold;
+  }
+  .modal .example {
+    background: #f5f5f5;
+    padding: 10px 15px;
+    border-radius: 10px;
+    margin: 8px 0;
+    border-right: 4px solid #764ba2;
+    font-size: 0.95rem;
+  }
+  .modal-close {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #f44336;
+    color: white;
+    font-size: 1.2rem;
+    border: none;
+    cursor: pointer;
+  }
+
+  /* Section intro */
+  .section-intro {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  .section-intro .emoji {
+    font-size: 3rem;
+    margin-bottom: 10px;
+  }
+  .section-intro h2 {
+    color: #764ba2;
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+  .section-intro p {
+    color: #666;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  /* Question area */
+  .question-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .question-num {
+    font-size: 0.85rem;
+    color: #999;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .sentence {
+    font-size: 1.4rem;
+    text-align: center;
+    margin-bottom: 25px;
+    line-height: 1.8;
+    color: #333;
+  }
+  .blank {
+    display: inline-block;
+    min-width: 80px;
+    border-bottom: 3px dashed #764ba2;
+    padding: 0 5px;
+    color: #764ba2;
+    font-weight: bold;
+  }
+  .blank.correct {
+    border-bottom-color: #4caf50;
+    color: #4caf50;
+  }
+  .blank.wrong {
+    border-bottom-color: #f44336;
+    color: #f44336;
+  }
+
+  /* Options */
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .option-btn {
+    padding: 14px 10px;
+    border: 2px solid #e0e0e0;
+    border-radius: 12px;
+    background: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    color: #333;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: #764ba2;
+    background: #f3e5f5;
+    transform: translateY(-2px);
+  }
+  .option-btn.selected {
+    border-color: #764ba2;
+    background: #f3e5f5;
+    color: #764ba2;
+    font-weight: bold;
+  }
+  .option-btn.correct {
+    border-color: #4caf50;
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .option-btn.wrong {
+    border-color: #f44336;
+    background: #fbe9e7;
+    color: #c62828;
+  }
+  .option-btn:disabled {
+    cursor: default;
+  }
+
+  /* Feedback */
+  .feedback {
+    text-align: center;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: none;
+  }
+  .feedback.show { display: block; }
+  .feedback.correct {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+  .feedback.wrong {
+    background: #fbe9e7;
+    color: #c62828;
+  }
+
+  /* Next button */
+  .next-btn {
+    padding: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-family: inherit;
+    display: none;
+  }
+  .next-btn.show { display: block; }
+  .next-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+
+  /* Start screen */
+  .start-screen {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+  }
+  .start-screen .emoji { font-size: 4rem; }
+  .start-screen h2 { color: #764ba2; font-size: 1.6rem; }
+  .start-screen p { color: #666; font-size: 1.05rem; line-height: 1.7; max-width: 400px; }
+  .start-btn {
+    padding: 16px 50px;
+    border: none;
+    border-radius: 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    font-family: inherit;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    transition: all 0.3s;
+  }
+  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 6px 25px rgba(0,0,0,0.3); }
+
+  /* End screen */
+  .end-screen {
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+  }
+  .end-screen .emoji { font-size: 4rem; }
+  .end-screen h2 { color: #764ba2; font-size: 1.6rem; }
+  .score-display {
+    font-size: 3rem;
+    font-weight: bold;
+    color: #764ba2;
+  }
+  .score-label { color: #666; font-size: 1rem; }
+  .stars {
+    font-size: 2.5rem;
+    margin: 10px 0;
+  }
+
+  /* Explanation box in questions */
+  .explanation-box {
+    background: #fff3e0;
+    border-radius: 10px;
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    border-right: 4px solid #ff9800;
+    font-size: 0.9rem;
+    color: #e65100;
+    display: none;
+  }
+  .explanation-box.show { display: block; }
+
+  /* Two-step question (verb + person) */
+  .two-step-label {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #764ba2;
+    font-weight: bold;
+    margin-bottom: 8px;
+  }
+
+  /* Confetti */
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    z-index: 200;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>📝 לומדים גופים בפעלים</h1>
+    <p>גוף ראשון, שני ושלישי</p>
+  </div>
+
+  <div class="progress-bar-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+
+  <div class="section-tabs" id="sectionTabs">
+    <div class="section-tab" data-section="0">גוף ראשון</div>
+    <div class="section-tab" data-section="1">גוף שני</div>
+    <div class="section-tab" data-section="2">גוף שלישי</div>
+    <div class="section-tab" data-section="3">תרגול מסכם</div>
+  </div>
+
+  <div class="card" id="card">
+    <!-- Dynamic content here -->
+  </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal-overlay" id="helpModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeHelp()">✕</button>
+    <h2>❓ מה זה גוף בפעלים?</h2>
+    <p style="margin-bottom:15px; color:#555; line-height:1.6;">
+      כשאנחנו מדברים או כותבים, הפועל משתנה לפי מי שעושה את הפעולה. זה נקרא <strong>"גוף"</strong>.
+    </p>
+
+    <table>
+      <tr>
+        <th>גוף</th>
+        <th>כינוי</th>
+        <th>הסבר</th>
+      </tr>
+      <tr>
+        <td><strong>ראשון</strong><br>"מדבר"</td>
+        <td>אני, אנחנו</td>
+        <td>האדם שמדבר</td>
+      </tr>
+      <tr>
+        <td><strong>שני</strong><br>"נוכח"</td>
+        <td>אתה, את,<br>אתם, אתן</td>
+        <td>מי שמדברים אליו</td>
+      </tr>
+      <tr>
+        <td><strong>שלישי</strong><br>"נסתר"</td>
+        <td>הוא, היא,<br>הם, הן</td>
+        <td>מי שמדברים עליו</td>
+      </tr>
+    </table>
+
+    <h3 style="color:#764ba2; margin: 15px 0 8px;">דוגמאות:</h3>
+    <div class="example">
+      <strong>גוף ראשון:</strong> "אני <u>כותב</u> מכתב" / "אנחנו <u>לומדים</u> יחד"
+    </div>
+    <div class="example">
+      <strong>גוף שני:</strong> "אתה <u>יודע</u> את התשובה?" / "את <u>באה</u> מחר?"
+    </div>
+    <div class="example">
+      <strong>גוף שלישי:</strong> "הוא <u>רץ</u> מהר" / "הן <u>שרות</u> יפה"
+    </div>
+
+    <h3 style="color:#764ba2; margin: 15px 0 8px;">טיפ לזיהוי:</h3>
+    <div class="example">
+      🔑 חפשו את <strong>כינוי הגוף</strong> במשפט (אני/אתה/הוא...) — הוא יגלה לכם את הגוף!
+    </div>
+  </div>
+</div>
+
+<script>
+// ============ DATA ============
+
+const sections = [
+  {
+    name: "גוף ראשון",
+    subtitle: "מדבר — אני / אנחנו",
+    emoji: "🗣️",
+    intro: "גוף ראשון הוא כשהדובר מדבר על עצמו.\nכינויי הגוף: אני, אנחנו.",
+    questions: [
+      {
+        sentence: "אני ___ ספר מעניין.",
+        blank: "קורא",
+        options: ["קורא", "קוראת", "קוראים", "קורא"],
+        correctIndex: 0,
+        person: "גוף ראשון",
+        explanation: "אני (זכר) → קורא. הפועל בגוף ראשון יחיד זכר."
+      },
+      {
+        sentence: "אני ___ לבית הספר כל בוקר.",
+        blank: "הולכת",
+        options: ["הולך", "הולכת", "הולכים", "הולכות"],
+        correctIndex: 1,
+        person: "גוף ראשון",
+        explanation: "אני (נקבה) → הולכת. הפועל בגוף ראשון יחיד נקבה."
+      },
+      {
+        sentence: "אנחנו ___ כדורגל אחרי הלימודים.",
+        blank: "משחקים",
+        options: ["משחק", "משחקת", "משחקים", "משחקות"],
+        correctIndex: 2,
+        person: "גוף ראשון",
+        explanation: "אנחנו → משחקים. הפועל בגוף ראשון רבים."
+      },
+      {
+        sentence: "אני ___ לעזור לך.",
+        blank: "רוצה",
+        options: ["רוצה", "רוצים", "רוצות", "רוצה"],
+        correctIndex: 0,
+        person: "גוף ראשון",
+        explanation: "אני → רוצה. הפועל בגוף ראשון יחיד."
+      },
+      {
+        sentence: "אנחנו ___ שיעורי בית ביחד.",
+        blank: "עושים",
+        options: ["עושה", "עושים", "עושות", "עושה"],
+        correctIndex: 1,
+        person: "גוף ראשון",
+        explanation: "אנחנו → עושים. הפועל בגוף ראשון רבים."
+      }
+    ]
+  },
+  {
+    name: "גוף שני",
+    subtitle: "נוכח — אתה / את / אתם / אתן",
+    emoji: "👉",
+    intro: "גוף שני הוא כשמדברים אל מישהו.\nכינויי הגוף: אתה, את, אתם, אתן.",
+    questions: [
+      {
+        sentence: "אתה ___ את התשובה?",
+        blank: "יודע",
+        options: ["יודע", "יודעת", "יודעים", "יודע"],
+        correctIndex: 0,
+        person: "גוף שני",
+        explanation: "אתה → יודע. הפועל בגוף שני יחיד זכר."
+      },
+      {
+        sentence: "את ___ מחר למסיבה?",
+        blank: "באה",
+        options: ["בא", "באה", "באים", "באות"],
+        correctIndex: 1,
+        person: "גוף שני",
+        explanation: "את → באה. הפועל בגוף שני יחיד נקבה."
+      },
+      {
+        sentence: "אתם ___ לשבת בשקט?",
+        blank: "יכולים",
+        options: ["יכול", "יכולה", "יכולים", "יכולות"],
+        correctIndex: 2,
+        person: "גוף שני",
+        explanation: "אתם → יכולים. הפועל בגוף שני רבים זכר."
+      },
+      {
+        sentence: "אתן ___ את השיר?",
+        blank: "שרות",
+        options: ["שר", "שרה", "שרים", "שרות"],
+        correctIndex: 3,
+        person: "גוף שני",
+        explanation: "אתן → שרות. הפועל בגוף שני רבים נקבה."
+      },
+      {
+        sentence: "אתה ___ מהר מאוד!",
+        blank: "רץ",
+        options: ["רץ", "רצה", "רצים", "רצות"],
+        correctIndex: 0,
+        person: "גוף שני",
+        explanation: "אתה → רץ. הפועל בגוף שני יחיד זכר."
+      }
+    ]
+  },
+  {
+    name: "גוף שלישי",
+    subtitle: "נסתר — הוא / היא / הם / הן",
+    emoji: "👤",
+    intro: "גוף שלישי הוא כשמדברים על מישהו אחר.\nכינויי הגוף: הוא, היא, הם, הן.",
+    questions: [
+      {
+        sentence: "הוא ___ את שיעורי הבית.",
+        blank: "כותב",
+        options: ["כותב", "כותבת", "כותבים", "כותבות"],
+        correctIndex: 0,
+        person: "גוף שלישי",
+        explanation: "הוא → כותב. הפועל בגוף שלישי יחיד זכר."
+      },
+      {
+        sentence: "היא ___ ציור יפה.",
+        blank: "מציירת",
+        options: ["מצייר", "מציירת", "מציירים", "מציירות"],
+        correctIndex: 1,
+        person: "גוף שלישי",
+        explanation: "היא → מציירת. הפועל בגוף שלישי יחיד נקבה."
+      },
+      {
+        sentence: "הם ___ בפארק כל יום.",
+        blank: "משחקים",
+        options: ["משחק", "משחקת", "משחקים", "משחקות"],
+        correctIndex: 2,
+        person: "גוף שלישי",
+        explanation: "הם → משחקים. הפועל בגוף שלישי רבים זכר."
+      },
+      {
+        sentence: "הן ___ עוגה לחגיגה.",
+        blank: "אופות",
+        options: ["אופה", "אופה", "אופים", "אופות"],
+        correctIndex: 3,
+        person: "גוף שלישי",
+        explanation: "הן → אופות. הפועל בגוף שלישי רבים נקבה."
+      },
+      {
+        sentence: "הוא ___ מאוד מהר.",
+        blank: "שוחה",
+        options: ["שוחה", "שוחה", "שוחים", "שוחות"],
+        correctIndex: 0,
+        person: "גוף שלישי",
+        explanation: "הוא → שוחה. הפועל בגוף שלישי יחיד זכר."
+      }
+    ]
+  },
+  {
+    name: "תרגול מסכם",
+    subtitle: "כל הגופים ביחד!",
+    emoji: "🏆",
+    intro: "עכשיו נתרגל את כל מה שלמדנו!\nבחרו את הפועל הנכון ואת הגוף המתאים.",
+    questions: [
+      {
+        sentence: "אני ___ פיצה לארוחת ערב.",
+        blank: "אוכל",
+        options: ["אוכל", "אוכלת", "אוכלים", "אוכלות"],
+        correctIndex: 0,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 0,
+        person: "גוף ראשון",
+        explanation: "אני = גוף ראשון (מדבר). אני (זכר) → אוכל."
+      },
+      {
+        sentence: "הם ___ לבית הספר באוטובוס.",
+        blank: "נוסעים",
+        options: ["נוסע", "נוסעת", "נוסעים", "נוסעות"],
+        correctIndex: 2,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "הם = גוף שלישי (נסתר). הם → נוסעים."
+      },
+      {
+        sentence: "את ___ את החידה?",
+        blank: "פותרת",
+        options: ["פותר", "פותרת", "פותרים", "פותרות"],
+        correctIndex: 1,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 1,
+        person: "גוף שני",
+        explanation: "את = גוף שני (נוכח). את → פותרת."
+      },
+      {
+        sentence: "אנחנו ___ סרט ביחד.",
+        blank: "צופים",
+        options: ["צופה", "צופה", "צופים", "צופות"],
+        correctIndex: 2,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 0,
+        person: "גוף ראשון",
+        explanation: "אנחנו = גוף ראשון (מדבר). אנחנו → צופים."
+      },
+      {
+        sentence: "היא ___ ספר בספרייה.",
+        blank: "קוראת",
+        options: ["קורא", "קוראת", "קוראים", "קוראות"],
+        correctIndex: 1,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "היא = גוף שלישי (נסתר). היא → קוראת."
+      },
+      {
+        sentence: "אתם ___ את הבית?",
+        blank: "מנקים",
+        options: ["מנקה", "מנקה", "מנקים", "מנקות"],
+        correctIndex: 2,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 1,
+        person: "גוף שני",
+        explanation: "אתם = גוף שני (נוכח). אתם → מנקים."
+      },
+      {
+        sentence: "הוא ___ גיטרה יפה.",
+        blank: "מנגן",
+        options: ["מנגן", "מנגנת", "מנגנים", "מנגנות"],
+        correctIndex: 0,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "הוא = גוף שלישי (נסתר). הוא → מנגן."
+      },
+      {
+        sentence: "אני ___ מכתב לסבתא.",
+        blank: "כותבת",
+        options: ["כותב", "כותבת", "כותבים", "כותבות"],
+        correctIndex: 1,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 0,
+        person: "גוף ראשון",
+        explanation: "אני = גוף ראשון (מדבר). אני (נקבה) → כותבת."
+      },
+      {
+        sentence: "הן ___ בחצר.",
+        blank: "רוקדות",
+        options: ["רוקד", "רוקדת", "רוקדים", "רוקדות"],
+        correctIndex: 3,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "הן = גוף שלישי (נסתר). הן → רוקדות."
+      },
+      {
+        sentence: "אתה ___ לבד?",
+        blank: "גר",
+        options: ["גר", "גרה", "גרים", "גרות"],
+        correctIndex: 0,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 1,
+        person: "גוף שני",
+        explanation: "אתה = גוף שני (נוכח). אתה → גר."
+      },
+      {
+        sentence: "אנחנו ___ עברית בבית הספר.",
+        blank: "לומדים",
+        options: ["לומד", "לומדת", "לומדים", "לומדות"],
+        correctIndex: 2,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 0,
+        person: "גוף ראשון",
+        explanation: "אנחנו = גוף ראשון (מדבר). אנחנו → לומדים."
+      },
+      {
+        sentence: "את ___ לנגן בפסנתר?",
+        blank: "יודעת",
+        options: ["יודע", "יודעת", "יודעים", "יודעות"],
+        correctIndex: 1,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 1,
+        person: "גוף שני",
+        explanation: "את = גוף שני (נוכח). את → יודעת."
+      },
+      {
+        sentence: "הוא ___ חלב כל בוקר.",
+        blank: "שותה",
+        options: ["שותה", "שותה", "שותים", "שותות"],
+        correctIndex: 0,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "הוא = גוף שלישי (נסתר). הוא → שותה."
+      },
+      {
+        sentence: "אתן ___ לים בקיץ?",
+        blank: "נוסעות",
+        options: ["נוסע", "נוסעת", "נוסעים", "נוסעות"],
+        correctIndex: 3,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 1,
+        person: "גוף שני",
+        explanation: "אתן = גוף שני (נוכח). אתן → נוסעות."
+      },
+      {
+        sentence: "הם ___ כדורסל בהפסקה.",
+        blank: "משחקים",
+        options: ["משחק", "משחקת", "משחקים", "משחקות"],
+        correctIndex: 2,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "הם = גוף שלישי (נסתר). הם → משחקים."
+      },
+      {
+        sentence: "אני ___ בשמחה.",
+        blank: "שר",
+        options: ["שר", "שרה", "שרים", "שרות"],
+        correctIndex: 0,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 0,
+        person: "גוף ראשון",
+        explanation: "אני = גוף ראשון (מדבר). אני (זכר) → שר."
+      },
+      {
+        sentence: "היא ___ את הכלב בפארק.",
+        blank: "מטיילת",
+        options: ["מטייל", "מטיילת", "מטיילים", "מטיילות"],
+        correctIndex: 1,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 2,
+        person: "גוף שלישי",
+        explanation: "היא = גוף שלישי (נסתר). היא → מטיילת."
+      },
+      {
+        sentence: "אתה ___ את האוכל בעצמך?",
+        blank: "מבשל",
+        options: ["מבשל", "מבשלת", "מבשלים", "מבשלות"],
+        correctIndex: 0,
+        personOptions: ["גוף ראשון", "גוף שני", "גוף שלישי"],
+        correctPerson: 1,
+        person: "גוף שני",
+        explanation: "אתה = גוף שני (נוכח). אתה → מבשל."
+      }
+    ]
+  }
+];
+
+// ============ STATE ============
+let currentSection = -1; // -1 = start screen
+let currentQuestion = 0;
+let score = 0;
+let totalQuestions = 0;
+let answeredQuestions = 0;
+let sectionScores = [0, 0, 0, 0];
+// For two-step questions in section 4
+let step = 0; // 0 = pick verb, 1 = pick person
+let selectedVerb = null;
+let selectedPerson = null;
+
+// Count total
+sections.forEach(s => totalQuestions += s.questions.length);
+
+// ============ RENDER ============
+
+function render() {
+  if (currentSection === -1) {
+    renderStart();
+  } else if (currentSection >= sections.length) {
+    renderEnd();
+  } else {
+    renderQuestion();
+  }
+  updateProgress();
+  updateTabs();
+}
+
+function renderStart() {
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <div class="start-screen">
+      <div class="emoji">📝</div>
+      <h2>לומדים גופים בפעלים!</h2>
+      <p>
+        בלומדה הזו נלמד על שלושת הגופים בפעלים:<br>
+        <strong>גוף ראשון</strong> (אני, אנחנו)<br>
+        <strong>גוף שני</strong> (אתה, את, אתם, אתן)<br>
+        <strong>גוף שלישי</strong> (הוא, היא, הם, הן)
+      </p>
+      <button class="start-btn" onclick="startGame()">יאללה, מתחילים! 🚀</button>
+    </div>
+  `;
+}
+
+function renderEnd() {
+  const pct = Math.round((score / totalQuestions) * 100);
+  let stars = '';
+  let msg = '';
+  if (pct >= 90) { stars = '⭐⭐⭐'; msg = 'מדהים! שליטה מלאה!'; }
+  else if (pct >= 70) { stars = '⭐⭐'; msg = 'כל הכבוד! עבודה טובה!'; }
+  else if (pct >= 50) { stars = '⭐'; msg = 'לא רע! כדאי לתרגל עוד קצת.'; }
+  else { stars = ''; msg = 'כדאי לחזור ולתרגל שוב. אתם יכולים!'; }
+
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <button class="help-btn" onclick="openHelp()">❓</button>
+    <div class="end-screen">
+      <div class="emoji">🎉</div>
+      <h2>סיימתם את הלומדה!</h2>
+      <div class="stars">${stars}</div>
+      <div class="score-display">${score} / ${totalQuestions}</div>
+      <div class="score-label">${msg}</div>
+      <div style="margin-top:10px; text-align:right; font-size:0.9rem; color:#666;">
+        <div>גוף ראשון: ${sectionScores[0]}/${sections[0].questions.length}</div>
+        <div>גוף שני: ${sectionScores[1]}/${sections[1].questions.length}</div>
+        <div>גוף שלישי: ${sectionScores[2]}/${sections[2].questions.length}</div>
+        <div>תרגול מסכם: ${sectionScores[3]}/${sections[3].questions.length}</div>
+      </div>
+      <button class="start-btn" onclick="resetGame()" style="margin-top:15px;">שחק שוב 🔄</button>
+    </div>
+  `;
+  launchConfetti();
+}
+
+function renderQuestion() {
+  const section = sections[currentSection];
+  const q = section.questions[currentQuestion];
+  const isSummary = currentSection === 3;
+  const qNumInSection = currentQuestion + 1;
+  const totalInSection = section.questions.length;
+
+  // Build sentence with blank
+  const sentenceHtml = q.sentence.replace('___', `<span class="blank" id="blankWord">____</span>`);
+
+  let optionsHtml = '';
+  if (isSummary) {
+    // Two-step: first verb, then person
+    if (step === 0) {
+      optionsHtml = `
+        <div class="two-step-label">שלב 1: בחרו את הפועל הנכון</div>
+        <div class="options" id="optionsArea">
+          ${q.options.map((opt, i) => `<button class="option-btn" onclick="selectVerb(${i})">${opt}</button>`).join('')}
+        </div>
+      `;
+    } else {
+      optionsHtml = `
+        <div class="two-step-label">שלב 2: באיזה גוף הפועל?</div>
+        <div class="options" id="optionsArea">
+          ${q.personOptions.map((opt, i) => `<button class="option-btn" onclick="selectPerson(${i})">${opt}</button>`).join('')}
+        </div>
+      `;
+    }
+  } else {
+    optionsHtml = `
+      <div class="options" id="optionsArea">
+        ${q.options.map((opt, i) => `<button class="option-btn" onclick="selectAnswer(${i})">${opt}</button>`).join('')}
+      </div>
+    `;
+  }
+
+  const card = document.getElementById('card');
+  card.innerHTML = `
+    <button class="help-btn" onclick="openHelp()">❓</button>
+    <div class="section-intro">
+      <div class="emoji">${section.emoji}</div>
+      <h2>${section.name}</h2>
+      <p>${section.subtitle}</p>
+    </div>
+    <div class="question-area">
+      <div class="question-num">שאלה ${qNumInSection} מתוך ${totalInSection}</div>
+      <div class="sentence" id="sentenceArea">${sentenceHtml}</div>
+      ${optionsHtml}
+      <div class="explanation-box" id="explanationBox"></div>
+      <div class="feedback" id="feedback"></div>
+      <button class="next-btn" id="nextBtn" onclick="nextQuestion()">המשך ←</button>
+    </div>
+  `;
+}
+
+// ============ ACTIONS ============
+
+function startGame() {
+  currentSection = 0;
+  currentQuestion = 0;
+  score = 0;
+  answeredQuestions = 0;
+  sectionScores = [0, 0, 0, 0];
+  step = 0;
+  render();
+}
+
+function resetGame() {
+  currentSection = -1;
+  render();
+}
+
+function selectAnswer(index) {
+  const q = sections[currentSection].questions[currentQuestion];
+  const buttons = document.querySelectorAll('.option-btn');
+  const feedback = document.getElementById('feedback');
+  const explanation = document.getElementById('explanationBox');
+  const blank = document.getElementById('blankWord');
+  const nextBtn = document.getElementById('nextBtn');
+
+  buttons.forEach(b => b.disabled = true);
+
+  if (index === q.correctIndex) {
+    buttons[index].classList.add('correct');
+    blank.textContent = q.blank;
+    blank.classList.add('correct');
+    feedback.textContent = '✅ נכון מאוד!';
+    feedback.className = 'feedback show correct';
+    score++;
+    sectionScores[currentSection]++;
+  } else {
+    buttons[index].classList.add('wrong');
+    buttons[q.correctIndex].classList.add('correct');
+    blank.textContent = q.blank;
+    blank.classList.add('wrong');
+    feedback.textContent = '❌ לא נכון...';
+    feedback.className = 'feedback show wrong';
+  }
+
+  explanation.textContent = q.explanation;
+  explanation.classList.add('show');
+  nextBtn.classList.add('show');
+  answeredQuestions++;
+}
+
+function selectVerb(index) {
+  const q = sections[currentSection].questions[currentQuestion];
+  const buttons = document.querySelectorAll('.option-btn');
+  const blank = document.getElementById('blankWord');
+
+  selectedVerb = index;
+
+  // Mark selected
+  buttons.forEach(b => b.classList.remove('selected'));
+  buttons[index].classList.add('selected');
+
+  // Show in blank
+  blank.textContent = q.options[index];
+
+  // Small delay then move to step 2
+  buttons.forEach(b => b.disabled = true);
+  setTimeout(() => {
+    step = 1;
+    render();
+    // Keep the verb shown in blank
+    const newBlank = document.getElementById('blankWord');
+    if (newBlank) newBlank.textContent = q.options[selectedVerb];
+  }, 400);
+}
+
+function selectPerson(index) {
+  const q = sections[currentSection].questions[currentQuestion];
+  const buttons = document.querySelectorAll('.option-btn');
+  const feedback = document.getElementById('feedback');
+  const explanation = document.getElementById('explanationBox');
+  const blank = document.getElementById('blankWord');
+  const nextBtn = document.getElementById('nextBtn');
+
+  selectedPerson = index;
+  buttons.forEach(b => b.disabled = true);
+
+  const verbCorrect = selectedVerb === q.correctIndex;
+  const personCorrect = index === q.correctPerson;
+  const bothCorrect = verbCorrect && personCorrect;
+
+  if (bothCorrect) {
+    buttons[index].classList.add('correct');
+    blank.textContent = q.blank;
+    blank.classList.add('correct');
+    feedback.textContent = '✅ מצוין! גם הפועל וגם הגוף נכונים!';
+    feedback.className = 'feedback show correct';
+    score++;
+    sectionScores[currentSection]++;
+  } else if (personCorrect) {
+    buttons[index].classList.add('correct');
+    blank.textContent = q.blank;
+    blank.classList.add('wrong');
+    feedback.textContent = `❌ הגוף נכון, אבל הפועל הנכון הוא: ${q.blank}`;
+    feedback.className = 'feedback show wrong';
+  } else if (verbCorrect) {
+    buttons[index].classList.add('wrong');
+    buttons[q.correctPerson].classList.add('correct');
+    blank.textContent = q.blank;
+    blank.classList.add('wrong');
+    feedback.textContent = `❌ הפועל נכון, אבל הגוף הנכון הוא: ${q.personOptions[q.correctPerson]}`;
+    feedback.className = 'feedback show wrong';
+  } else {
+    buttons[index].classList.add('wrong');
+    buttons[q.correctPerson].classList.add('correct');
+    blank.textContent = q.blank;
+    blank.classList.add('wrong');
+    feedback.textContent = `❌ הפועל הנכון: ${q.blank}, הגוף: ${q.personOptions[q.correctPerson]}`;
+    feedback.className = 'feedback show wrong';
+  }
+
+  explanation.textContent = q.explanation;
+  explanation.classList.add('show');
+  nextBtn.classList.add('show');
+  answeredQuestions++;
+}
+
+function nextQuestion() {
+  const section = sections[currentSection];
+  currentQuestion++;
+  step = 0;
+  selectedVerb = null;
+  selectedPerson = null;
+
+  if (currentQuestion >= section.questions.length) {
+    currentSection++;
+    currentQuestion = 0;
+  }
+  render();
+}
+
+// ============ HELP ============
+
+function openHelp() {
+  document.getElementById('helpModal').classList.add('visible');
+}
+function closeHelp() {
+  document.getElementById('helpModal').classList.remove('visible');
+}
+// Close on overlay click
+document.getElementById('helpModal').addEventListener('click', function(e) {
+  if (e.target === this) closeHelp();
+});
+
+// ============ PROGRESS ============
+
+function updateProgress() {
+  const bar = document.getElementById('progressBar');
+  const pct = totalQuestions > 0 ? (answeredQuestions / totalQuestions) * 100 : 0;
+  bar.style.width = pct + '%';
+}
+
+function updateTabs() {
+  const tabs = document.querySelectorAll('.section-tab');
+  tabs.forEach((tab, i) => {
+    tab.classList.remove('active', 'completed');
+    if (i === currentSection) {
+      tab.classList.add('active');
+    } else if (i < currentSection) {
+      tab.classList.add('completed');
+    }
+  });
+}
+
+// ============ CONFETTI ============
+
+function launchConfetti() {
+  const colors = ['#f44336','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#00bcd4','#4caf50','#ffeb3b','#ff9800'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.left = Math.random() * 100 + 'vw';
+    piece.style.top = '-20px';
+    piece.style.width = (Math.random() * 8 + 6) + 'px';
+    piece.style.height = (Math.random() * 8 + 6) + 'px';
+    piece.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    document.body.appendChild(piece);
+
+    const duration = Math.random() * 2000 + 1500;
+    const xDrift = (Math.random() - 0.5) * 200;
+    piece.animate([
+      { transform: 'translateY(0) translateX(0) rotate(0deg)', opacity: 1 },
+      { transform: `translateY(100vh) translateX(${xDrift}px) rotate(${Math.random()*720}deg)`, opacity: 0 }
+    ], { duration, easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)' }).onfinish = () => piece.remove();
+  }
+}
+
+// ============ INIT ============
+render();
+</script>
+</body>
+</html>

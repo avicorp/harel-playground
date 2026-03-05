@@ -72,6 +72,14 @@ export const games: Game[] = [
     description: "A beautiful yearly calendar with Israeli holidays and special dates!",
     path: "/games/yearly-calendar/index.html",
   },
+  {
+    slug: "hebrew-verbs",
+    title: "Hebrew Verb Conjugation",
+    titleHe: "גופים בפעלים",
+    emoji: "📝",
+    description: "Learn first, second, and third person verb conjugation in Hebrew!",
+    path: "/games/hebrew-verbs/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

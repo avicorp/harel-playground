@@ -1020,18 +1020,26 @@ function tryHitLane(laneIdx) {
     state.hitNotes++;
     state.recentResults.push(true);
 
+    // Proximity-based scoring: closer to hit zone = more points
+    // Perfect zone: 0-PERFECT_WINDOW => 100 points, linearly down to 30 at GOOD_WINDOW
+    const proximity = 1 - (bestDist / GOOD_WINDOW); // 1.0 = dead center, 0.0 = edge
+    const basePoints = Math.round(30 + 70 * proximity);
+    const comboMultiplier = Math.max(1, Math.floor(state.combo / 5));
+    const points = basePoints * comboMultiplier;
+    state.score += points;
+    state.combo++;
+
     if (bestDist <= PERFECT_WINDOW) {
       state.perfectHits++;
-      state.score += 100 * Math.max(1, Math.floor(state.combo / 5));
-      state.combo++;
       spawnFireParticles(laneX, hitZoneY, 22);
       spawnFeedback(laneX, hitZoneY - 40, '!מושלם', '#ffd200');
       Audio.playHit();
-    } else {
-      state.score += 50 * Math.max(1, Math.floor(state.combo / 5));
-      state.combo++;
+    } else if (proximity >= 0.5) {
       spawnParticles(laneX, hitZoneY, lane.color, 12);
       spawnFeedback(laneX, hitZoneY - 40, '!טוב', '#ffab00');
+    } else {
+      spawnParticles(laneX, hitZoneY, lane.color, 6);
+      spawnFeedback(laneX, hitZoneY - 40, 'בסדר', '#ff8800');
     }
 
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
@@ -1040,9 +1048,6 @@ function tryHitLane(laneIdx) {
     if (best.duration > 1) {
       state.activeHolds.set(best.id, { noteId: best.id, lane: laneIdx, startY: best.y, held: true });
     }
-
-    // Evaluate speed based on hit rate
-    evaluateAndAdjustSpeed();
   }
 
   updateHUD();
@@ -1066,9 +1071,6 @@ function handleMiss(note) {
   spawnParticles(laneX, hitZoneY, '#ff2200', 6);
   spawnFeedback(laneX, hitZoneY - 40, 'החמצה', '#ff2200');
   Audio.playMiss();
-
-  // Evaluate speed based on hit rate
-  evaluateAndAdjustSpeed();
 
   updateHUD();
 }

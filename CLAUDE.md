@@ -1,4 +1,4 @@
-# Harel Playground
+# Harel & Yuval Playground
 
 A game portal built with Next.js. The homepage shows the latest game fullscreen with a nav bar for switching between games.
 
@@ -48,6 +48,14 @@ harel-playground/
 |---|---|
 | `public/games/space-shooter/` | Fly a spaceship and blast enemies! |
 | `public/games/balloon-popper/` | Pop as many balloons as you can! |
+| `public/games/fruit-ninja/` | Swipe to slice flying fruits! |
+| `public/games/restaurant/` | Pick ingredients and serve to a robot judge! |
+| `public/games/english-learning/` | Learn English words with pictures and sounds! |
+| `public/games/division-practice/` | Practice division with numbers 1-100! |
+| `public/games/ninja-turtle/` | Choose your Ninja Turtle and smash bricks! |
+| `public/games/yearly-calendar/` | Yearly calendar with Israeli holidays! |
+| `public/games/hebrew-verbs/` | Learn Hebrew verb conjugation! |
+| `public/games/hebrew-piano/` | Learn piano notes Guitar Hero style! |
 
 ## Development
 

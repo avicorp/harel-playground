@@ -80,6 +80,14 @@ export const games: Game[] = [
     description: "Learn first, second, and third person verb conjugation in Hebrew!",
     path: "/games/hebrew-verbs/index.html",
   },
+  {
+    slug: "hebrew-piano",
+    title: "Magic Piano",
+    titleHe: "פסנתר קסום",
+    emoji: "🎹",
+    description: "Learn piano notes Guitar Hero style! Play falling notes and learn the musical scale in Hebrew.",
+    path: "/games/hebrew-piano/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

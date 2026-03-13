@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Harel Playground",
-  description: "A collection of fun games by Harel",
+  title: "Harel & Yuval Playground",
+  description: "A collection of fun games for Harel and Yuval",
 };
 
 export default function RootLayout({

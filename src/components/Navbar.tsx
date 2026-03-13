@@ -22,7 +22,7 @@ export default function Navbar({ currentSlug }: { currentSlug?: string }) {
     <nav style={styles.nav}>
       <Link href="/" style={styles.brand}>
         <span style={styles.brandIcon}>🎮</span>
-        <span style={styles.brandText}>Harel Playground</span>
+        <span style={styles.brandText}>Harel & Yuval Playground</span>
       </Link>
 
       <div ref={menuRef} style={styles.menuWrapper}>

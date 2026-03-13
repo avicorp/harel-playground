@@ -758,6 +758,8 @@ const state = {
   stars: [],
   recentResults: [], // track recent hit/miss for dynamic speed
   laneGlowTimers: {}, // track per-lane glow for strip highlight
+  ripples: [], // shockwave ripple effects
+  keyBounce: {}, // per-lane bounce animation timers
 };
 
 // ============================================================
@@ -766,7 +768,7 @@ const state = {
 function resize() {
   canvas.width = W = window.innerWidth;
   canvas.height = H = window.innerHeight;
-  pianoKeyH = Math.min(120, H * 0.15);
+  pianoKeyH = Math.min(180, H * 0.22);
   hitZoneY = H - pianoKeyH - 10;
   // Regenerate background stars
   state.stars = [];
@@ -873,6 +875,8 @@ function startSong(songIndex) {
   state.notes = [];
   state.particles = [];
   state.feedbacks = [];
+  state.ripples = [];
+  state.keyBounce = {};
   state.keysDown.clear();
   state.activeHolds.clear();
   state.songBeat = 0;
@@ -959,6 +963,15 @@ function spawnFeedback(x, y, text, color) {
   state.feedbacks.push({ x, y, text, color, alpha: 1, scale: 1.5, life: 50 });
 }
 
+function spawnRipple(x, y, color) {
+  state.ripples.push({ x, y, color, radius: 10, maxRadius: 120, alpha: 0.8 });
+}
+
+function spawnShockwave(x, y, color) {
+  state.ripples.push({ x, y, color, radius: 5, maxRadius: 200, alpha: 1.0 });
+  state.ripples.push({ x, y, color: '#ffffff', radius: 5, maxRadius: 140, alpha: 0.6 });
+}
+
 // ============================================================
 // DYNAMIC SPEED BASED ON HIT RATE
 // ============================================================
@@ -1020,18 +1033,32 @@ function tryHitLane(laneIdx) {
     state.hitNotes++;
     state.recentResults.push(true);
 
+    // Proximity-based scoring: closer to hit zone = more points
+    // Perfect zone: 0-PERFECT_WINDOW => 100 points, linearly down to 30 at GOOD_WINDOW
+    const proximity = 1 - (bestDist / GOOD_WINDOW); // 1.0 = dead center, 0.0 = edge
+    const basePoints = Math.round(30 + 70 * proximity);
+    const comboMultiplier = Math.max(1, Math.floor(state.combo / 5));
+    const points = basePoints * comboMultiplier;
+    state.score += points;
+    state.combo++;
+
+    // Key bounce animation
+    state.keyBounce[laneIdx] = 15;
+
     if (bestDist <= PERFECT_WINDOW) {
       state.perfectHits++;
-      state.score += 100 * Math.max(1, Math.floor(state.combo / 5));
-      state.combo++;
-      spawnFireParticles(laneX, hitZoneY, 22);
-      spawnFeedback(laneX, hitZoneY - 40, '!מושלם', '#ffd200');
+      spawnFireParticles(laneX, hitZoneY, 30);
+      spawnShockwave(laneX, hitZoneY, lane.color);
+      spawnFeedback(laneX, hitZoneY - 50, '!מושלם', '#ffd200');
       Audio.playHit();
+    } else if (proximity >= 0.5) {
+      spawnParticles(laneX, hitZoneY, lane.color, 16);
+      spawnRipple(laneX, hitZoneY, lane.color);
+      spawnFeedback(laneX, hitZoneY - 50, '!טוב', '#ffab00');
     } else {
-      state.score += 50 * Math.max(1, Math.floor(state.combo / 5));
-      state.combo++;
-      spawnParticles(laneX, hitZoneY, lane.color, 12);
-      spawnFeedback(laneX, hitZoneY - 40, '!טוב', '#ffab00');
+      spawnParticles(laneX, hitZoneY, lane.color, 8);
+      spawnRipple(laneX, hitZoneY, lane.color);
+      spawnFeedback(laneX, hitZoneY - 50, 'בסדר', '#ff8800');
     }
 
     if (state.combo > state.maxCombo) state.maxCombo = state.combo;
@@ -1040,9 +1067,6 @@ function tryHitLane(laneIdx) {
     if (best.duration > 1) {
       state.activeHolds.set(best.id, { noteId: best.id, lane: laneIdx, startY: best.y, held: true });
     }
-
-    // Evaluate speed based on hit rate
-    evaluateAndAdjustSpeed();
   }
 
   updateHUD();
@@ -1066,9 +1090,6 @@ function handleMiss(note) {
   spawnParticles(laneX, hitZoneY, '#ff2200', 6);
   spawnFeedback(laneX, hitZoneY - 40, 'החמצה', '#ff2200');
   Audio.playMiss();
-
-  // Evaluate speed based on hit rate
-  evaluateAndAdjustSpeed();
 
   updateHUD();
 }
@@ -1337,54 +1358,99 @@ function render() {
     }
   }
 
-  // Piano keys at bottom - warm theme
+  // Piano keys at bottom - warm theme with bounce animation
   for (let i = 0; i < numLanes; i++) {
     const lane = lanes[i];
     const x = i * laneW;
-    const y = H - pianoKeyH;
+    let y = H - pianoKeyH;
     const pressed = state.keysDown.has(i);
+    const bounceTimer = state.keyBounce[i] || 0;
+
+    // Bounce offset: key jumps up then settles
+    let bounceOffset = 0;
+    if (bounceTimer > 0) {
+      bounceOffset = Math.sin((bounceTimer / 15) * Math.PI) * 12;
+    }
+    y -= bounceOffset;
+
+    // Idle pulsing glow
+    const pulseAlpha = 0.15 + Math.sin(frameCount * 0.04 + i * 1.2) * 0.08;
+
+    ctx.save();
 
     // Key background with warm gradient
     if (pressed) {
       const keyGrad = ctx.createLinearGradient(x, y, x, y + pianoKeyH);
       keyGrad.addColorStop(0, lane.glowColor);
-      keyGrad.addColorStop(1, lane.color);
+      keyGrad.addColorStop(0.5, lane.color);
+      keyGrad.addColorStop(1, lane.glowColor);
       ctx.fillStyle = keyGrad;
       ctx.globalAlpha = 1;
 
-      // Glow above key when pressed
-      ctx.save();
+      // Strong glow when pressed
       ctx.shadowColor = lane.color;
-      ctx.shadowBlur = 30;
-      roundRect(ctx, x + 2, y + 2, laneW - 4, pianoKeyH - 4, 10);
+      ctx.shadowBlur = 45;
+      roundRect(ctx, x + 3, y + 3, laneW - 6, pianoKeyH - 6, 14);
       ctx.fill();
-      ctx.restore();
+
+      // Extra inner glow
+      ctx.shadowColor = lane.glowColor;
+      ctx.shadowBlur = 20;
+      roundRect(ctx, x + 3, y + 3, laneW - 6, pianoKeyH - 6, 14);
+      ctx.fill();
     } else {
-      ctx.fillStyle = '#1a0a08';
-      ctx.globalAlpha = 0.92;
+      // Idle state with subtle color tint
+      const idleGrad = ctx.createLinearGradient(x, y, x, y + pianoKeyH);
+      idleGrad.addColorStop(0, '#1a0a08');
+      idleGrad.addColorStop(1, '#120605');
+      ctx.fillStyle = idleGrad;
+      ctx.globalAlpha = 0.95;
+      roundRect(ctx, x + 3, y + 3, laneW - 6, pianoKeyH - 6, 14);
+      ctx.fill();
+
+      // Subtle pulsing color overlay
+      ctx.globalAlpha = pulseAlpha;
+      ctx.fillStyle = lane.color;
+      roundRect(ctx, x + 3, y + 3, laneW - 6, pianoKeyH - 6, 14);
+      ctx.fill();
     }
-    roundRect(ctx, x + 2, y + 2, laneW - 4, pianoKeyH - 4, 10);
-    ctx.fill();
     ctx.globalAlpha = 1;
 
-    // Key border
+    // Key border with glow
     ctx.strokeStyle = lane.color;
-    ctx.lineWidth = pressed ? 3 : 2;
-    roundRect(ctx, x + 2, y + 2, laneW - 4, pianoKeyH - 4, 10);
+    ctx.lineWidth = pressed ? 4 : 2.5;
+    if (pressed || bounceTimer > 0) {
+      ctx.shadowColor = lane.color;
+      ctx.shadowBlur = pressed ? 20 : bounceTimer;
+    }
+    roundRect(ctx, x + 3, y + 3, laneW - 6, pianoKeyH - 6, 14);
     ctx.stroke();
 
-    // Hebrew label
+    ctx.restore();
+
+    // Hebrew label - bigger for bigger keys
     ctx.fillStyle = pressed ? '#ffffff' : lane.color;
-    ctx.font = `bold ${Math.min(22, laneW * 0.35)}px 'Segoe UI', sans-serif`;
+    ctx.font = `bold ${Math.min(30, laneW * 0.4)}px 'Segoe UI', sans-serif`;
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(lane.hebrew, x + laneW / 2, y + pianoKeyH / 2 - 10);
+    ctx.fillText(lane.hebrew, x + laneW / 2, y + pianoKeyH / 2 - 14);
 
-    // Keyboard shortcut
-    ctx.fillStyle = pressed ? 'rgba(255,255,255,0.7)' : 'rgba(255,200,150,0.3)';
-    ctx.font = `${Math.min(14, laneW * 0.2)}px 'Segoe UI', sans-serif`;
-    ctx.fillText(lane.keys[0].toUpperCase(), x + laneW / 2, y + pianoKeyH / 2 + 14);
+    // Keyboard shortcut - bigger
+    ctx.fillStyle = pressed ? 'rgba(255,255,255,0.8)' : 'rgba(255,200,150,0.4)';
+    ctx.font = `${Math.min(18, laneW * 0.25)}px 'Segoe UI', sans-serif`;
+    ctx.fillText(lane.keys[0].toUpperCase(), x + laneW / 2, y + pianoKeyH / 2 + 18);
   }
+
+  // Ripples / shockwaves
+  for (const r of state.ripples) {
+    ctx.globalAlpha = r.alpha;
+    ctx.strokeStyle = r.color;
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
 
   // Particles
   for (const p of state.particles) {
@@ -1529,6 +1595,20 @@ function update() {
     f.scale = Math.max(1, f.scale - 0.03);
   }
   state.feedbacks = state.feedbacks.filter(f => f.life > 0 && f.alpha > 0);
+
+  // Update ripples
+  for (const r of state.ripples) {
+    r.radius += 4;
+    r.alpha -= 0.03;
+  }
+  state.ripples = state.ripples.filter(r => r.alpha > 0 && r.radius < r.maxRadius);
+
+  // Update key bounce timers
+  for (const key in state.keyBounce) {
+    if (state.keyBounce[key] > 0) {
+      state.keyBounce[key]--;
+    }
+  }
 
   // Check song complete
   if (state.songNoteIdx >= state.song.length && state.notes.length === 0 && !state.songDone) {

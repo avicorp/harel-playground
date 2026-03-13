@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>פסנתר קסום</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  background: #0d0019;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  direction: rtl;
+}
+canvas {
+  display: block;
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+}
+
+/* Overlay screens */
+.screen-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  background: rgba(13, 0, 25, 0.92);
+}
+.screen-overlay.active { display: flex; }
+
+/* Menu screen */
+#menu-screen {
+  gap: 30px;
+}
+.menu-title {
+  font-size: 64px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #FF6B6B, #4FC3F7, #81C784, #FFD54F, #CE93D8);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-shadow: none;
+  animation: titlePulse 2s ease-in-out infinite;
+}
+@keyframes titlePulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+.menu-emoji {
+  font-size: 80px;
+  animation: bounce 1.5s ease-in-out infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+.menu-subtitle {
+  font-size: 22px;
+  color: #a0a0cc;
+}
+
+/* Buttons */
+.btn {
+  padding: 16px 48px;
+  font-size: 24px;
+  font-weight: bold;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+}
+.btn:hover { transform: scale(1.07); }
+.btn:active { transform: scale(0.97); }
+
+.btn-primary {
+  background: linear-gradient(135deg, #e94560, #ff6b81);
+  color: white;
+  box-shadow: 0 4px 20px rgba(233, 69, 96, 0.5);
+}
+.btn-secondary {
+  background: linear-gradient(135deg, #4FC3F7, #29B6F6);
+  color: white;
+  box-shadow: 0 4px 20px rgba(79, 195, 247, 0.4);
+}
+.btn-small {
+  padding: 12px 32px;
+  font-size: 18px;
+}
+
+/* Level select */
+#level-select { gap: 20px; }
+.level-title {
+  font-size: 40px;
+  color: #f5f5f5;
+  margin-bottom: 10px;
+}
+.levels-container {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.level-card {
+  background: rgba(30, 20, 60, 0.9);
+  border: 3px solid rgba(255,255,255,0.15);
+  border-radius: 20px;
+  padding: 24px 32px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+  width: 260px;
+  text-align: center;
+}
+.level-card:hover {
+  transform: scale(1.05);
+  border-color: #e94560;
+}
+.level-card h3 {
+  font-size: 26px;
+  color: #f5f5f5;
+  margin-bottom: 8px;
+}
+.level-card p {
+  font-size: 16px;
+  color: #a0a0cc;
+  margin-bottom: 12px;
+}
+.key-preview {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  margin-top: 10px;
+}
+.key-preview-item {
+  width: 32px; height: 40px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; color: white; font-weight: bold;
+}
+
+/* Song select */
+.song-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+.song-btn {
+  padding: 10px 20px;
+  font-size: 18px;
+  background: rgba(255,255,255,0.08);
+  border: 2px solid rgba(255,255,255,0.15);
+  border-radius: 12px;
+  color: #f5f5f5;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+  font-family: inherit;
+}
+.song-btn:hover {
+  background: rgba(233, 69, 96, 0.3);
+  border-color: #e94560;
+}
+
+/* Results screen */
+#results-screen { gap: 20px; }
+.results-title {
+  font-size: 36px;
+  color: #f5f5f5;
+}
+.stars-container {
+  display: flex;
+  gap: 16px;
+  font-size: 56px;
+}
+.star { opacity: 0.2; transition: opacity 0.5s, transform 0.5s; }
+.star.earned { opacity: 1; transform: scale(1.2); }
+.results-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 20px;
+  color: #c0c0dd;
+  text-align: center;
+}
+.results-score {
+  font-size: 48px;
+  font-weight: bold;
+  color: #FFD54F;
+}
+.results-buttons {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+/* Pause overlay */
+#pause-overlay { gap: 24px; }
+.pause-title {
+  font-size: 42px;
+  color: #f5f5f5;
+}
+
+/* Song select screen */
+#song-select { gap: 20px; }
+.song-select-title {
+  font-size: 32px;
+  color: #f5f5f5;
+}
+
+/* HUD */
+#hud {
+  position: absolute;
+  top: 8px; left: 16px; right: 16px;
+  display: none;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 5;
+  pointer-events: none;
+}
+#hud.active { display: flex; }
+.hud-item {
+  font-size: 20px;
+  color: #f5f5f5;
+  font-weight: bold;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.7);
+}
+.hud-combo {
+  font-size: 28px;
+  color: #FFD54F;
+  transition: transform 0.1s;
+}
+.hud-combo.pop { transform: scale(1.4); }
+
+/* Countdown */
+.countdown {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 120px;
+  font-weight: bold;
+  color: #FFD54F;
+  text-shadow: 0 0 40px rgba(255, 213, 79, 0.6);
+  z-index: 15;
+  display: none;
+  animation: countPop 0.8s ease-out;
+}
+.countdown.active { display: block; }
+@keyframes countPop {
+  0% { transform: translate(-50%, -50%) scale(2); opacity: 0; }
+  30% { opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="game-canvas"></canvas>
+
+<div id="hud">
+  <div class="hud-item" id="hud-score">ניקוד: 0</div>
+  <div class="hud-combo" id="hud-combo"></div>
+  <div class="hud-item" id="hud-speed">מהירות: 1</div>
+</div>
+
+<div id="countdown" class="countdown"></div>
+
+<!-- Menu Screen -->
+<div id="menu-screen" class="screen-overlay active">
+  <div class="menu-emoji">🎹</div>
+  <div class="menu-title">פסנתר קסום</div>
+  <div class="menu-subtitle">למד לנגן בסגנון גיטרה הירו!</div>
+  <button class="btn btn-primary" id="btn-start">!בואו נתחיל</button>
+</div>
+
+<!-- Level Select -->
+<div id="level-select" class="screen-overlay">
+  <div class="level-title">בחר שלב</div>
+  <div class="levels-container">
+    <div class="level-card" id="card-level1">
+      <h3>שלב 1 - קל</h3>
+      <p>4 תווים: דו רה מי פה</p>
+      <div class="key-preview" id="preview-level1"></div>
+    </div>
+    <div class="level-card" id="card-level2">
+      <h3>שלב 2 - מתקדם</h3>
+      <p>8 תווים: סולם שלם</p>
+      <div class="key-preview" id="preview-level2"></div>
+    </div>
+  </div>
+  <button class="btn btn-small btn-secondary" id="btn-back-menu">חזרה לתפריט</button>
+</div>
+
+<!-- Song Select -->
+<div id="song-select" class="screen-overlay">
+  <div class="song-select-title">בחר שיר</div>
+  <div class="song-list" id="song-list"></div>
+  <button class="btn btn-small btn-secondary" id="btn-back-levels" style="margin-top:16px;">חזרה לשלבים</button>
+</div>
+
+<!-- Pause -->
+<div id="pause-overlay" class="screen-overlay">
+  <div class="pause-title">⏸️ הפסקה</div>
+  <button class="btn btn-primary" id="btn-resume">המשך לנגן</button>
+  <button class="btn btn-small btn-secondary" id="btn-quit">יציאה לתפריט</button>
+</div>
+
+<!-- Results -->
+<div id="results-screen" class="screen-overlay">
+  <div class="results-title">!סיימת</div>
+  <div class="stars-container">
+    <span class="star" id="star1">⭐</span>
+    <span class="star" id="star2">⭐</span>
+    <span class="star" id="star3">⭐</span>
+  </div>
+  <div class="results-score" id="results-score">0</div>
+  <div class="results-stats" id="results-stats"></div>
+  <div class="results-buttons">
+    <button class="btn btn-primary" id="btn-retry">נסה שוב</button>
+    <button class="btn btn-secondary" id="btn-results-menu">תפריט</button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// AUDIO MANAGER
+// ============================================================
+const Audio = {
+  ctx: null,
+  init() {
+    if (!this.ctx) {
+      this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (this.ctx.state === 'suspended') this.ctx.resume();
+  },
+  playNote(freq, duration) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.value = freq;
+    // Harmonic for richness
+    const osc2 = this.ctx.createOscillator();
+    const gain2 = this.ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.value = freq * 2;
+    gain2.gain.setValueAtTime(0, t);
+    gain2.gain.linearRampToValueAtTime(0.08, t + 0.01);
+    gain2.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc2.connect(gain2).connect(this.ctx.destination);
+    osc2.start(t); osc2.stop(t + duration);
+
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.3, t + 0.01);
+    gain.gain.setValueAtTime(0.3, t + Math.max(0.02, duration - 0.1));
+    gain.gain.exponentialRampToValueAtTime(0.001, t + duration);
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(t); osc.stop(t + duration);
+  },
+  playHit() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sine'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.15, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(t); osc.stop(t + 0.08);
+  },
+  playMiss() {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'sawtooth'; osc.frequency.value = 120;
+    gain.gain.setValueAtTime(0.12, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+    osc.connect(gain).connect(this.ctx.destination);
+    osc.start(t); osc.stop(t + 0.15);
+  },
+  playLevelComplete() {
+    if (!this.ctx) return;
+    const freqs = [261.63, 329.63, 392, 523.25];
+    freqs.forEach((f, i) => {
+      setTimeout(() => this.playNote(f, 0.3), i * 150);
+    });
+  }
+};
+
+// ============================================================
+// LANE CONFIGURATIONS
+// ============================================================
+const LEVEL1_LANES = [
+  { note: 'C4', hebrew: 'דו', color: '#FF6B6B', freq: 261.63, keys: ['d', '1'] },
+  { note: 'D4', hebrew: 'רה', color: '#4FC3F7', freq: 293.66, keys: ['f', '2'] },
+  { note: 'E4', hebrew: 'מי', color: '#81C784', freq: 329.63, keys: ['j', '3'] },
+  { note: 'F4', hebrew: 'פה', color: '#FFD54F', freq: 349.23, keys: ['k', '4'] },
+];
+
+const LEVEL2_LANES = [
+  { note: 'C4', hebrew: 'דו', color: '#FF6B6B', freq: 261.63, keys: ['a', '1'] },
+  { note: 'D4', hebrew: 'רה', color: '#4FC3F7', freq: 293.66, keys: ['s', '2'] },
+  { note: 'E4', hebrew: 'מי', color: '#81C784', freq: 329.63, keys: ['d', '3'] },
+  { note: 'F4', hebrew: 'פה', color: '#FFD54F', freq: 349.23, keys: ['f', '4'] },
+  { note: 'G4', hebrew: 'סול', color: '#CE93D8', freq: 392.00, keys: ['j', '5'] },
+  { note: 'A4', hebrew: 'לה', color: '#FFB74D', freq: 440.00, keys: ['k', '6'] },
+  { note: 'B4', hebrew: 'סי', color: '#4DD0E1', freq: 493.88, keys: ['l', '7'] },
+  { note: 'C5', hebrew: 'דו²', color: '#F48FB1', freq: 523.25, keys: [';', '8'] },
+];
+
+// ============================================================
+// SONG DATA: [laneIndex, beatNumber, durationInBeats]
+// duration 1 = short, 2+ = long
+// ============================================================
+const SONGS = {
+  level1: [
+    {
+      name: 'סולם עולה ויורד',
+      desc: 'למד את התווים',
+      data: [
+        [0,0,1],[1,2,1],[2,4,1],[3,6,1],
+        [3,10,1],[2,12,1],[1,14,1],[0,16,1],
+        [0,20,1],[1,22,1],[2,24,1],[3,26,1],
+        [3,30,1],[2,32,1],[1,34,1],[0,36,2],
+      ]
+    },
+    {
+      name: 'מרי והכבשה הקטנה',
+      desc: 'שיר מוכר ומהנה',
+      data: [
+        [2,0,1],[1,2,1],[0,4,1],[1,6,1],
+        [2,8,1],[2,10,1],[2,12,2],
+        [1,16,1],[1,18,1],[1,20,2],
+        [2,24,1],[3,26,1],[3,28,2],
+        [2,32,1],[1,34,1],[0,36,1],[1,38,1],
+        [2,40,1],[2,42,1],[2,44,1],[2,46,1],
+        [1,48,1],[1,50,1],[2,52,1],[1,54,1],
+        [0,56,2],
+      ]
+    },
+    {
+      name: 'נצנוץ כוכב קטן',
+      desc: 'טווינקל טווינקל',
+      data: [
+        [0,0,1],[0,2,1],[3,4,1],[3,6,1],
+        [2,8,1],[2,10,1],[3,12,2],
+        [1,16,1],[1,18,1],[0,20,1],[0,22,1],
+        [2,24,1],[2,26,1],[1,28,2],
+        [3,32,1],[3,34,1],[2,36,1],[2,38,1],
+        [1,40,1],[1,42,1],[0,44,2],
+        [3,48,1],[3,50,1],[2,52,1],[2,54,1],
+        [1,56,1],[1,58,1],[0,60,2],
+        [0,64,1],[0,66,1],[3,68,1],[3,70,1],
+        [2,72,1],[2,74,1],[3,76,2],
+        [1,80,1],[1,82,1],[0,84,1],[0,86,1],
+        [2,88,1],[2,90,1],[1,92,2],
+      ]
+    }
+  ],
+  level2: [
+    {
+      name: 'סולם שלם',
+      desc: 'כל 8 התווים עם החזקות',
+      data: [
+        [0,0,1],[1,2,1],[2,4,1],[3,6,1],
+        [4,8,1],[5,10,1],[6,12,1],[7,14,2],
+        [7,18,1],[6,20,1],[5,22,1],[4,24,1],
+        [3,26,1],[2,28,1],[1,30,1],[0,32,2],
+        [0,36,2],[2,40,2],[4,44,2],[7,48,3],
+        [7,54,1],[5,56,1],[3,58,1],[0,60,3],
+      ]
+    },
+    {
+      name: 'שמחה גדולה',
+      desc: 'שיר עליז עם כל התווים',
+      data: [
+        [0,0,1],[2,2,1],[4,4,1],[7,6,2],
+        [5,10,1],[3,12,1],[1,14,1],[0,16,2],
+        [4,20,1],[4,22,1],[5,24,1],[5,26,1],
+        [6,28,1],[6,30,1],[7,32,3],
+        [7,38,1],[6,40,1],[5,42,1],[4,44,1],
+        [3,46,1],[2,48,1],[1,50,1],[0,52,2],
+        [0,56,1],[4,58,1],[7,60,2],
+        [0,64,1],[2,66,1],[4,68,1],[5,70,1],
+        [7,72,3],
+        [6,78,1],[4,80,1],[2,82,1],[0,84,3],
+      ]
+    }
+  ]
+};
+
+// ============================================================
+// CONSTANTS
+// ============================================================
+const PERFECT_WINDOW = 22;
+const GOOD_WINDOW = 48;
+const SHORT_NOTE_HEIGHT = 32;
+const LONG_NOTE_BASE = 80;
+const SPEED_INCREMENT = 0.12;
+const SPEED_DECREMENT = 0.25;
+const MIN_SPEED = 1.2;
+const MAX_SPEED = 5.5;
+const HITS_FOR_SPEEDUP = 5;
+const MISSES_FOR_SLOWDOWN = 4;
+const BASE_SPEED_L1 = 2.0;
+const BASE_SPEED_L2 = 2.2;
+const BEATS_PER_FRAME_L1 = 0.025;
+const BEATS_PER_FRAME_L2 = 0.028;
+
+// ============================================================
+// GAME STATE
+// ============================================================
+const canvas = document.getElementById('game-canvas');
+const ctx = canvas.getContext('2d');
+
+let W, H, hitZoneY, pianoKeyH;
+
+const state = {
+  screen: 'menu',
+  level: 1,
+  songIndex: 0,
+  lanes: LEVEL1_LANES,
+  song: null,
+  score: 0,
+  combo: 0,
+  maxCombo: 0,
+  consecutiveHits: 0,
+  consecutiveMisses: 0,
+  totalNotes: 0,
+  hitNotes: 0,
+  perfectHits: 0,
+  speed: BASE_SPEED_L1,
+  notes: [],
+  particles: [],
+  feedbacks: [],
+  keysDown: new Set(),
+  activeHolds: new Map(),
+  songBeat: 0,
+  songNoteIdx: 0,
+  songDone: false,
+  paused: false,
+  countdownVal: 0,
+  countdownTimer: 0,
+  stars: [],  // twinkling background stars
+};
+
+// ============================================================
+// RESIZE
+// ============================================================
+function resize() {
+  canvas.width = W = window.innerWidth;
+  canvas.height = H = window.innerHeight;
+  pianoKeyH = Math.min(120, H * 0.15);
+  hitZoneY = H - pianoKeyH - 10;
+  // Regenerate background stars
+  state.stars = [];
+  for (let i = 0; i < 60; i++) {
+    state.stars.push({
+      x: Math.random() * W,
+      y: Math.random() * (H - pianoKeyH - 50),
+      r: Math.random() * 1.5 + 0.5,
+      phase: Math.random() * Math.PI * 2,
+      speed: Math.random() * 0.02 + 0.005
+    });
+  }
+}
+window.addEventListener('resize', resize);
+resize();
+
+// ============================================================
+// SCREEN MANAGEMENT
+// ============================================================
+function showScreen(name) {
+  state.screen = name;
+  document.querySelectorAll('.screen-overlay').forEach(el => el.classList.remove('active'));
+  const hud = document.getElementById('hud');
+  hud.classList.remove('active');
+
+  if (name === 'menu') document.getElementById('menu-screen').classList.add('active');
+  else if (name === 'levelSelect') document.getElementById('level-select').classList.add('active');
+  else if (name === 'songSelect') document.getElementById('song-select').classList.add('active');
+  else if (name === 'paused') document.getElementById('pause-overlay').classList.add('active');
+  else if (name === 'results') document.getElementById('results-screen').classList.add('active');
+  else if (name === 'playing') hud.classList.add('active');
+}
+
+// Build key previews
+function buildPreviews() {
+  const p1 = document.getElementById('preview-level1');
+  const p2 = document.getElementById('preview-level2');
+  p1.innerHTML = '';
+  p2.innerHTML = '';
+  LEVEL1_LANES.forEach(l => {
+    const d = document.createElement('div');
+    d.className = 'key-preview-item';
+    d.style.background = l.color;
+    d.textContent = l.hebrew;
+    p1.appendChild(d);
+  });
+  LEVEL2_LANES.forEach(l => {
+    const d = document.createElement('div');
+    d.className = 'key-preview-item';
+    d.style.background = l.color;
+    d.textContent = l.hebrew;
+    p2.appendChild(d);
+  });
+}
+buildPreviews();
+
+function showSongSelect(level) {
+  state.level = level;
+  state.lanes = level === 1 ? LEVEL1_LANES : LEVEL2_LANES;
+  const songs = level === 1 ? SONGS.level1 : SONGS.level2;
+  const list = document.getElementById('song-list');
+  list.innerHTML = '';
+  songs.forEach((s, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'song-btn';
+    btn.innerHTML = `<strong>${s.name}</strong><br><small>${s.desc}</small>`;
+    btn.onclick = () => startSong(i);
+    list.appendChild(btn);
+  });
+  showScreen('songSelect');
+}
+
+function startSong(songIndex) {
+  Audio.init();
+  state.songIndex = songIndex;
+  const songs = state.level === 1 ? SONGS.level1 : SONGS.level2;
+  state.song = songs[songIndex].data;
+  state.score = 0;
+  state.combo = 0;
+  state.maxCombo = 0;
+  state.consecutiveHits = 0;
+  state.consecutiveMisses = 0;
+  state.totalNotes = state.song.length;
+  state.hitNotes = 0;
+  state.perfectHits = 0;
+  state.speed = state.level === 1 ? BASE_SPEED_L1 : BASE_SPEED_L2;
+  state.notes = [];
+  state.particles = [];
+  state.feedbacks = [];
+  state.keysDown.clear();
+  state.activeHolds.clear();
+  state.songBeat = 0;
+  state.songNoteIdx = 0;
+  state.songDone = false;
+  state.paused = false;
+
+  // Countdown
+  state.countdownVal = 3;
+  state.countdownTimer = 0;
+  showScreen('playing');
+  updateHUD();
+}
+
+// ============================================================
+// BUTTON HANDLERS
+// ============================================================
+document.getElementById('btn-start').onclick = () => showScreen('levelSelect');
+document.getElementById('card-level1').onclick = () => showSongSelect(1);
+document.getElementById('card-level2').onclick = () => showSongSelect(2);
+document.getElementById('btn-back-menu').onclick = () => showScreen('menu');
+document.getElementById('btn-back-levels').onclick = () => showScreen('levelSelect');
+document.getElementById('btn-resume').onclick = () => { state.paused = false; showScreen('playing'); };
+document.getElementById('btn-quit').onclick = () => showScreen('menu');
+document.getElementById('btn-retry').onclick = () => startSong(state.songIndex);
+document.getElementById('btn-results-menu').onclick = () => showScreen('menu');
+
+// ============================================================
+// HUD
+// ============================================================
+function updateHUD() {
+  document.getElementById('hud-score').textContent = `ניקוד: ${state.score}`;
+  const comboEl = document.getElementById('hud-combo');
+  if (state.combo > 1) {
+    comboEl.textContent = `🔥 קומבו x${state.combo}`;
+    comboEl.classList.add('pop');
+    setTimeout(() => comboEl.classList.remove('pop'), 100);
+  } else {
+    comboEl.textContent = '';
+  }
+  const speedLvl = Math.round((state.speed - MIN_SPEED) / (MAX_SPEED - MIN_SPEED) * 10) + 1;
+  document.getElementById('hud-speed').textContent = `מהירות: ${Math.min(speedLvl, 10)}`;
+}
+
+// ============================================================
+// PARTICLES
+// ============================================================
+function spawnParticles(x, y, color, count) {
+  for (let i = 0; i < count; i++) {
+    const angle = Math.random() * Math.PI * 2;
+    const speed = Math.random() * 4 + 2;
+    state.particles.push({
+      x, y,
+      vx: Math.cos(angle) * speed,
+      vy: Math.sin(angle) * speed - 2,
+      r: Math.random() * 4 + 2,
+      color,
+      alpha: 1,
+      decay: Math.random() * 0.02 + 0.015
+    });
+  }
+}
+
+function spawnFeedback(x, y, text, color) {
+  state.feedbacks.push({ x, y, text, color, alpha: 1, scale: 1.5, life: 50 });
+}
+
+// ============================================================
+// HIT DETECTION
+// ============================================================
+function tryHitLane(laneIdx) {
+  const lane = state.lanes[laneIdx];
+  if (!lane) return;
+
+  // Play the note sound
+  const dur = 0.3;
+  Audio.playNote(lane.freq, dur);
+
+  // Find closest unhit note in this lane near hit zone
+  let best = null;
+  let bestDist = Infinity;
+  for (const n of state.notes) {
+    if (n.lane !== laneIdx || n.hit) continue;
+    const noteCenter = n.y + n.height / 2;
+    const dist = Math.abs(noteCenter - hitZoneY);
+    if (dist < bestDist) { bestDist = dist; best = n; }
+  }
+
+  const laneW = W / state.lanes.length;
+  const laneX = laneIdx * laneW + laneW / 2;
+
+  if (best && bestDist <= GOOD_WINDOW) {
+    best.hit = true;
+    state.hitNotes++;
+    state.consecutiveMisses = 0;
+    state.consecutiveHits++;
+
+    if (bestDist <= PERFECT_WINDOW) {
+      state.perfectHits++;
+      state.score += 100 * Math.max(1, Math.floor(state.combo / 5));
+      state.combo++;
+      spawnParticles(laneX, hitZoneY, '#FFD54F', 18);
+      spawnFeedback(laneX, hitZoneY - 40, '!מושלם', '#FFD54F');
+      Audio.playHit();
+    } else {
+      state.score += 50 * Math.max(1, Math.floor(state.combo / 5));
+      state.combo++;
+      spawnParticles(laneX, hitZoneY, lane.color, 10);
+      spawnFeedback(laneX, hitZoneY - 40, '!טוב', '#81C784');
+    }
+
+    if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+
+    // Long note: start hold tracking
+    if (best.duration > 1) {
+      state.activeHolds.set(best.id, { noteId: best.id, lane: laneIdx, startY: best.y, held: true });
+    }
+
+    // Speed up check
+    if (state.consecutiveHits > 0 && state.consecutiveHits % HITS_FOR_SPEEDUP === 0) {
+      state.speed = Math.min(state.speed + SPEED_INCREMENT, MAX_SPEED);
+    }
+  }
+
+  updateHUD();
+}
+
+function releaseLane(laneIdx) {
+  // Check for active holds on this lane
+  for (const [id, hold] of state.activeHolds) {
+    if (hold.lane === laneIdx) {
+      hold.held = false;
+      state.activeHolds.delete(id);
+    }
+  }
+}
+
+function handleMiss(note) {
+  const laneW = W / state.lanes.length;
+  const laneX = note.lane * laneW + laneW / 2;
+
+  state.combo = 0;
+  state.consecutiveHits = 0;
+  state.consecutiveMisses++;
+  spawnParticles(laneX, hitZoneY, '#ff4444', 6);
+  spawnFeedback(laneX, hitZoneY - 40, 'החמצה', '#ff4444');
+  Audio.playMiss();
+
+  // Speed down check
+  if (state.consecutiveMisses >= MISSES_FOR_SLOWDOWN) {
+    state.speed = Math.max(state.speed - SPEED_DECREMENT, MIN_SPEED);
+    state.consecutiveMisses = 0;
+  }
+
+  updateHUD();
+}
+
+// ============================================================
+// INPUT
+// ============================================================
+function laneForKey(key) {
+  const k = key.toLowerCase();
+  for (let i = 0; i < state.lanes.length; i++) {
+    if (state.lanes[i].keys.includes(k)) return i;
+  }
+  return -1;
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  if (state.screen === 'playing' && !state.paused && state.countdownVal <= 0) {
+    if (e.key === 'Escape' || e.key === 'p' || e.key === 'P') {
+      state.paused = true;
+      showScreen('paused');
+      return;
+    }
+    const lane = laneForKey(e.key);
+    if (lane >= 0) {
+      state.keysDown.add(lane);
+      tryHitLane(lane);
+    }
+  } else if (state.screen === 'paused' && (e.key === 'Escape' || e.key === 'p' || e.key === 'P')) {
+    state.paused = false;
+    showScreen('playing');
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  const lane = laneForKey(e.key);
+  if (lane >= 0) {
+    state.keysDown.delete(lane);
+    releaseLane(lane);
+  }
+});
+
+// Mouse/touch on piano keys
+function laneFromX(x) {
+  const laneW = W / state.lanes.length;
+  const idx = Math.floor(x / laneW);
+  return Math.max(0, Math.min(state.lanes.length - 1, idx));
+}
+
+canvas.addEventListener('mousedown', (e) => {
+  if (state.screen !== 'playing' || state.paused || state.countdownVal > 0) return;
+  // Only respond if click is in the piano key area
+  if (e.clientY >= H - pianoKeyH - 20) {
+    const lane = laneFromX(e.clientX);
+    state.keysDown.add(lane);
+    tryHitLane(lane);
+  }
+});
+
+canvas.addEventListener('mouseup', (e) => {
+  const lane = laneFromX(e.clientX);
+  state.keysDown.delete(lane);
+  releaseLane(lane);
+});
+
+canvas.addEventListener('touchstart', (e) => {
+  if (state.screen !== 'playing' || state.paused || state.countdownVal > 0) return;
+  e.preventDefault();
+  for (const touch of e.changedTouches) {
+    if (touch.clientY >= H - pianoKeyH - 20) {
+      const lane = laneFromX(touch.clientX);
+      state.keysDown.add(lane);
+      tryHitLane(lane);
+    }
+  }
+}, { passive: false });
+
+canvas.addEventListener('touchend', (e) => {
+  for (const touch of e.changedTouches) {
+    const lane = laneFromX(touch.clientX);
+    state.keysDown.delete(lane);
+    releaseLane(lane);
+  }
+});
+
+// ============================================================
+// RESULTS
+// ============================================================
+function showResults() {
+  Audio.playLevelComplete();
+  const pct = state.totalNotes > 0 ? state.hitNotes / state.totalNotes : 0;
+  const stars = pct >= 0.9 ? 3 : pct >= 0.75 ? 2 : pct >= 0.5 ? 1 : 0;
+
+  document.getElementById('results-score').textContent = state.score;
+
+  const statsEl = document.getElementById('results-stats');
+  statsEl.innerHTML = `
+    <div>מושלם: ${state.perfectHits}</div>
+    <div>פגיעות: ${state.hitNotes}</div>
+    <div>החמצות: ${state.totalNotes - state.hitNotes}</div>
+    <div>קומבו מקסימלי: ${state.maxCombo}</div>
+  `;
+
+  // Stars animation
+  ['star1', 'star2', 'star3'].forEach((id, i) => {
+    const el = document.getElementById(id);
+    el.classList.remove('earned');
+    if (i < stars) {
+      setTimeout(() => el.classList.add('earned'), (i + 1) * 400);
+    }
+  });
+
+  showScreen('results');
+}
+
+// ============================================================
+// RENDERING
+// ============================================================
+let frameCount = 0;
+
+function render() {
+  ctx.clearRect(0, 0, W, H);
+
+  // Background gradient
+  const grad = ctx.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, Math.max(W, H) * 0.7);
+  grad.addColorStop(0, '#1a0a2e');
+  grad.addColorStop(1, '#0d0019');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Twinkling stars
+  for (const s of state.stars) {
+    const twinkle = Math.sin(frameCount * s.speed + s.phase) * 0.4 + 0.6;
+    ctx.globalAlpha = twinkle * 0.7;
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  if (state.screen !== 'playing') return;
+
+  const lanes = state.lanes;
+  const numLanes = lanes.length;
+  const laneW = W / numLanes;
+
+  // Lane backgrounds
+  for (let i = 0; i < numLanes; i++) {
+    ctx.fillStyle = lanes[i].color;
+    ctx.globalAlpha = 0.06;
+    ctx.fillRect(i * laneW, 0, laneW, H);
+    // Lane divider
+    ctx.globalAlpha = 0.15;
+    ctx.strokeStyle = lanes[i].color;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(i * laneW, 0);
+    ctx.lineTo(i * laneW, H);
+    ctx.stroke();
+  }
+  ctx.globalAlpha = 1;
+
+  // Hit zone glow
+  const glowAlpha = 0.3 + Math.sin(frameCount * 0.05) * 0.1;
+  ctx.save();
+  ctx.shadowColor = '#FFD54F';
+  ctx.shadowBlur = 20;
+  ctx.globalAlpha = glowAlpha;
+  ctx.strokeStyle = '#FFD54F';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  ctx.moveTo(0, hitZoneY);
+  ctx.lineTo(W, hitZoneY);
+  ctx.stroke();
+  ctx.restore();
+
+  // Draw falling notes
+  for (const n of state.notes) {
+    const lane = lanes[n.lane];
+    const x = n.lane * laneW + 4;
+    const w = laneW - 8;
+    const color = lane.color;
+
+    if (n.hit) {
+      // Fade out hit notes
+      ctx.globalAlpha = Math.max(0, 0.3);
+      ctx.fillStyle = color;
+      roundRect(ctx, x, n.y, w, n.height, 8);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    } else {
+      // Active note
+      ctx.fillStyle = color;
+      ctx.globalAlpha = 0.85;
+      roundRect(ctx, x, n.y, w, n.height, 8);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+
+      // Border
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      roundRect(ctx, x, n.y, w, n.height, 8);
+      ctx.stroke();
+
+      // Hebrew label
+      ctx.fillStyle = '#ffffff';
+      ctx.font = `bold ${Math.min(18, laneW * 0.3)}px 'Segoe UI', sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(lane.hebrew, n.lane * laneW + laneW / 2, n.y + n.height / 2);
+    }
+  }
+
+  // Piano keys at bottom
+  for (let i = 0; i < numLanes; i++) {
+    const lane = lanes[i];
+    const x = i * laneW;
+    const y = H - pianoKeyH;
+    const pressed = state.keysDown.has(i);
+
+    // Key background
+    ctx.fillStyle = pressed ? lane.color : '#1a1a2e';
+    ctx.globalAlpha = pressed ? 1 : 0.9;
+    roundRect(ctx, x + 2, y + 2, laneW - 4, pianoKeyH - 4, 10);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+
+    // Key border
+    ctx.strokeStyle = lane.color;
+    ctx.lineWidth = pressed ? 3 : 2;
+    roundRect(ctx, x + 2, y + 2, laneW - 4, pianoKeyH - 4, 10);
+    ctx.stroke();
+
+    // Hebrew label
+    ctx.fillStyle = pressed ? '#ffffff' : lane.color;
+    ctx.font = `bold ${Math.min(22, laneW * 0.35)}px 'Segoe UI', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(lane.hebrew, x + laneW / 2, y + pianoKeyH / 2 - 10);
+
+    // Keyboard shortcut
+    ctx.fillStyle = pressed ? 'rgba(255,255,255,0.7)' : 'rgba(255,255,255,0.3)';
+    ctx.font = `${Math.min(14, laneW * 0.2)}px 'Segoe UI', sans-serif`;
+    ctx.fillText(lane.keys[0].toUpperCase(), x + laneW / 2, y + pianoKeyH / 2 + 14);
+  }
+
+  // Particles
+  for (const p of state.particles) {
+    ctx.globalAlpha = p.alpha;
+    ctx.fillStyle = p.color;
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+  ctx.globalAlpha = 1;
+
+  // Feedback text
+  for (const f of state.feedbacks) {
+    ctx.globalAlpha = f.alpha;
+    ctx.fillStyle = f.color;
+    ctx.font = `bold ${Math.round(24 * f.scale)}px 'Segoe UI', sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText(f.text, f.x, f.y);
+  }
+  ctx.globalAlpha = 1;
+
+  // Countdown
+  if (state.countdownVal > 0) {
+    ctx.fillStyle = '#FFD54F';
+    ctx.font = 'bold 120px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(255, 213, 79, 0.6)';
+    ctx.shadowBlur = 40;
+    ctx.fillText(state.countdownVal, W / 2, H / 2);
+    ctx.shadowBlur = 0;
+  }
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+// ============================================================
+// GAME LOOP
+// ============================================================
+let noteIdCounter = 0;
+
+function update() {
+  if (state.screen !== 'playing' || state.paused) return;
+
+  // Countdown
+  if (state.countdownVal > 0) {
+    state.countdownTimer++;
+    if (state.countdownTimer >= 60) {
+      state.countdownTimer = 0;
+      state.countdownVal--;
+    }
+    return;
+  }
+
+  const bpf = state.level === 1 ? BEATS_PER_FRAME_L1 : BEATS_PER_FRAME_L2;
+  // Adjust beat rate with speed
+  const adjustedBpf = bpf * (state.speed / (state.level === 1 ? BASE_SPEED_L1 : BASE_SPEED_L2));
+  state.songBeat += adjustedBpf;
+
+  // Spawn notes
+  while (state.songNoteIdx < state.song.length) {
+    const [lane, beat, dur] = state.song[state.songNoteIdx];
+    if (beat <= state.songBeat) {
+      const noteH = dur <= 1 ? SHORT_NOTE_HEIGHT : LONG_NOTE_BASE + (dur - 1) * 40;
+      state.notes.push({
+        id: noteIdCounter++,
+        lane,
+        y: -noteH,
+        height: noteH,
+        duration: dur,
+        hit: false,
+      });
+      state.songNoteIdx++;
+    } else {
+      break;
+    }
+  }
+
+  // Move notes
+  for (const n of state.notes) {
+    n.y += state.speed;
+  }
+
+  // Check misses
+  for (const n of state.notes) {
+    if (!n.hit && n.y + n.height / 2 > hitZoneY + GOOD_WINDOW + 20) {
+      n.hit = true; // Mark so we don't re-miss
+      handleMiss(n);
+    }
+  }
+
+  // Remove off-screen notes
+  state.notes = state.notes.filter(n => n.y < H + 50);
+
+  // Update particles
+  for (const p of state.particles) {
+    p.x += p.vx;
+    p.y += p.vy;
+    p.vy += 0.1; // gravity
+    p.alpha -= p.decay;
+  }
+  state.particles = state.particles.filter(p => p.alpha > 0);
+
+  // Update feedbacks
+  for (const f of state.feedbacks) {
+    f.y -= 1.2;
+    f.life--;
+    if (f.life < 20) f.alpha -= 0.05;
+    f.scale = Math.max(1, f.scale - 0.03);
+  }
+  state.feedbacks = state.feedbacks.filter(f => f.life > 0 && f.alpha > 0);
+
+  // Check song complete
+  if (state.songNoteIdx >= state.song.length && state.notes.length === 0 && !state.songDone) {
+    state.songDone = true;
+    setTimeout(() => showResults(), 500);
+  }
+}
+
+function gameLoop() {
+  frameCount++;
+  update();
+  render();
+  requestAnimationFrame(gameLoop);
+}
+
+gameLoop();
+</script>
+</body>
+</html>

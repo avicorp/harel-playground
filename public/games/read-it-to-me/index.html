@@ -1,0 +1,1598 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>תקרא לי</title>
+  <style>
+    :root {
+      --bg-primary: #0a1628;
+      --bg-secondary: #1a2a4a;
+      --bg-card: rgba(255, 255, 255, 0.08);
+      --bg-card-hover: rgba(255, 255, 255, 0.12);
+      --text-primary: #f0f4ff;
+      --text-secondary: #8899bb;
+      --text-muted: #556688;
+      --btn-read: #4a9eff;
+      --btn-syllable: #4ade80;
+      --btn-super: #fb923c;
+      --btn-easy: #f472b6;
+      --btn-read-bg: rgba(74, 158, 255, 0.15);
+      --btn-syllable-bg: rgba(74, 222, 128, 0.15);
+      --btn-super-bg: rgba(251, 146, 60, 0.15);
+      --btn-easy-bg: rgba(244, 114, 182, 0.15);
+      --gold: #fbbf24;
+      --font-word: 72px;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'David', 'Noto Sans Hebrew', 'Arial', sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+      color: var(--text-primary);
+      min-height: 100vh;
+      user-select: none;
+      overflow: hidden;
+    }
+
+    .screen {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .screen.active { display: flex; }
+
+    /* ===== START SCREEN ===== */
+    #start-screen .title {
+      font-size: 56px;
+      font-weight: bold;
+      margin-bottom: 8px;
+      background: linear-gradient(135deg, var(--btn-read), var(--btn-syllable));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    #start-screen .subtitle {
+      font-size: 22px;
+      color: var(--text-secondary);
+      margin-bottom: 40px;
+    }
+
+    .character-display {
+      width: 180px;
+      height: 180px;
+      margin-bottom: 30px;
+    }
+
+    .character-name-label {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .character-level-label {
+      font-size: 16px;
+      color: var(--text-muted);
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 16px 48px;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .btn:hover { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+
+    .btn-play {
+      background: linear-gradient(135deg, var(--btn-read), #2563eb);
+      color: white;
+      font-size: 32px;
+      padding: 20px 64px;
+      box-shadow: 0 4px 24px rgba(74, 158, 255, 0.4);
+      margin-bottom: 20px;
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 18px;
+      cursor: pointer;
+      padding: 8px 16px;
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
+
+    .btn-link:hover { color: var(--text-primary); }
+
+    .start-links { display: flex; gap: 24px; margin-top: 10px; }
+
+    /* ===== GAME SCREEN ===== */
+    .game-top-bar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 24px;
+    }
+
+    .top-bar-character {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top-bar-avatar {
+      width: 48px;
+      height: 48px;
+    }
+
+    .top-bar-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .top-bar-name {
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .top-bar-level {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .progress-dots {
+      display: flex;
+      gap: 8px;
+      direction: ltr;
+    }
+
+    .progress-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--bg-card);
+      border: 2px solid var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .progress-dot.done {
+      background: var(--btn-syllable);
+      border-color: var(--btn-syllable);
+    }
+
+    .progress-dot.current {
+      border-color: var(--btn-read);
+      box-shadow: 0 0 8px var(--btn-read);
+    }
+
+    .word-area {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      padding: 80px 20px 20px;
+    }
+
+    .word-display {
+      font-size: var(--font-word);
+      font-weight: bold;
+      line-height: 1.4;
+      text-align: center;
+      transition: font-size 0.2s;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .syllable {
+      display: inline-block;
+      transition: all 0.4s ease;
+      padding: 0 4px;
+      border-radius: 8px;
+    }
+
+    .syllable.highlight {
+      color: var(--btn-syllable);
+      transform: scale(1.3);
+      text-shadow: 0 0 20px rgba(74, 222, 128, 0.5);
+    }
+
+    .super-size-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 8px;
+      direction: ltr;
+    }
+
+    .super-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      transition: all 0.3s;
+    }
+
+    .super-dot.filled {
+      background: var(--btn-super);
+      box-shadow: 0 0 8px var(--btn-super);
+    }
+
+    .game-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      padding: 20px 24px 32px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .game-btn {
+      border: 2px solid;
+      border-radius: var(--radius);
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 16px 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      transition: transform 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    .game-btn:hover { transform: translateY(-2px); }
+    .game-btn:active { transform: translateY(0); }
+
+    .game-btn svg { width: 32px; height: 32px; }
+
+    .game-btn.read-btn {
+      background: var(--btn-read-bg);
+      border-color: var(--btn-read);
+      color: var(--btn-read);
+    }
+    .game-btn.read-btn:hover { background: rgba(74, 158, 255, 0.25); }
+
+    .game-btn.syllable-btn {
+      background: var(--btn-syllable-bg);
+      border-color: var(--btn-syllable);
+      color: var(--btn-syllable);
+    }
+    .game-btn.syllable-btn:hover { background: rgba(74, 222, 128, 0.25); }
+
+    .game-btn.super-btn {
+      background: var(--btn-super-bg);
+      border-color: var(--btn-super);
+      color: var(--btn-super);
+    }
+    .game-btn.super-btn:hover { background: rgba(251, 146, 60, 0.25); }
+
+    .game-btn.easy-btn {
+      background: var(--btn-easy-bg);
+      border-color: var(--btn-easy);
+      color: var(--btn-easy);
+    }
+    .game-btn.easy-btn:hover { background: rgba(244, 114, 182, 0.25); }
+
+    .btn-next {
+      background: linear-gradient(135deg, var(--btn-read), #2563eb);
+      color: white;
+      font-size: 22px;
+      padding: 14px 40px;
+      box-shadow: 0 4px 20px rgba(74, 158, 255, 0.3);
+      margin-bottom: 8px;
+      visibility: visible;
+    }
+
+    .btn-next.hidden { visibility: hidden; }
+
+    /* Reaction bubble */
+    .reaction-bubble {
+      position: absolute;
+      top: 20%;
+      background: var(--bg-card);
+      border: 2px solid var(--btn-easy);
+      border-radius: 20px;
+      padding: 16px 28px;
+      font-size: 28px;
+      color: var(--btn-easy);
+      opacity: 0;
+      transform: scale(0.5);
+      transition: all 0.4s ease;
+      pointer-events: none;
+      z-index: 10;
+    }
+
+    .reaction-bubble.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* Speaker pulse animation */
+    @keyframes pulse-speaker {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .reading .read-btn svg { animation: pulse-speaker 0.6s infinite; }
+
+    /* Explosion animation */
+    @keyframes explode {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(2.5); opacity: 0.7; }
+      100% { transform: scale(4); opacity: 0; }
+    }
+
+    .word-display.exploding {
+      animation: explode 0.8s ease-out forwards;
+    }
+
+    /* Character animations */
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    @keyframes dance {
+      0%, 100% { transform: rotate(0deg) translateY(0); }
+      25% { transform: rotate(-10deg) translateY(-10px); }
+      75% { transform: rotate(10deg) translateY(-10px); }
+    }
+
+    .char-bounce { animation: bounce 0.5s ease 3; }
+    .char-spin { animation: spin 0.6s ease; }
+    .char-dance { animation: dance 0.4s ease 4; }
+
+    /* ===== COMPLETE SCREEN ===== */
+    #complete-screen {
+      gap: 20px;
+    }
+
+    .complete-character {
+      width: 200px;
+      height: 200px;
+    }
+
+    .complete-title {
+      font-size: 42px;
+      font-weight: bold;
+      background: linear-gradient(135deg, var(--gold), #f59e0b);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .complete-subtitle {
+      font-size: 20px;
+      color: var(--text-secondary);
+      margin-bottom: 10px;
+    }
+
+    .xp-bar-container {
+      width: 300px;
+      height: 24px;
+      background: var(--bg-card);
+      border-radius: 12px;
+      overflow: hidden;
+      border: 2px solid var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .xp-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--btn-syllable), var(--gold));
+      border-radius: 12px;
+      transition: width 1s ease;
+      width: 0;
+    }
+
+    .xp-label {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 20px;
+    }
+
+    .level-up-text {
+      font-size: 32px;
+      color: var(--gold);
+      font-weight: bold;
+      display: none;
+    }
+
+    @keyframes level-up-glow {
+      0%, 100% { text-shadow: 0 0 10px var(--gold); }
+      50% { text-shadow: 0 0 30px var(--gold), 0 0 60px var(--gold); }
+    }
+
+    .level-up-text.show {
+      display: block;
+      animation: level-up-glow 1s ease 3;
+    }
+
+    .unlock-text {
+      font-size: 28px;
+      color: var(--btn-read);
+      font-weight: bold;
+      display: none;
+    }
+
+    .unlock-text.show { display: block; }
+
+    .complete-buttons {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .btn-secondary {
+      background: var(--bg-card);
+      color: var(--text-primary);
+      border: 2px solid var(--text-muted);
+      font-size: 20px;
+      padding: 14px 32px;
+    }
+
+    .btn-secondary:hover { background: var(--bg-card-hover); }
+
+    /* ===== QUEST MAP ===== */
+    #quest-screen {
+      padding: 40px 20px;
+      overflow-y: auto;
+    }
+
+    .quest-title {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .quest-subtitle {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .quest-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .quest-card {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: all 0.3s;
+      position: relative;
+    }
+
+    .quest-card:hover { background: var(--bg-card-hover); }
+
+    .quest-card.active-char {
+      border-color: var(--gold);
+      box-shadow: 0 0 20px rgba(251, 191, 36, 0.2);
+    }
+
+    .quest-card.locked {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    .quest-card.locked:hover { background: var(--bg-card); }
+
+    .quest-avatar {
+      width: 100px;
+      height: 100px;
+    }
+
+    .quest-char-name {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .quest-char-level {
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .quest-progress {
+      width: 100%;
+      height: 8px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .quest-progress-fill {
+      height: 100%;
+      background: var(--gold);
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    .quest-lock {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      font-size: 24px;
+      color: var(--text-muted);
+    }
+
+    .quest-unlock-req {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .quest-back {
+      margin-top: 32px;
+    }
+
+    /* ===== SETTINGS ===== */
+    #settings-screen {
+      padding: 40px 20px;
+      overflow-y: auto;
+      gap: 20px;
+    }
+
+    .settings-title {
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .settings-section {
+      background: var(--bg-card);
+      border-radius: var(--radius);
+      padding: 24px;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .settings-section h3 {
+      font-size: 20px;
+      margin-bottom: 16px;
+      color: var(--text-secondary);
+    }
+
+    .settings-input-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .settings-input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid var(--text-muted);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      font-family: inherit;
+      font-size: 18px;
+      color: var(--text-primary);
+      direction: rtl;
+    }
+
+    .settings-input::placeholder { color: var(--text-muted); }
+    .settings-input:focus { outline: none; border-color: var(--btn-read); }
+
+    .settings-hint {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .btn-add {
+      background: var(--btn-syllable-bg);
+      color: var(--btn-syllable);
+      border: 2px solid var(--btn-syllable);
+      font-size: 18px;
+      padding: 10px 24px;
+      width: 100%;
+    }
+
+    .custom-word-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .custom-word-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255,255,255,0.05);
+      border-radius: var(--radius-sm);
+      padding: 8px 14px;
+    }
+
+    .custom-word-text { font-size: 16px; }
+
+    .btn-delete-word {
+      background: none;
+      border: none;
+      color: #ef4444;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 4px 8px;
+    }
+
+    .btn-reset {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 2px solid #ef4444;
+      font-size: 16px;
+      padding: 10px 24px;
+      margin-top: 8px;
+    }
+
+    .settings-back { margin-top: 16px; }
+
+    /* Confetti */
+    .confetti-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      animation: confetti-fall 2s ease-in forwards;
+    }
+
+    /* Particles for explosion */
+    @keyframes particle-out {
+      0% { transform: translate(0, 0) scale(1); opacity: 1; }
+      100% { opacity: 0; }
+    }
+
+    .particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ===== START SCREEN ===== -->
+  <div id="start-screen" class="screen active">
+    <div class="title">תקרא לי!</div>
+    <div class="subtitle">בוא נקרא ביחד</div>
+    <div id="start-character" class="character-display"></div>
+    <div id="start-char-name" class="character-name-label"></div>
+    <div id="start-char-level" class="character-level-label"></div>
+    <button class="btn btn-play" onclick="startGame()">שחק!</button>
+    <div class="start-links">
+      <button class="btn-link" onclick="showScreen('quest')">מפת דמויות</button>
+      <button class="btn-link" onclick="showScreen('settings')">הגדרות</button>
+    </div>
+  </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div id="game-screen" class="screen">
+    <div class="game-top-bar">
+      <div class="top-bar-character">
+        <div id="game-avatar" class="top-bar-avatar"></div>
+        <div class="top-bar-info">
+          <div id="game-char-name" class="top-bar-name"></div>
+          <div id="game-char-level" class="top-bar-level"></div>
+        </div>
+      </div>
+      <div id="progress-dots" class="progress-dots"></div>
+    </div>
+
+    <div class="word-area">
+      <div id="word-display" class="word-display"></div>
+    </div>
+
+    <div id="super-dots-container" class="super-size-dots" style="display:none;"></div>
+
+    <div class="reaction-bubble" id="reaction-bubble"></div>
+
+    <button class="btn btn-next hidden" id="btn-next" onclick="nextWord()">הבא →</button>
+
+    <div class="game-buttons" id="game-buttons">
+      <button class="game-btn read-btn" onclick="actionRead()">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M6 16c0-2 2-6 10-6s10 4 10 6" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><circle cx="16" cy="18" r="4" stroke="currentColor" stroke-width="2.5"/><path d="M3 8v16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/><path d="M3 12c2-2 4-3 7-3" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.5"/><path d="M3 16c2-1 4-2 6-2" stroke="currentColor" stroke-width="2" stroke-linecap="round" opacity="0.3"/></svg>
+        תקרא לי
+      </button>
+      <button class="game-btn syllable-btn" onclick="actionSyllables()">
+        <svg viewBox="0 0 32 32" fill="none"><rect x="2" y="10" width="8" height="12" rx="3" stroke="currentColor" stroke-width="2.5"/><rect x="12" y="10" width="8" height="12" rx="3" stroke="currentColor" stroke-width="2.5"/><rect x="22" y="10" width="8" height="12" rx="3" stroke="currentColor" stroke-width="2.5"/></svg>
+        חלק להברות
+      </button>
+      <button class="game-btn super-btn" onclick="actionSuperSize()">
+        <svg viewBox="0 0 32 32" fill="none"><path d="M16 4L20 12H12L16 4Z" fill="currentColor"/><path d="M16 28L12 20H20L16 28Z" fill="currentColor"/><path d="M4 16L12 12V20L4 16Z" fill="currentColor"/><path d="M28 16L20 20V12L28 16Z" fill="currentColor"/></svg>
+        סופר סייז
+      </button>
+      <button class="game-btn easy-btn" onclick="actionEasy()">
+        <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="12" stroke="currentColor" stroke-width="2.5"/><path d="M10 14c0-1 1-2 2-2s2 1 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M18 14c0-1 1-2 2-2s2 1 2 2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M10 20c2 3 10 3 12 0" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"/></svg>
+        !קלה עליי
+      </button>
+    </div>
+  </div>
+
+  <!-- ===== SESSION COMPLETE SCREEN ===== -->
+  <div id="complete-screen" class="screen">
+    <div id="complete-character" class="complete-character"></div>
+    <div class="complete-title">!כל הכבוד</div>
+    <div id="complete-subtitle" class="complete-subtitle"></div>
+    <div class="xp-bar-container">
+      <div id="xp-bar" class="xp-bar"></div>
+    </div>
+    <div id="xp-label" class="xp-label"></div>
+    <div id="level-up-text" class="level-up-text">!עלית רמה</div>
+    <div id="unlock-text" class="unlock-text"></div>
+    <div class="complete-buttons">
+      <button class="btn btn-play" onclick="startGame()" style="font-size:22px;padding:14px 36px;">!שחק שוב</button>
+      <button class="btn btn-secondary" onclick="showScreen('quest')">מפת דמויות</button>
+    </div>
+  </div>
+
+  <!-- ===== QUEST MAP SCREEN ===== -->
+  <div id="quest-screen" class="screen">
+    <div class="quest-title">מפת דמויות</div>
+    <div id="quest-sessions" class="quest-subtitle"></div>
+    <div id="quest-grid" class="quest-grid"></div>
+    <button class="btn btn-secondary quest-back" onclick="showScreen('start')">חזרה</button>
+  </div>
+
+  <!-- ===== SETTINGS SCREEN ===== -->
+  <div id="settings-screen" class="screen">
+    <div class="settings-title">הגדרות</div>
+
+    <div class="settings-section">
+      <h3>הוספת מילים</h3>
+      <div class="settings-input-group">
+        <input type="text" id="input-word" class="settings-input" placeholder="מילה (עם ניקוד)">
+        <input type="text" id="input-syllables" class="settings-input" placeholder="הברות מופרדות בפסיקים">
+        <div class="settings-hint">לדוגמה: מילה: אֲבַטִּיחַ | הברות: אֲ,בַ,טִּי,חַ</div>
+      </div>
+      <button class="btn btn-add" onclick="addCustomWord()">הוסף מילה</button>
+      <div id="custom-word-list" class="custom-word-list"></div>
+    </div>
+
+    <div class="settings-section">
+      <h3>איפוס</h3>
+      <button class="btn btn-reset" onclick="resetProgress()">אפס התקדמות</button>
+    </div>
+
+    <button class="btn btn-secondary settings-back" onclick="showScreen('start')">חזרה</button>
+  </div>
+
+<script>
+// ===== WORD BANK =====
+const WORD_BANK = [
+  // בעלי חיים (Animals)
+  { word: 'תַּרְנְגוֹלֶת', syllables: ['תַּרְ','נְ','גוֹ','לֶת'], category: 'animals', speech: 'תרנגולת' },
+  { word: 'חֲסִידָה', syllables: ['חֲ','סִי','דָה'], category: 'animals', speech: 'חסידה' },
+  { word: 'דִּינוֹזָאוּר', syllables: ['דִּי','נוֹ','זָ','אוּר'], category: 'animals', speech: 'דינוזאור' },
+  { word: 'חִפּוּשִׁית', syllables: ['חִ','פּוּ','שִׁית'], category: 'animals', speech: 'חיפושית' },
+  { word: 'צְפַרְדֵּעַ', syllables: ['צְפַרְ','דֵּ','עַ'], category: 'animals', speech: 'צפרדע' },
+  { word: 'עֲכָבִישׁ', syllables: ['עֲ','כָ','בִישׁ'], category: 'animals', speech: 'עכביש' },
+  { word: 'לְטָאָה', syllables: ['לְ','טָ','אָה'], category: 'animals', speech: 'לטאה' },
+  { word: 'נְמָלָה', syllables: ['נְ','מָ','לָה'], category: 'animals', speech: 'נמלה' },
+  { word: 'פְּלָמִינְגוֹ', syllables: ['פְּלָ','מִינְ','גוֹ'], category: 'animals', speech: 'פלמינגו' },
+  { word: 'תִּמְסָח', syllables: ['תִּמְ','סָ','ח'], category: 'animals', speech: 'תימסח' },
+
+  // אוכל (Food)
+  { word: 'שׁוֹקוֹלָד', syllables: ['שׁוֹ','קוֹ','לָד'], category: 'food', speech: 'שוקולד' },
+  { word: 'בַּנָּנָה', syllables: ['בַּ','נָּ','נָה'], category: 'food', speech: 'בננה' },
+  { word: 'אֲבַטִּיחַ', syllables: ['אֲ','בַ','טִּי','חַ'], category: 'food', speech: 'אבטיח' },
+  { word: 'עֲגָבָנִיָּה', syllables: ['עֲ','גָ','בָ','נִ','יָּה'], category: 'food', speech: 'עגבנייה' },
+  { word: 'מַלְפֵּפוֹן', syllables: ['מַלְ','פֵּ','פוֹן'], category: 'food', speech: 'מלפפון' },
+  { word: 'תַּפּוּחַ', syllables: ['תַּ','פּוּ','חַ'], category: 'food', speech: 'תפוח' },
+  { word: 'אֲנָנָס', syllables: ['אֲ','נָ','נָס'], category: 'food', speech: 'אננס' },
+  { word: 'תּוּת־שָׂדֶה', syllables: ['תּוּת','שָׂ','דֶה'], category: 'food', speech: 'תות שדה' },
+  { word: 'גְּלִידָה', syllables: ['גְּ','לִי','דָה'], category: 'food', speech: 'גלידה' },
+  { word: 'סוּכָּרִיָּה', syllables: ['סוּ','כָּ','רִ','יָּה'], category: 'food', speech: 'סוכרייה' },
+
+  // גוף (Body)
+  { word: 'אֶצְבָּעוֹת', syllables: ['אֶצְ','בָּ','עוֹת'], category: 'body', speech: 'אצבעות' },
+  { word: 'בִּרְכַּיִם', syllables: ['בִּרְ','כַּ','יִם'], category: 'body', speech: 'ברכיים' },
+  { word: 'שִׁינַּיִם', syllables: ['שִׁי','נַּ','יִם'], category: 'body', speech: 'שיניים' },
+  { word: 'כְּתֵפַיִם', syllables: ['כְּ','תֵ','פַ','יִם'], category: 'body', speech: 'כתפיים' },
+  { word: 'שְׂפָתַיִם', syllables: ['שְׂ','פָ','תַ','יִם'], category: 'body', speech: 'שפתיים' },
+  { word: 'עֵינַיִם', syllables: ['עֵי','נַ','יִם'], category: 'body', speech: 'עיניים' },
+  { word: 'אוֹזְנַיִם', syllables: ['אוֹזְ','נַ','יִם'], category: 'body', speech: 'אוזניים' },
+  { word: 'רַגְלַיִם', syllables: ['רַגְ','לַ','יִם'], category: 'body', speech: 'רגליים' },
+  { word: 'מַרְפֵּקַיִם', syllables: ['מַרְ','פֵּ','קַ','יִם'], category: 'body', speech: 'מרפקיים' },
+  { word: 'צִפּוֹרְנַיִם', syllables: ['צִ','פּוֹרְ','נַ','יִם'], category: 'body', speech: 'ציפורניים' },
+
+  // בית (Home)
+  { word: 'מִקְרֶרֶת', syllables: ['מִקְ','רֶ','רֶת'], category: 'home', speech: 'מקררת' },
+  { word: 'מִכְבָּסָה', syllables: ['מִכְ','בָּ','סָה'], category: 'home', speech: 'מכבסה' },
+  { word: 'טֶלֶוִיזְיָה', syllables: ['טֶ','לֶ','וִיזְ','יָה'], category: 'home', speech: 'טלוויזיה' },
+  { word: 'מַדְרֵגוֹת', syllables: ['מַדְ','רֵ','גוֹת'], category: 'home', speech: 'מדרגות' },
+  { word: 'מִזְרוֹן', syllables: ['מִזְ','רוֹ','ן'], category: 'home', speech: 'מזרון' },
+  { word: 'כּוֹרְסָה', syllables: ['כּוֹרְ','סָ','ה'], category: 'home', speech: 'כורסה' },
+  { word: 'מְנוֹרָה', syllables: ['מְ','נוֹ','רָה'], category: 'home', speech: 'מנורה' },
+  { word: 'שְׁמִיכָה', syllables: ['שְׁ','מִי','כָה'], category: 'home', speech: 'שמיכה' },
+  { word: 'מִטְבָּחוֹן', syllables: ['מִטְ','בָּ','חוֹן'], category: 'home', speech: 'מטבחון' },
+  { word: 'אַמְבַּטְיָה', syllables: ['אַמְ','בַּטְ','יָה'], category: 'home', speech: 'אמבטיה' },
+
+  // טבע (Nature)
+  { word: 'פְּרָחִים', syllables: ['פְּ','רָ','חִים'], category: 'nature', speech: 'פרחים' },
+  { word: 'חַמָּנִיָּה', syllables: ['חַ','מָּ','נִ','יָּה'], category: 'nature', speech: 'חמנייה' },
+  { word: 'הָרִים', syllables: ['הָ','רִ','ים'], category: 'nature', speech: 'הרים' },
+  { word: 'מַפָּלִים', syllables: ['מַ','פָּ','לִים'], category: 'nature', speech: 'מפלים' },
+  { word: 'עֲנָנִים', syllables: ['עֲ','נָ','נִים'], category: 'nature', speech: 'עננים' },
+  { word: 'כּוֹכָבִים', syllables: ['כּוֹ','כָ','בִים'], category: 'nature', speech: 'כוכבים' },
+  { word: 'קֶשֶׁת', syllables: ['קֶ','שֶׁ','ת'], category: 'nature', speech: 'קשת' },
+  { word: 'אֲדָמָה', syllables: ['אֲ','דָ','מָה'], category: 'nature', speech: 'אדמה' },
+  { word: 'מִדְבָּרִי', syllables: ['מִדְ','בָּ','רִי'], category: 'nature', speech: 'מדברי' },
+  { word: 'יַעֲרָה', syllables: ['יַ','עֲ','רָה'], category: 'nature', speech: 'יערה' },
+
+  // בגדים (Clothes)
+  { word: 'מִכְנָסַיִם', syllables: ['מִכְ','נָ','סַ','יִם'], category: 'clothes', speech: 'מכנסיים' },
+  { word: 'סַנְדָּלִים', syllables: ['סַנְ','דָּ','לִים'], category: 'clothes', speech: 'סנדלים' },
+  { word: 'גַּרְבַּיִם', syllables: ['גַּרְ','בַּ','יִם'], category: 'clothes', speech: 'גרביים' },
+  { word: 'חֲגוֹרָה', syllables: ['חֲ','גוֹ','רָה'], category: 'clothes', speech: 'חגורה' },
+  { word: 'מְעִילוֹן', syllables: ['מְ','עִי','לוֹן'], category: 'clothes', speech: 'מעילון' },
+  { word: 'כּוֹבַעוֹן', syllables: ['כּוֹ','בַ','עוֹן'], category: 'clothes', speech: 'כובעון' },
+  { word: 'נַעֲלַיִם', syllables: ['נַ','עֲ','לַ','יִם'], category: 'clothes', speech: 'נעליים' },
+  { word: 'שִׁמְלָה', syllables: ['שִׁמְ','לָ','ה'], category: 'clothes', speech: 'שמלה' },
+  { word: 'חוּלְצָה', syllables: ['חוּלְ','צָ','ה'], category: 'clothes', speech: 'חולצה' },
+  { word: 'מִטְרִיָּה', syllables: ['מִטְ','רִ','יָּה'], category: 'clothes', speech: 'מטרייה' },
+
+  // כלי רכב (Vehicles)
+  { word: 'מְכוֹנִית', syllables: ['מְ','כוֹ','נִית'], category: 'vehicles', speech: 'מכונית' },
+  { word: 'אוֹטוֹבּוּס', syllables: ['אוֹ','טוֹ','בּוּס'], category: 'vehicles', speech: 'אוטובוס' },
+  { word: 'מוֹנִית', syllables: ['מוֹ','נִ','ית'], category: 'vehicles', speech: 'מונית' },
+  { word: 'אוֹפַנַּיִם', syllables: ['אוֹ','פַ','נַּ','יִם'], category: 'vehicles', speech: 'אופניים' },
+  { word: 'מָטוֹס', syllables: ['מָ','טוֹ','ס'], category: 'vehicles', speech: 'מטוס' },
+  { word: 'רַכֶּבֶת', syllables: ['רַ','כֶּ','בֶת'], category: 'vehicles', speech: 'רכבת' },
+  { word: 'מַסּוֹקִית', syllables: ['מַ','סּוֹ','קִית'], category: 'vehicles', speech: 'מסוקית' },
+  { word: 'אֳנִיָּה', syllables: ['אֳ','נִ','יָּה'], category: 'vehicles', speech: 'אונייה' },
+  { word: 'טְרַקְטוֹר', syllables: ['טְרַקְ','טוֹ','ר'], category: 'vehicles', speech: 'טרקטור' },
+  { word: 'קוֹרְקִינֶט', syllables: ['קוֹרְ','קִי','נֶט'], category: 'vehicles', speech: 'קורקינט' },
+
+  // בית ספר (School)
+  { word: 'מַחְבֶּרֶת', syllables: ['מַחְ','בֶּ','רֶת'], category: 'school', speech: 'מחברת' },
+  { word: 'מוֹרָה', syllables: ['מוֹ','רָ','ה'], category: 'school', speech: 'מורה' },
+  { word: 'שִׁעוּרִים', syllables: ['שִׁ','עוּ','רִים'], category: 'school', speech: 'שיעורים' },
+  { word: 'מַחְשֵׁבוֹן', syllables: ['מַחְ','שֵׁ','בוֹן'], category: 'school', speech: 'מחשבון' },
+  { word: 'סִפְרִיָּה', syllables: ['סִפְ','רִ','יָּה'], category: 'school', speech: 'ספרייה' },
+  { word: 'תַּלְמִידָה', syllables: ['תַּלְ','מִי','דָה'], category: 'school', speech: 'תלמידה' },
+  { word: 'מִבְחָנִים', syllables: ['מִבְ','חָ','נִים'], category: 'school', speech: 'מבחנים' },
+  { word: 'הַפְסָקָה', syllables: ['הַפְ','סָ','קָה'], category: 'school', speech: 'הפסקה' },
+  { word: 'מַחְשֵׁבוֹנִים', syllables: ['מַחְ','שֵׁ','בוֹ','נִים'], category: 'school', speech: 'מחשבונים' },
+  { word: 'עִפָּרוֹן', syllables: ['עִ','פָּ','רוֹן'], category: 'school', speech: 'עיפרון' },
+
+  // פעולות (Actions)
+  { word: 'לִרְקוֹד', syllables: ['לִרְ','קוֹ','ד'], category: 'actions', speech: 'לרקוד' },
+  { word: 'לְצַיֵּר', syllables: ['לְ','צַ','יֵּר'], category: 'actions', speech: 'לצייר' },
+  { word: 'לִשְׂחוֹק', syllables: ['לִשְׂ','חוֹ','ק'], category: 'actions', speech: 'לשחוק' },
+  { word: 'לְהִתְלַבֵּשׁ', syllables: ['לְ','הִתְ','לַ','בֵּשׁ'], category: 'actions', speech: 'להתלבש' },
+  { word: 'לְטַיֵּל', syllables: ['לְ','טַ','יֵּל'], category: 'actions', speech: 'לטייל' },
+  { word: 'לְהִתְקַלֵּחַ', syllables: ['לְ','הִתְ','קַ','לֵּחַ'], category: 'actions', speech: 'להתקלח' },
+  { word: 'לַחֲלוֹם', syllables: ['לַ','חֲ','לוֹם'], category: 'actions', speech: 'לחלום' },
+  { word: 'לְהַקְשִׁיב', syllables: ['לְ','הַקְ','שִׁיב'], category: 'actions', speech: 'להקשיב' },
+  { word: 'לְהִתְאַמֵּן', syllables: ['לְ','הִתְ','אַ','מֵּן'], category: 'actions', speech: 'להתאמן' },
+  { word: 'לְהִסְתּוֹבֵב', syllables: ['לְ','הִסְ','תּוֹ','בֵב'], category: 'actions', speech: 'להסתובב' },
+
+  // כיף ושונות (Fun/Misc)
+  { word: 'הַרְפַּתְקָה', syllables: ['הַרְ','פַּתְ','קָה'], category: 'fun', speech: 'הרפתקה' },
+  { word: 'יוֹם הֻלֶּדֶת', syllables: ['יוֹם','הֻ','לֶּ','דֶת'], category: 'fun', speech: 'יום הולדת' },
+  { word: 'הַפְתָּעָה', syllables: ['הַפְ','תָּ','עָה'], category: 'fun', speech: 'הפתעה' },
+  { word: 'מַתָּנָה', syllables: ['מַ','תָּ','נָה'], category: 'fun', speech: 'מתנה' },
+  { word: 'קַרְנָבָל', syllables: ['קַרְ','נָ','בָל'], category: 'fun', speech: 'קרנבל' },
+  { word: 'מִשְׂחָקִים', syllables: ['מִשְׂ','חָ','קִים'], category: 'fun', speech: 'משחקים' },
+  { word: 'תַּחֲפּוֹשֶׂת', syllables: ['תַּ','חֲ','פּוֹ','שֶׂת'], category: 'fun', speech: 'תחפושת' },
+  { word: 'בּוּבָּה', syllables: ['בּוּ','בָּ','ה'], category: 'fun', speech: 'בובה' },
+  { word: 'פְּלָאִים', syllables: ['פְּ','לָ','אִים'], category: 'fun', speech: 'פלאים' },
+  { word: 'דִּמְיוֹן', syllables: ['דִּמְ','יוֹ','ן'], category: 'fun', speech: 'דמיון' },
+];
+
+// ===== CHARACTER DEFINITIONS =====
+const CHARACTERS = {
+  gugu: {
+    name: 'גוּגוּ',
+    desc: 'מפלצת חמודה',
+    unlockAt: 0,
+    color: '#a78bfa',
+    svg: (level) => {
+      const sizes = [60,70,80,90,100];
+      const s = sizes[level-1] || 60;
+      const colors = ['#a78bfa','#a78bfa','#8b5cf6','#7c3aed','#6d28d9'];
+      const c = colors[level-1] || '#a78bfa';
+      let extras = '';
+      if (level >= 2) extras += `<circle cx="30" cy="15" r="6" fill="#fbbf24"/><circle cx="70" cy="15" r="6" fill="#fbbf24"/>`;
+      if (level >= 3) extras += `<rect x="20" y="70" width="8" height="12" rx="4" fill="${c}" opacity="0.6"/><rect x="72" y="70" width="8" height="12" rx="4" fill="${c}" opacity="0.6"/>`;
+      if (level >= 4) extras += `<circle cx="50" cy="20" r="10" fill="none" stroke="#fbbf24" stroke-width="2" opacity="0.5"/><circle cx="50" cy="20" r="15" fill="none" stroke="#fbbf24" stroke-width="1" opacity="0.3"/>`;
+      if (level >= 5) extras += `<circle cx="25" cy="10" r="3" fill="#fbbf24" opacity="0.8"/><circle cx="75" cy="10" r="3" fill="#fbbf24" opacity="0.8"/><circle cx="50" cy="5" r="2" fill="#fbbf24" opacity="0.6"/>`;
+      return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="55" rx="${s/2}" ry="${s/2.2}" fill="${c}"/>
+        <circle cx="38" cy="45" r="8" fill="white"/><circle cx="62" cy="45" r="8" fill="white"/>
+        <circle cx="40" cy="45" r="4" fill="#1a1a2e"/><circle cx="64" cy="45" r="4" fill="#1a1a2e"/>
+        <path d="M40 62 Q50 70 60 62" stroke="#1a1a2e" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="30" cy="55" rx="5" ry="3" fill="#f9a8d4" opacity="0.5"/>
+        <ellipse cx="70" cy="55" rx="5" ry="3" fill="#f9a8d4" opacity="0.5"/>
+        ${extras}
+      </svg>`;
+    }
+  },
+  drakosh: {
+    name: 'דְּרָקוֹשׁ',
+    desc: 'דרקון קטן',
+    unlockAt: 5,
+    color: '#4ade80',
+    svg: (level) => {
+      const colors = ['#4ade80','#4ade80','#22c55e','#16a34a','#15803d'];
+      const c = colors[level-1] || '#4ade80';
+      let extras = '';
+      if (level >= 2) extras += `<path d="M75 45 L90 30 L80 50" fill="${c}" opacity="0.7"/>`;
+      if (level >= 3) extras += `<path d="M25 45 L10 30 L20 50" fill="${c}" opacity="0.7"/><circle cx="50" cy="85" r="4" fill="#fb923c" opacity="0.6"/>`;
+      if (level >= 4) extras += `<path d="M85 35 Q95 20 80 25" fill="none" stroke="${c}" stroke-width="2"/><path d="M15 35 Q5 20 20 25" fill="none" stroke="${c}" stroke-width="2"/>`;
+      if (level >= 5) extras += `<circle cx="50" cy="20" r="8" fill="#fb923c" opacity="0.3"/><circle cx="50" cy="20" r="4" fill="#fb923c" opacity="0.5"/><path d="M45 15 L50 8 L55 15" fill="#fbbf24"/>`;
+      return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="58" rx="28" ry="30" fill="${c}"/>
+        <ellipse cx="50" cy="40" rx="22" ry="20" fill="${c}"/>
+        <polygon points="35,25 30,10 40,22" fill="${c}"/>
+        <polygon points="65,25 70,10 60,22" fill="${c}"/>
+        <circle cx="42" cy="38" r="5" fill="white"/><circle cx="58" cy="38" r="5" fill="white"/>
+        <circle cx="43" cy="38" r="2.5" fill="#1a1a2e"/><circle cx="59" cy="38" r="2.5" fill="#1a1a2e"/>
+        <ellipse cx="50" cy="48" rx="4" ry="2" fill="#1a1a2e" opacity="0.3"/>
+        <path d="M50 88 Q55 95 50 98 Q45 95 50 88" fill="${c}" opacity="0.8"/>
+        ${extras}
+      </svg>`;
+    }
+  },
+  robi: {
+    name: 'רוֹבִּי',
+    desc: 'רובוט חברותי',
+    unlockAt: 15,
+    color: '#4a9eff',
+    svg: (level) => {
+      const colors = ['#4a9eff','#4a9eff','#3b82f6','#2563eb','#1d4ed8'];
+      const c = colors[level-1] || '#4a9eff';
+      let extras = '';
+      if (level >= 2) extras += `<rect x="44" y="12" width="12" height="8" rx="2" fill="#fbbf24"/>`;
+      if (level >= 3) extras += `<circle cx="50" cy="10" r="4" fill="#fb923c"/><line x1="50" y1="6" x2="50" y2="2" stroke="#fb923c" stroke-width="2"/>`;
+      if (level >= 4) extras += `<rect x="12" y="50" width="6" height="16" rx="3" fill="${c}" opacity="0.6"/><rect x="82" y="50" width="6" height="16" rx="3" fill="${c}" opacity="0.6"/>`;
+      if (level >= 5) extras += `<circle cx="50" cy="8" r="5" fill="none" stroke="#fbbf24" stroke-width="1.5" opacity="0.6"/><circle cx="50" cy="8" r="8" fill="none" stroke="#fbbf24" stroke-width="1" opacity="0.3"/>`;
+      return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <rect x="25" y="20" width="50" height="40" rx="8" fill="${c}"/>
+        <rect x="20" y="65" width="60" height="25" rx="6" fill="${c}" opacity="0.9"/>
+        <rect x="38" y="45" width="24" height="8" rx="4" fill="#1a1a2e" opacity="0.5"/>
+        <circle cx="38" cy="38" r="6" fill="white"/><circle cx="62" cy="38" r="6" fill="white"/>
+        <circle cx="39" cy="38" r="3" fill="#1a1a2e"/><circle cx="63" cy="38" r="3" fill="#1a1a2e"/>
+        <line x1="50" y1="60" x2="50" y2="65" stroke="#1a1a2e" stroke-width="3"/>
+        <rect x="30" y="72" width="12" height="4" rx="2" fill="white" opacity="0.3"/>
+        <rect x="46" y="72" width="12" height="4" rx="2" fill="white" opacity="0.3"/>
+        <rect x="62" y="72" width="8" height="4" rx="2" fill="#4ade80" opacity="0.5"/>
+        ${extras}
+      </svg>`;
+    }
+  },
+  yanshufon: {
+    name: 'יַנְשׁוּפוֹן',
+    desc: 'ינשוף חכם',
+    unlockAt: 25,
+    color: '#f59e0b',
+    svg: (level) => {
+      const colors = ['#f59e0b','#f59e0b','#d97706','#b45309','#92400e'];
+      const c = colors[level-1] || '#f59e0b';
+      let extras = '';
+      if (level >= 2) extras += `<path d="M22 50 L8 55 L22 58" fill="${c}" opacity="0.7"/><path d="M78 50 L92 55 L78 58" fill="${c}" opacity="0.7"/>`;
+      if (level >= 3) extras += `<circle cx="50" cy="15" r="5" fill="#fbbf24" opacity="0.4"/>`;
+      if (level >= 4) extras += `<path d="M15 48 L5 40 L12 52" fill="${c}" opacity="0.5"/><path d="M85 48 L95 40 L88 52" fill="${c}" opacity="0.5"/>`;
+      if (level >= 5) extras += `<circle cx="50" cy="12" r="8" fill="none" stroke="#fbbf24" stroke-width="1.5" opacity="0.5"/><path d="M46 8 L50 2 L54 8" fill="#fbbf24" opacity="0.6"/>`;
+      return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="50" cy="55" rx="30" ry="32" fill="${c}"/>
+        <polygon points="25,30 20,12 35,28" fill="${c}"/>
+        <polygon points="75,30 80,12 65,28" fill="${c}"/>
+        <circle cx="38" cy="42" r="10" fill="white"/><circle cx="62" cy="42" r="10" fill="white"/>
+        <circle cx="40" cy="42" r="5" fill="#1a1a2e"/><circle cx="64" cy="42" r="5" fill="#1a1a2e"/>
+        <circle cx="41" cy="41" r="2" fill="white"/>
+        <circle cx="65" cy="41" r="2" fill="white"/>
+        <polygon points="46,55 50,60 54,55" fill="#d97706"/>
+        <ellipse cx="50" cy="72" rx="15" ry="8" fill="${c}" opacity="0.7"/>
+        <path d="M38 70 Q50 78 62 70" stroke="${c}" stroke-width="1" fill="none" opacity="0.5"/>
+        ${extras}
+      </svg>`;
+    }
+  }
+};
+
+// ===== REACTIONS POOL =====
+const REACTIONS = {
+  impressed: ['!וואו, אתה קורא כמו רקטה', '!אין עליך', '!מלך הקריאה', '!קורא מהיר', '!יופי של קריאה'],
+  challenge: ['!בטוח? בוא נראה את הבאה', '!קל לך? אז קדימה', '...אוקיי, בוא ננסה עוד אחת'],
+  party: ['!מסיבה', '!יש מצב לחגוג', '!קונפטי']
+};
+
+// ===== STATE =====
+const STORAGE_KEY = 'readItToMe';
+let state = loadState();
+let sessionWords = [];
+let currentWordIndex = 0;
+let superSizeCount = 0;
+let currentFontSize = 72;
+let syllableAnimating = false;
+let actionTaken = false;
+let syllableMode = false;
+let currentUtterance = null; // Keep reference to prevent GC
+
+function defaultState() {
+  return {
+    sessionsCompleted: 0,
+    activeCharacter: 'gugu',
+    characters: {
+      gugu: { unlocked: true, level: 1, sessions: 0 },
+      drakosh: { unlocked: false, level: 0, sessions: 0 },
+      robi: { unlocked: false, level: 0, sessions: 0 },
+      yanshufon: { unlocked: false, level: 0, sessions: 0 }
+    },
+    customWords: [],
+    lastSessionDate: null
+  };
+}
+
+function loadState() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (saved) return saved;
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+}
+
+// ===== SCREEN MANAGEMENT =====
+const screens = {
+  start: document.getElementById('start-screen'),
+  game: document.getElementById('game-screen'),
+  complete: document.getElementById('complete-screen'),
+  quest: document.getElementById('quest-screen'),
+  settings: document.getElementById('settings-screen')
+};
+
+function showScreen(name) {
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+
+  if (name === 'start') renderStartScreen();
+  if (name === 'quest') renderQuestMap();
+  if (name === 'settings') renderSettings();
+}
+
+// ===== START SCREEN =====
+function renderStartScreen() {
+  const char = CHARACTERS[state.activeCharacter];
+  const charState = state.characters[state.activeCharacter];
+  document.getElementById('start-character').innerHTML = char.svg(charState.level || 1);
+  document.getElementById('start-char-name').textContent = char.name;
+  document.getElementById('start-char-level').textContent = charState.level > 0 ? `רמה ${charState.level}` : '';
+}
+
+// ===== GAME =====
+function startGame() {
+  // Pick 10 random words
+  const allWords = [...WORD_BANK, ...state.customWords.map(w => ({
+    word: w.word, syllables: w.syllables, category: 'custom'
+  }))];
+  sessionWords = shuffle(allWords).slice(0, 10);
+  currentWordIndex = 0;
+
+  showScreen('game');
+  renderGameTopBar();
+  renderProgressDots();
+  showWord();
+}
+
+function renderGameTopBar() {
+  const char = CHARACTERS[state.activeCharacter];
+  const charState = state.characters[state.activeCharacter];
+  document.getElementById('game-avatar').innerHTML = char.svg(charState.level || 1);
+  document.getElementById('game-char-name').textContent = char.name;
+  document.getElementById('game-char-level').textContent = `רמה ${charState.level || 1}`;
+}
+
+function renderProgressDots() {
+  const container = document.getElementById('progress-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < sessionWords.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    if (i < currentWordIndex) dot.classList.add('done');
+    if (i === currentWordIndex) dot.classList.add('current');
+    container.appendChild(dot);
+  }
+}
+
+function showWord() {
+  if (currentWordIndex >= sessionWords.length) {
+    completeSession();
+    return;
+  }
+
+  const wordData = sessionWords[currentWordIndex];
+  const display = document.getElementById('word-display');
+  display.className = 'word-display';
+  display.textContent = wordData.word;
+  currentFontSize = 72;
+  display.style.fontSize = currentFontSize + 'px';
+
+  // Reset state
+  superSizeCount = 0;
+  actionTaken = false;
+  syllableMode = false;
+  syllableAnimating = false;
+
+  document.getElementById('btn-next').classList.add('hidden');
+  document.getElementById('game-buttons').style.display = 'grid';
+  document.getElementById('super-dots-container').style.display = 'none';
+  document.getElementById('reaction-bubble').classList.remove('show');
+
+  // Remove any character animation
+  const avatar = document.getElementById('game-avatar');
+  avatar.classList.remove('char-bounce', 'char-spin', 'char-dance');
+
+  renderProgressDots();
+}
+
+function showNextButton() {
+  document.getElementById('btn-next').classList.remove('hidden');
+}
+
+function nextWord() {
+  currentWordIndex++;
+  showWord();
+}
+
+// ===== BUTTON ACTIONS =====
+
+// Read It To Me
+function actionRead() {
+  if (syllableAnimating) return;
+
+  const wordData = sessionWords[currentWordIndex];
+  const gameScreen = document.getElementById('game-screen');
+
+  // Cancel any ongoing speech and reset the engine
+  speechSynthesis.cancel();
+
+  // Small delay after cancel to let the engine reset (Chrome bug workaround)
+  setTimeout(() => {
+    currentUtterance = new SpeechSynthesisUtterance(wordData.speech || wordData.word);
+    currentUtterance.lang = 'he-IL';
+    currentUtterance.rate = 0.85;
+
+    gameScreen.classList.add('reading');
+    currentUtterance.onend = () => {
+      gameScreen.classList.remove('reading');
+      currentUtterance = null;
+      actionTaken = true;
+      showNextButton();
+    };
+    currentUtterance.onerror = () => {
+      gameScreen.classList.remove('reading');
+      currentUtterance = null;
+      actionTaken = true;
+      showNextButton();
+    };
+
+    speechSynthesis.speak(currentUtterance);
+  }, 100);
+}
+
+// Split Syllables
+function actionSyllables() {
+  if (syllableAnimating) return;
+  syllableAnimating = true;
+  syllableMode = true;
+
+  const wordData = sessionWords[currentWordIndex];
+  const display = document.getElementById('word-display');
+
+  // Replace word with syllable spans
+  display.innerHTML = '';
+  const spans = wordData.syllables.map(syl => {
+    const span = document.createElement('span');
+    span.className = 'syllable';
+    span.textContent = syl;
+    span.style.fontSize = currentFontSize + 'px';
+    display.appendChild(span);
+    return span;
+  });
+
+  // Animate syllables sequentially, then repeat once
+  animateSyllables(spans, 0, 0);
+}
+
+function animateSyllables(spans, index, pass) {
+  if (pass >= 2) {
+    syllableAnimating = false;
+    actionTaken = true;
+    showNextButton();
+    return;
+  }
+
+  if (index >= spans.length) {
+    // Start next pass
+    setTimeout(() => animateSyllables(spans, 0, pass + 1), 400);
+    return;
+  }
+
+  // Remove highlight from all
+  spans.forEach(s => s.classList.remove('highlight'));
+  // Highlight current
+  spans[index].classList.add('highlight');
+
+  setTimeout(() => {
+    animateSyllables(spans, index + 1, pass);
+  }, 600);
+}
+
+// Super Size
+function actionSuperSize() {
+  if (syllableAnimating) return;
+  if (superSizeCount >= 5) return;
+
+  superSizeCount++;
+  currentFontSize += 10;
+
+  const display = document.getElementById('word-display');
+
+  // Update font size on word or syllable spans
+  if (syllableMode) {
+    display.querySelectorAll('.syllable').forEach(s => {
+      s.style.fontSize = currentFontSize + 'px';
+    });
+  } else {
+    display.style.fontSize = currentFontSize + 'px';
+  }
+
+  // Show super size dots
+  const dotsContainer = document.getElementById('super-dots-container');
+  dotsContainer.style.display = 'flex';
+  dotsContainer.innerHTML = '';
+  for (let i = 0; i < 5; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'super-dot' + (i < superSizeCount ? ' filled' : '');
+    dotsContainer.appendChild(dot);
+  }
+
+  if (superSizeCount >= 5) {
+    // Explosion!
+    display.classList.add('exploding');
+    actionTaken = true;
+    setTimeout(() => {
+      dotsContainer.style.display = 'none';
+      createParticles(display);
+      setTimeout(() => {
+        currentWordIndex++;
+        showWord();
+      }, 600);
+    }, 800);
+  }
+}
+
+function createParticles(element) {
+  const rect = element.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top + rect.height / 2;
+  const colors = ['#fb923c', '#fbbf24', '#f472b6', '#4ade80', '#4a9eff'];
+
+  for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.background = colors[i % colors.length];
+    particle.style.left = cx + 'px';
+    particle.style.top = cy + 'px';
+
+    const angle = (Math.PI * 2 * i) / 20;
+    const distance = 80 + Math.random() * 120;
+    const tx = Math.cos(angle) * distance;
+    const ty = Math.sin(angle) * distance;
+
+    particle.style.animation = 'none';
+    particle.style.transition = 'all 0.8s ease-out';
+    document.body.appendChild(particle);
+
+    requestAnimationFrame(() => {
+      particle.style.transform = `translate(${tx}px, ${ty}px) scale(0)`;
+      particle.style.opacity = '0';
+    });
+
+    setTimeout(() => particle.remove(), 1000);
+  }
+}
+
+// Too Easy
+function actionEasy() {
+  if (syllableAnimating) return;
+  actionTaken = true;
+
+  // Pick random reaction
+  const categories = Object.keys(REACTIONS);
+  const cat = categories[Math.floor(Math.random() * categories.length)];
+  const reactions = REACTIONS[cat];
+  const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+
+  // Show reaction bubble
+  const bubble = document.getElementById('reaction-bubble');
+  bubble.textContent = reaction;
+  bubble.classList.add('show');
+
+  // Character animation
+  const avatar = document.getElementById('game-avatar');
+  const anims = ['char-bounce', 'char-spin', 'char-dance'];
+  const anim = anims[Math.floor(Math.random() * anims.length)];
+  avatar.classList.remove(...anims);
+  void avatar.offsetWidth; // Force reflow
+  avatar.classList.add(anim);
+
+  // Confetti for party reactions
+  if (cat === 'party') {
+    createConfetti();
+  }
+
+  // Auto-advance after 1.5s
+  setTimeout(() => {
+    bubble.classList.remove('show');
+    currentWordIndex++;
+    showWord();
+  }, 1500);
+}
+
+function createConfetti() {
+  const container = document.createElement('div');
+  container.className = 'confetti-container';
+  document.body.appendChild(container);
+
+  const colors = ['#fb923c', '#fbbf24', '#f472b6', '#4ade80', '#4a9eff', '#a78bfa'];
+
+  for (let i = 0; i < 30; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDelay = Math.random() * 0.5 + 's';
+    piece.style.animationDuration = 1.5 + Math.random() * 1 + 's';
+    if (Math.random() > 0.5) {
+      piece.style.borderRadius = '50%';
+    }
+    container.appendChild(piece);
+  }
+
+  setTimeout(() => container.remove(), 3000);
+}
+
+// ===== SESSION COMPLETE =====
+function completeSession() {
+  state.sessionsCompleted++;
+  state.lastSessionDate = new Date().toISOString().split('T')[0];
+
+  const activeChar = state.activeCharacter;
+  const charState = state.characters[activeChar];
+  charState.sessions++;
+
+  // Level up check (every 2 sessions with this character)
+  let leveledUp = false;
+  if (charState.sessions % 2 === 0 && charState.level < 5) {
+    charState.level++;
+    leveledUp = true;
+  }
+
+  // Unlock check
+  let newUnlock = null;
+  for (const [key, char] of Object.entries(CHARACTERS)) {
+    if (!state.characters[key].unlocked && state.sessionsCompleted >= char.unlockAt) {
+      state.characters[key].unlocked = true;
+      state.characters[key].level = 1;
+      newUnlock = key;
+    }
+  }
+
+  saveState();
+
+  // Render complete screen
+  showScreen('complete');
+
+  const char = CHARACTERS[activeChar];
+  document.getElementById('complete-character').innerHTML = char.svg(charState.level);
+
+  document.getElementById('complete-subtitle').textContent =
+    `סיימת ${state.sessionsCompleted} משחקים!`;
+
+  // XP bar
+  const sessionsToNextLevel = 2;
+  const progress = charState.level >= 5 ? 100 : ((charState.sessions % 2) / sessionsToNextLevel * 100);
+  setTimeout(() => {
+    document.getElementById('xp-bar').style.width = progress + '%';
+  }, 300);
+
+  document.getElementById('xp-label').textContent =
+    charState.level >= 5 ? `${char.name} ברמה מקסימלית!` : `רמה ${charState.level} — ${charState.sessions % 2}/${sessionsToNextLevel} לרמה הבאה`;
+
+  // Level up
+  const levelUpEl = document.getElementById('level-up-text');
+  levelUpEl.className = 'level-up-text' + (leveledUp ? ' show' : '');
+
+  // Unlock
+  const unlockEl = document.getElementById('unlock-text');
+  if (newUnlock) {
+    unlockEl.textContent = `!${CHARACTERS[newUnlock].name} נפתח`;
+    unlockEl.className = 'unlock-text show';
+  } else {
+    unlockEl.className = 'unlock-text';
+  }
+
+  // Celebration confetti
+  createConfetti();
+}
+
+// ===== QUEST MAP =====
+function renderQuestMap() {
+  document.getElementById('quest-sessions').textContent = `סה"כ ${state.sessionsCompleted} משחקים`;
+
+  const grid = document.getElementById('quest-grid');
+  grid.innerHTML = '';
+
+  for (const [key, char] of Object.entries(CHARACTERS)) {
+    const charState = state.characters[key];
+    const card = document.createElement('div');
+    card.className = 'quest-card';
+    if (key === state.activeCharacter) card.classList.add('active-char');
+    if (!charState.unlocked) card.classList.add('locked');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'quest-avatar';
+    avatar.innerHTML = charState.unlocked ? char.svg(charState.level || 1) :
+      `<svg viewBox="0 0 100 100"><text x="50" y="60" text-anchor="middle" font-size="40" fill="#556688">🔒</text></svg>`;
+
+    const name = document.createElement('div');
+    name.className = 'quest-char-name';
+    name.textContent = char.name;
+
+    const level = document.createElement('div');
+    level.className = 'quest-char-level';
+    level.textContent = charState.unlocked ? `רמה ${charState.level} • ${char.desc}` : `נפתח ב-${char.unlockAt} משחקים`;
+
+    const progressBar = document.createElement('div');
+    progressBar.className = 'quest-progress';
+    const fill = document.createElement('div');
+    fill.className = 'quest-progress-fill';
+    fill.style.width = charState.unlocked ? (charState.level / 5 * 100) + '%' : '0%';
+    progressBar.appendChild(fill);
+
+    card.appendChild(avatar);
+    card.appendChild(name);
+    card.appendChild(level);
+    card.appendChild(progressBar);
+
+    if (charState.unlocked) {
+      card.onclick = () => {
+        state.activeCharacter = key;
+        saveState();
+        renderQuestMap();
+      };
+    }
+
+    grid.appendChild(card);
+  }
+}
+
+// ===== SETTINGS =====
+function renderSettings() {
+  const list = document.getElementById('custom-word-list');
+  list.innerHTML = '';
+
+  state.customWords.forEach((w, i) => {
+    const item = document.createElement('div');
+    item.className = 'custom-word-item';
+
+    const text = document.createElement('span');
+    text.className = 'custom-word-text';
+    text.textContent = `${w.word} (${w.syllables.join(' - ')})`;
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-delete-word';
+    delBtn.textContent = '✕';
+    delBtn.onclick = () => {
+      state.customWords.splice(i, 1);
+      saveState();
+      renderSettings();
+    };
+
+    item.appendChild(text);
+    item.appendChild(delBtn);
+    list.appendChild(item);
+  });
+}
+
+function addCustomWord() {
+  const wordInput = document.getElementById('input-word');
+  const sylInput = document.getElementById('input-syllables');
+
+  const word = wordInput.value.trim();
+  const syllables = sylInput.value.split(',').map(s => s.trim()).filter(s => s);
+
+  if (!word || syllables.length < 2) return;
+
+  state.customWords.push({ word, syllables });
+  saveState();
+
+  wordInput.value = '';
+  sylInput.value = '';
+  renderSettings();
+}
+
+function resetProgress() {
+  if (confirm('?האם אתה בטוח שברצונך לאפס את כל ההתקדמות')) {
+    state = defaultState();
+    saveState();
+    renderSettings();
+  }
+}
+
+// ===== UTILITIES =====
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ===== INIT =====
+renderStartScreen();
+</script>
+</body>
+</html>

@@ -56,6 +56,7 @@ harel-playground/
 | `public/games/yearly-calendar/` | Yearly calendar with Israeli holidays! |
 | `public/games/hebrew-verbs/` | Learn Hebrew verb conjugation! |
 | `public/games/hebrew-piano/` | Learn piano notes Guitar Hero style! |
+| `public/games/read-it-to-me/` | Practice reading Hebrew words with nikud! |
 
 ## Development
 

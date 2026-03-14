@@ -88,6 +88,14 @@ export const games: Game[] = [
     description: "Learn piano notes Guitar Hero style! Play falling notes and learn the musical scale in Hebrew.",
     path: "/games/hebrew-piano/index.html",
   },
+  {
+    slug: "read-it-to-me",
+    title: "Read It To Me",
+    titleHe: "תקרא לי",
+    emoji: "📖",
+    description: "Practice reading Hebrew words with nikud! Listen, split syllables, and level up your characters.",
+    path: "/games/read-it-to-me/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

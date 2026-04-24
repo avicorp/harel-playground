@@ -96,6 +96,14 @@ export const games: Game[] = [
     description: "Practice reading Hebrew words with nikud! Listen, split syllables, and level up your characters.",
     path: "/games/read-it-to-me/index.html",
   },
+  {
+    slug: "division-remainder",
+    title: "Division with Remainder",
+    titleHe: "חילוק עם שארית",
+    emoji: "➗",
+    description: "Practice division with remainders for 6th grade! Fill in the quotient and remainder — 30 questions with detailed explanations.",
+    path: "/games/division-remainder/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>חילוק עם שארית - Division with Remainder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .bg-symbols {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .bg-symbol {
+            position: absolute;
+            font-size: 44px;
+            opacity: 0.08;
+            animation: floatSymbol linear infinite;
+        }
+
+        @keyframes floatSymbol {
+            0% { transform: translateY(110vh) rotate(0deg); }
+            100% { transform: translateY(-10vh) rotate(360deg); }
+        }
+
+        #hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            z-index: 10;
+            color: white;
+            font-size: 18px;
+            flex-wrap: wrap;
+        }
+
+        .hud-item { display: flex; align-items: center; gap: 8px; }
+        .hud-icon { font-size: 24px; }
+        .hud-value {
+            font-weight: bold;
+            font-size: 22px;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        #game-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px;
+            padding: 20px;
+            width: 100%;
+            max-width: 700px;
+            margin-top: 60px;
+        }
+
+        /* Start screen */
+        #start-screen {
+            text-align: center;
+            color: white;
+        }
+
+        #start-screen h1 {
+            font-size: 52px;
+            margin-bottom: 10px;
+            text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        #start-screen p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            opacity: 0.95;
+            line-height: 1.5;
+        }
+
+        .start-btn {
+            background: linear-gradient(135deg, #f9d423, #ff4e50);
+            border: none;
+            color: white;
+            padding: 18px 55px;
+            border-radius: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .start-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+        }
+
+        /* Problem area */
+        #problem-area {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+        }
+
+        #problem-area.active { display: flex; }
+
+        .problem-card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 25px;
+            padding: 35px 30px;
+            text-align: center;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 550px;
+            transition: transform 0.3s;
+        }
+
+        .problem-card.shake { animation: shake 0.5s ease-in-out; }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-15px); }
+            40% { transform: translateX(15px); }
+            60% { transform: translateX(-10px); }
+            80% { transform: translateX(10px); }
+        }
+
+        .problem-card.correct-flash { animation: correctFlash 0.5s ease-out; }
+        @keyframes correctFlash {
+            0% { transform: scale(1); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2); }
+            50% { transform: scale(1.05); box-shadow: 0 0 40px rgba(76, 175, 80, 0.6); }
+            100% { transform: scale(1); box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2); }
+        }
+
+        .problem-number {
+            font-size: 18px;
+            color: #2193b0;
+            margin-bottom: 14px;
+            font-weight: bold;
+        }
+
+        .problem-text {
+            font-size: 54px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 24px;
+            direction: ltr;
+        }
+
+        /* Answer template */
+        .template {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 32px;
+            font-weight: bold;
+            color: #333;
+            direction: ltr;
+        }
+
+        .template-label {
+            font-size: 22px;
+            color: #555;
+            font-weight: normal;
+        }
+
+        .answer-input {
+            width: 95px;
+            height: 70px;
+            font-size: 36px;
+            font-weight: bold;
+            text-align: center;
+            border: 3px solid #6dd5ed;
+            border-radius: 14px;
+            background: #f9feff;
+            color: #1d6d87;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .answer-input:focus {
+            border-color: #2193b0;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(33, 147, 176, 0.15);
+        }
+
+        .answer-input.filled { border-color: #2193b0; }
+
+        .answer-input.correct {
+            background: #e8f5e9;
+            border-color: #4CAF50;
+            color: #2E7D32;
+        }
+
+        .answer-input.wrong {
+            background: #ffebee;
+            border-color: #f44336;
+            color: #c62828;
+        }
+
+        #submit-btn {
+            margin-top: 20px;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            border: none;
+            color: white;
+            padding: 16px 55px;
+            border-radius: 15px;
+            font-size: 22px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.25s;
+            font-family: inherit;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+        }
+
+        #submit-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+        }
+
+        #submit-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Feedback */
+        #feedback {
+            width: 100%;
+            max-width: 600px;
+            padding: 20px 25px;
+            border-radius: 18px;
+            font-size: 18px;
+            line-height: 1.7;
+            display: none;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        #feedback.visible { display: block; animation: slideIn 0.4s ease-out; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        #feedback.correct {
+            background: #e8f5e9;
+            border: 3px solid #4CAF50;
+            color: #1B5E20;
+        }
+
+        #feedback.wrong {
+            background: #fff3e0;
+            border: 3px solid #FF9800;
+            color: #4E342E;
+        }
+
+        .feedback-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .feedback-steps {
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-top: 10px;
+        }
+
+        .feedback-step {
+            margin: 6px 0;
+            font-size: 17px;
+        }
+
+        .feedback-step strong { color: #1565C0; }
+        .feedback-formula {
+            font-family: 'Consolas', monospace;
+            background: #fff;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: bold;
+            direction: ltr;
+            display: inline-block;
+            margin: 0 3px;
+        }
+
+        #next-btn {
+            margin-top: 14px;
+            background: #1565C0;
+            border: none;
+            color: white;
+            padding: 12px 40px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        #next-btn:hover {
+            background: #0D47A1;
+            transform: scale(1.03);
+        }
+
+        /* Progress */
+        .progress-wrap {
+            width: 100%;
+            max-width: 550px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.25);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f9d423, #ff4e50);
+            border-radius: 5px;
+            transition: width 0.4s ease-out;
+            width: 0%;
+        }
+
+        /* End screen */
+        #end-screen {
+            display: none;
+            text-align: center;
+            color: white;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        #end-screen.active { display: block; }
+
+        #end-screen h2 {
+            font-size: 46px;
+            margin-bottom: 16px;
+        }
+
+        #end-screen .final-score {
+            font-size: 70px;
+            font-weight: bold;
+            margin: 10px 0;
+            text-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        #end-screen .grade-msg {
+            font-size: 22px;
+            margin: 15px 0 25px;
+            opacity: 0.95;
+        }
+
+        #end-screen .restart-btn {
+            background: linear-gradient(135deg, #f9d423, #ff4e50);
+            border: none;
+            color: white;
+            padding: 16px 45px;
+            border-radius: 14px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            font-family: inherit;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        #end-screen .restart-btn:hover { transform: scale(1.05); }
+
+        /* Streak */
+        #streak {
+            color: #ffeb3b;
+            font-weight: bold;
+        }
+
+        @media (max-width: 500px) {
+            #start-screen h1 { font-size: 38px; }
+            .problem-text { font-size: 42px; }
+            .answer-input { width: 75px; height: 60px; font-size: 30px; }
+            .template { font-size: 26px; }
+            #hud { font-size: 15px; gap: 15px; }
+            .hud-value { font-size: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-symbols" id="bg-symbols"></div>
+
+    <div id="hud" style="display:none;">
+        <div class="hud-item">
+            <span class="hud-icon">📝</span>
+            <span>שאלה:</span>
+            <span class="hud-value" id="question-num">1</span>
+            <span>/ 30</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-icon">✅</span>
+            <span>נכון:</span>
+            <span class="hud-value" id="correct-count">0</span>
+        </div>
+        <div class="hud-item">
+            <span class="hud-icon">🔥</span>
+            <span>רצף:</span>
+            <span class="hud-value" id="streak">0</span>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <!-- Start Screen -->
+        <div id="start-screen">
+            <h1>➗ חילוק עם שארית</h1>
+            <p>
+                תרגול חילוק למספרים שאינם מתחלקים בשלמות.<br>
+                מלאו את המנה ואת השארית.<br>
+                <strong>30 שאלות</strong> — כיתה ו'.
+            </p>
+            <button class="start-btn" id="start-btn">בואו נתחיל! 🚀</button>
+        </div>
+
+        <!-- Problem Area -->
+        <div id="problem-area">
+            <div class="progress-wrap">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+
+            <div class="problem-card" id="problem-card">
+                <div class="problem-number" id="problem-number">שאלה 1 מתוך 30</div>
+                <div class="problem-text" id="problem-text">47 ÷ 5</div>
+
+                <div class="template">
+                    <span class="template-label">=</span>
+                    <input type="number" inputmode="numeric" class="answer-input" id="quotient-input" aria-label="מנה" placeholder="?">
+                    <span class="template-label">עם שארית</span>
+                    <input type="number" inputmode="numeric" class="answer-input" id="remainder-input" aria-label="שארית" placeholder="?">
+                </div>
+
+                <button id="submit-btn" disabled>בדיקה ✓</button>
+            </div>
+
+            <div id="feedback"></div>
+        </div>
+
+        <!-- End Screen -->
+        <div id="end-screen">
+            <h2>🎉 סיימת!</h2>
+            <div class="final-score"><span id="final-correct">0</span> / 30</div>
+            <div class="grade-msg" id="grade-msg"></div>
+            <button class="restart-btn" id="restart-btn">שחקו שוב 🔄</button>
+        </div>
+    </div>
+
+    <script>
+        // ========== Background symbols ==========
+        (function createBg() {
+            const container = document.getElementById('bg-symbols');
+            const symbols = ['÷', '=', '%', '+', '−', '×', '?', '…'];
+            for (let i = 0; i < 25; i++) {
+                const el = document.createElement('div');
+                el.className = 'bg-symbol';
+                el.textContent = symbols[Math.floor(Math.random() * symbols.length)];
+                el.style.left = Math.random() * 100 + '%';
+                el.style.fontSize = (30 + Math.random() * 40) + 'px';
+                el.style.animationDuration = (15 + Math.random() * 20) + 's';
+                el.style.animationDelay = -Math.random() * 20 + 's';
+                container.appendChild(el);
+            }
+        })();
+
+        // ========== Game state ==========
+        const TOTAL_QUESTIONS = 30;
+        const state = {
+            questions: [],
+            index: 0,
+            correct: 0,
+            streak: 0,
+            answered: false,
+        };
+
+        // ========== Question generation ==========
+        // Generate 30 division-with-remainder problems suitable for 6th grade.
+        // dividend is not a multiple of divisor (remainder > 0).
+        function generateQuestions() {
+            const questions = [];
+            const used = new Set();
+            while (questions.length < TOTAL_QUESTIONS) {
+                // divisor 2..12, quotient 3..40 → dividend up to ~480
+                const divisor = randInt(2, 12);
+                const quotient = randInt(3, Math.min(40, Math.floor(400 / divisor)));
+                const remainder = randInt(1, divisor - 1); // must be > 0
+                const dividend = quotient * divisor + remainder;
+                const key = dividend + '/' + divisor;
+                if (used.has(key)) continue;
+                used.add(key);
+                questions.push({ dividend, divisor, quotient, remainder });
+            }
+            return questions;
+        }
+
+        function randInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // ========== DOM refs ==========
+        const startScreen = document.getElementById('start-screen');
+        const problemArea = document.getElementById('problem-area');
+        const endScreen = document.getElementById('end-screen');
+        const hud = document.getElementById('hud');
+        const startBtn = document.getElementById('start-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const problemText = document.getElementById('problem-text');
+        const problemNumber = document.getElementById('problem-number');
+        const problemCard = document.getElementById('problem-card');
+        const qInput = document.getElementById('quotient-input');
+        const rInput = document.getElementById('remainder-input');
+        const feedback = document.getElementById('feedback');
+        const progressFill = document.getElementById('progress-fill');
+        const questionNumEl = document.getElementById('question-num');
+        const correctCountEl = document.getElementById('correct-count');
+        const streakEl = document.getElementById('streak');
+        const finalCorrectEl = document.getElementById('final-correct');
+        const gradeMsgEl = document.getElementById('grade-msg');
+
+        // ========== Flow ==========
+        startBtn.addEventListener('click', startGame);
+        restartBtn.addEventListener('click', startGame);
+
+        function startGame() {
+            state.questions = generateQuestions();
+            state.index = 0;
+            state.correct = 0;
+            state.streak = 0;
+            state.answered = false;
+            startScreen.style.display = 'none';
+            endScreen.classList.remove('active');
+            problemArea.classList.add('active');
+            hud.style.display = 'flex';
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            state.answered = false;
+            const q = state.questions[state.index];
+            problemText.textContent = `${q.dividend} ÷ ${q.divisor}`;
+            problemNumber.textContent = `שאלה ${state.index + 1} מתוך ${TOTAL_QUESTIONS}`;
+            questionNumEl.textContent = state.index + 1;
+            correctCountEl.textContent = state.correct;
+            streakEl.textContent = state.streak;
+            progressFill.style.width = ((state.index) / TOTAL_QUESTIONS * 100) + '%';
+
+            qInput.value = '';
+            rInput.value = '';
+            qInput.classList.remove('correct', 'wrong', 'filled');
+            rInput.classList.remove('correct', 'wrong', 'filled');
+            qInput.disabled = false;
+            rInput.disabled = false;
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'בדיקה ✓';
+            feedback.classList.remove('visible', 'correct', 'wrong');
+            feedback.innerHTML = '';
+
+            setTimeout(() => qInput.focus(), 100);
+        }
+
+        function updateSubmitEnabled() {
+            const hasQ = qInput.value.trim() !== '';
+            const hasR = rInput.value.trim() !== '';
+            submitBtn.disabled = !(hasQ && hasR) || state.answered;
+            qInput.classList.toggle('filled', hasQ);
+            rInput.classList.toggle('filled', hasR);
+        }
+
+        qInput.addEventListener('input', () => {
+            updateSubmitEnabled();
+            if (qInput.value.length >= 2 || parseInt(qInput.value, 10) >= 10) {
+                // auto-advance to remainder when quotient is likely done (optional UX)
+            }
+        });
+        rInput.addEventListener('input', updateSubmitEnabled);
+
+        qInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); rInput.focus(); }
+        });
+        rInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') { e.preventDefault(); if (!submitBtn.disabled) submitAnswer(); }
+        });
+
+        submitBtn.addEventListener('click', submitAnswer);
+
+        function submitAnswer() {
+            if (state.answered) {
+                advance();
+                return;
+            }
+            const q = state.questions[state.index];
+            const userQ = parseInt(qInput.value, 10);
+            const userR = parseInt(rInput.value, 10);
+
+            const qCorrect = userQ === q.quotient;
+            const rCorrect = userR === q.remainder;
+            const allCorrect = qCorrect && rCorrect;
+
+            state.answered = true;
+            qInput.disabled = true;
+            rInput.disabled = true;
+
+            qInput.classList.add(qCorrect ? 'correct' : 'wrong');
+            rInput.classList.add(rCorrect ? 'correct' : 'wrong');
+
+            if (allCorrect) {
+                state.correct++;
+                state.streak++;
+                correctCountEl.textContent = state.correct;
+                streakEl.textContent = state.streak;
+                problemCard.classList.add('correct-flash');
+                setTimeout(() => problemCard.classList.remove('correct-flash'), 600);
+                showCorrectFeedback(q);
+            } else {
+                state.streak = 0;
+                streakEl.textContent = state.streak;
+                problemCard.classList.add('shake');
+                setTimeout(() => problemCard.classList.remove('shake'), 600);
+                showWrongFeedback(q, userQ, userR, qCorrect, rCorrect);
+            }
+
+            submitBtn.disabled = false;
+            submitBtn.textContent = state.index + 1 === TOTAL_QUESTIONS ? 'סיום 🏁' : 'השאלה הבאה ←';
+        }
+
+        function showCorrectFeedback(q) {
+            feedback.className = 'visible correct';
+            feedback.innerHTML = `
+                <div class="feedback-title">🎉 כל הכבוד! תשובה נכונה</div>
+                <div>${q.dividend} ÷ ${q.divisor} = <strong>${q.quotient}</strong> עם שארית <strong>${q.remainder}</strong></div>
+                <div style="margin-top:8px;">בדיקה:
+                    <span class="feedback-formula">${q.quotient} × ${q.divisor} + ${q.remainder} = ${q.dividend}</span> ✓
+                </div>
+            `;
+        }
+
+        function showWrongFeedback(q, userQ, userR, qCorrect, rCorrect) {
+            feedback.className = 'visible wrong';
+
+            // Build the detailed explanation
+            const largestMultiple = q.quotient * q.divisor;
+
+            let whatsWrong = '';
+            if (!qCorrect && !rCorrect) {
+                whatsWrong = `התשובה שלך: <strong>${isNaN(userQ) ? '?' : userQ}</strong> עם שארית <strong>${isNaN(userR) ? '?' : userR}</strong> — שניהם לא נכונים.`;
+            } else if (!qCorrect) {
+                whatsWrong = `המנה שלך (<strong>${isNaN(userQ) ? '?' : userQ}</strong>) לא נכונה. השארית הייתה נכונה.`;
+            } else {
+                whatsWrong = `השארית שלך (<strong>${isNaN(userR) ? '?' : userR}</strong>) לא נכונה. המנה הייתה נכונה.`;
+            }
+
+            feedback.innerHTML = `
+                <div class="feedback-title">🤔 לא בדיוק — בואו נפתור יחד</div>
+                <div>${whatsWrong}</div>
+                <div class="feedback-steps">
+                    <div class="feedback-step">
+                        <strong>שלב 1:</strong> שואלים — כמה פעמים ${q.divisor} נכנס בתוך ${q.dividend} בלי לעבור אותו?
+                    </div>
+                    <div class="feedback-step">
+                        <strong>שלב 2:</strong> בודקים את הכפולות של ${q.divisor}:
+                        <span class="feedback-formula">${q.quotient} × ${q.divisor} = ${largestMultiple}</span>
+                        (זה הכי גדול שלא עובר את ${q.dividend})
+                        ${q.quotient + 1 <= 40 ? `<br><span class="feedback-formula">${q.quotient + 1} × ${q.divisor} = ${(q.quotient + 1) * q.divisor}</span> — גדול מדי!` : ''}
+                    </div>
+                    <div class="feedback-step">
+                        <strong>שלב 3:</strong> המנה היא <strong>${q.quotient}</strong>.
+                    </div>
+                    <div class="feedback-step">
+                        <strong>שלב 4:</strong> מחסרים כדי למצוא את השארית:
+                        <span class="feedback-formula">${q.dividend} − ${largestMultiple} = ${q.remainder}</span>
+                    </div>
+                    <div class="feedback-step">
+                        <strong>שלב 5:</strong> התשובה:
+                        <span class="feedback-formula">${q.dividend} ÷ ${q.divisor} = ${q.quotient} עם שארית ${q.remainder}</span>
+                    </div>
+                    <div class="feedback-step" style="margin-top:10px;">
+                        <strong>בדיקה:</strong>
+                        <span class="feedback-formula">${q.quotient} × ${q.divisor} + ${q.remainder} = ${largestMultiple} + ${q.remainder} = ${q.dividend}</span> ✓
+                    </div>
+                </div>
+            `;
+        }
+
+        function advance() {
+            state.index++;
+            progressFill.style.width = (state.index / TOTAL_QUESTIONS * 100) + '%';
+            if (state.index >= TOTAL_QUESTIONS) {
+                endGame();
+            } else {
+                renderQuestion();
+            }
+        }
+
+        function endGame() {
+            problemArea.classList.remove('active');
+            hud.style.display = 'none';
+            endScreen.classList.add('active');
+            finalCorrectEl.textContent = state.correct;
+
+            const pct = state.correct / TOTAL_QUESTIONS;
+            let msg;
+            if (pct === 1) msg = '🏆 מושלם! ציון 100 — אלוף אמיתי!';
+            else if (pct >= 0.9) msg = '🌟 מצוין! כמעט הכל נכון!';
+            else if (pct >= 0.75) msg = '👍 עבודה טובה! עוד קצת תרגול ותהיו מושלמים.';
+            else if (pct >= 0.5) msg = '💪 יפה מאוד! כדאי לעבור עוד פעם על שלבי החילוק.';
+            else msg = '📚 תרגול נוסף יעזור — אל תוותרו!';
+            gradeMsgEl.textContent = msg;
+        }
+    </script>
+</body>
+</html>

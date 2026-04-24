@@ -57,6 +57,7 @@ harel-playground/
 | `public/games/hebrew-verbs/` | Learn Hebrew verb conjugation! |
 | `public/games/hebrew-piano/` | Learn piano notes Guitar Hero style! |
 | `public/games/read-it-to-me/` | Practice reading Hebrew words with nikud! |
+| `public/games/division-remainder/` | Practice division with remainders for 6th grade! |
 
 ## Development
 

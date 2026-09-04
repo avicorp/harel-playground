@@ -1,0 +1,1228 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>חוקר הפונקציות - Function Explorer</title>
+<style>
+    :root {
+        --bg-primary: #0a1628;
+        --bg-secondary: #1a2a4a;
+        --bg-card: rgba(255, 255, 255, 0.07);
+        --bg-card-strong: rgba(255, 255, 255, 0.12);
+        --border: rgba(255, 255, 255, 0.14);
+        --text-primary: #f0f4ff;
+        --text-secondary: #8fa3c8;
+        --f-color: #38d9f5;
+        --g-color: #fbbf24;
+        --inv-color: #c084fc;
+        --ok: #4ade80;
+        --warn: #fbbf24;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    html, body {
+        height: 100%;
+        overflow: hidden;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #0a1628 0%, #14203c 50%, #0f3460 100%);
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ---------- top bar ---------- */
+    .topbar {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 8px 16px;
+        background: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .topbar h1 {
+        font-size: 19px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-inline-start: auto;
+    }
+
+    .legend-chip {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        white-space: nowrap;
+    }
+
+    .legend-chip .swatch {
+        width: 18px;
+        height: 4px;
+        border-radius: 2px;
+        background: currentColor;
+    }
+
+    .legend-chip.f { color: var(--f-color); }
+    .legend-chip.g { color: var(--g-color); }
+    .legend-chip.inv { color: var(--inv-color); }
+    .legend-chip[hidden] { display: none; }
+
+    /* ---------- layout ---------- */
+    .layout {
+        flex: 1;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 12px;
+        padding: 12px;
+        min-height: 0;
+    }
+
+    .plot-col {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 0;
+        min-width: 0;
+    }
+
+    .canvas-wrap {
+        position: relative;
+        flex: 1;
+        min-height: 0;
+        background: rgba(0, 0, 0, 0.25);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+        touch-action: none;
+        cursor: crosshair;
+    }
+
+    .zoom-buttons {
+        position: absolute;
+        top: 10px;
+        inset-inline-start: 10px;
+        display: flex;
+        gap: 6px;
+    }
+
+    .zoom-buttons button {
+        width: 34px;
+        height: 34px;
+        font-size: 18px;
+        font-weight: 700;
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        cursor: pointer;
+        backdrop-filter: blur(6px);
+    }
+
+    .zoom-buttons button:hover { background: rgba(255, 255, 255, 0.2); }
+    .zoom-buttons button:active { transform: scale(0.94); }
+
+    /* ---------- machine strip ---------- */
+    .machine {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 10px;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+    }
+
+    .m-box {
+        min-width: 78px;
+        padding: 6px 10px;
+        text-align: center;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        border: 1px solid var(--border);
+    }
+
+    .m-box .m-label {
+        display: block;
+        font-size: 11px;
+        color: var(--text-secondary);
+    }
+
+    .m-box .m-value {
+        display: block;
+        font-size: 18px;
+        font-weight: 700;
+        direction: ltr;
+    }
+
+    .m-box.fn {
+        background: rgba(56, 217, 245, 0.14);
+        border-color: rgba(56, 217, 245, 0.45);
+    }
+
+    .m-box.fn.g-machine {
+        background: rgba(251, 191, 36, 0.14);
+        border-color: rgba(251, 191, 36, 0.45);
+    }
+
+    .m-box.out-f .m-value { color: var(--f-color); }
+    .m-box.out-g .m-value { color: var(--g-color); }
+
+    .m-arrow {
+        font-size: 20px;
+        color: var(--text-secondary);
+    }
+
+    .machine[data-cancel="1"] .m-box.out-g {
+        background: rgba(74, 222, 128, 0.16);
+        border-color: rgba(74, 222, 128, 0.5);
+    }
+
+    .machine[data-cancel="1"] .m-box.out-g .m-value { color: var(--ok); }
+
+    .cancel-note {
+        width: 100%;
+        text-align: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--ok);
+    }
+
+    /* ---------- controls ---------- */
+    .controls {
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        padding-inline-end: 4px;
+    }
+
+    .panel {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px;
+    }
+
+    .panel.f-panel { border-inline-start: 4px solid var(--f-color); }
+    .panel.g-panel { border-inline-start: 4px solid var(--g-color); }
+    .panel.inv-panel { border-inline-start: 4px solid var(--inv-color); }
+
+    .panel-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 10px;
+    }
+
+    .panel-head h2 {
+        font-size: 15px;
+        font-weight: 700;
+    }
+
+    .switch {
+        margin-inline-start: auto;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 12px;
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+
+    .switch input {
+        appearance: none;
+        width: 40px;
+        height: 22px;
+        border-radius: 11px;
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid var(--border);
+        position: relative;
+        cursor: pointer;
+        transition: background 0.15s;
+    }
+
+    .switch input::after {
+        content: '';
+        position: absolute;
+        top: 2px;
+        inset-inline-start: 2px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #fff;
+        transition: transform 0.15s;
+    }
+
+    .switch input:checked { background: var(--ok); }
+    .switch input:checked::after { transform: translateX(-18px); }
+
+    .formula {
+        direction: ltr;
+        text-align: left;
+        font-size: 17px;
+        font-weight: 700;
+        padding: 8px 10px;
+        margin-bottom: 10px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.3);
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .formula .p { color: var(--g-color); }
+    .panel.f-panel .formula { color: var(--f-color); }
+    .panel.g-panel .formula { color: var(--g-color); }
+    .panel.inv-panel .formula { color: var(--inv-color); }
+
+    .type-row {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        margin-bottom: 10px;
+    }
+
+    .type-btn {
+        flex: 1 1 auto;
+        min-width: 74px;
+        padding: 8px 6px;
+        font-family: inherit;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.15s;
+    }
+
+    .type-btn:hover { background: rgba(255, 255, 255, 0.14); }
+
+    .type-btn.active {
+        color: #06121f;
+        background: var(--f-color);
+        border-color: var(--f-color);
+    }
+
+    .g-panel .type-btn.active {
+        background: var(--g-color);
+        border-color: var(--g-color);
+    }
+
+    .type-btn.inverse-choice.active {
+        background: var(--inv-color);
+        border-color: var(--inv-color);
+        color: #17061f;
+    }
+
+    .slider-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 8px;
+    }
+
+    .slider-row .name {
+        font-size: 17px;
+        font-weight: 700;
+        font-style: italic;
+        width: 16px;
+        text-align: center;
+    }
+
+    .slider-row input[type="range"] {
+        appearance: none;
+        flex: 1;
+        height: 6px;
+        border-radius: 3px;
+        background: rgba(255, 255, 255, 0.18);
+        outline: none;
+        cursor: pointer;
+        direction: ltr;
+    }
+
+    .slider-row input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--f-color);
+        border: 2px solid #06121f;
+        cursor: pointer;
+    }
+
+    .slider-row input[type="range"]::-moz-range-thumb {
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: var(--f-color);
+        border: 2px solid #06121f;
+        cursor: pointer;
+    }
+
+    .g-panel .slider-row input[type="range"]::-webkit-slider-thumb { background: var(--g-color); }
+    .g-panel .slider-row input[type="range"]::-moz-range-thumb { background: var(--g-color); }
+
+    .value-chip {
+        direction: ltr;
+        min-width: 52px;
+        padding: 4px 6px;
+        text-align: center;
+        font-size: 14px;
+        font-weight: 700;
+        border-radius: 8px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--border);
+        cursor: pointer;
+    }
+
+    .value-chip:hover { background: rgba(255, 255, 255, 0.14); }
+
+    .hint {
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-secondary);
+    }
+
+    .note {
+        margin-top: 8px;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1.5;
+        border-radius: 9px;
+        background: rgba(251, 191, 36, 0.12);
+        border: 1px solid rgba(251, 191, 36, 0.4);
+        color: var(--warn);
+    }
+
+    .note[hidden], [hidden] { display: none !important; }
+
+    .btn {
+        width: 100%;
+        padding: 10px;
+        font-family: inherit;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        cursor: pointer;
+    }
+
+    .btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .btn:active { transform: scale(0.98); }
+
+    /* ---------- explanation ---------- */
+    details.explain {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 12px;
+    }
+
+    details.explain summary {
+        font-size: 15px;
+        font-weight: 700;
+        cursor: pointer;
+        list-style: none;
+    }
+
+    details.explain summary::-webkit-details-marker { display: none; }
+    details.explain summary::after { content: ' ▾'; color: var(--text-secondary); }
+    details.explain[open] summary::after { content: ' ▴'; }
+
+    details.explain .body {
+        margin-top: 10px;
+        font-size: 13px;
+        line-height: 1.7;
+        color: var(--text-secondary);
+    }
+
+    details.explain .body h3 {
+        margin: 10px 0 4px;
+        font-size: 13px;
+        color: var(--text-primary);
+    }
+
+    details.explain .body code {
+        direction: ltr;
+        display: inline-block;
+        padding: 1px 5px;
+        border-radius: 5px;
+        background: rgba(0, 0, 0, 0.35);
+        color: var(--f-color);
+        font-size: 12px;
+    }
+
+    details.explain .body ul { padding-inline-start: 18px; }
+
+    /* ---------- mobile ---------- */
+    @media (max-width: 900px) {
+        .layout {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-rows: auto minmax(0, 1fr);
+            overflow-y: auto;
+        }
+
+        .plot-col { height: 58vh; }
+        .controls { overflow: visible; }
+        .topbar h1 { font-size: 16px; }
+        .legend { width: 100%; margin-inline-start: 0; }
+        .topbar { flex-wrap: wrap; }
+    }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+    <h1>📈 חוקר הפונקציות</h1>
+    <div class="legend">
+        <span class="legend-chip f"><span class="swatch"></span>f(x)</span>
+        <span class="legend-chip g" id="legend-g" hidden><span class="swatch"></span><span dir="ltr">g(f(x))</span></span>
+        <span class="legend-chip inv" id="legend-inv" hidden><span class="swatch"></span>ההופכית <span dir="ltr">f⁻¹</span></span>
+    </div>
+</div>
+
+<div class="layout">
+    <div class="plot-col">
+        <div class="canvas-wrap">
+            <canvas id="plot"></canvas>
+            <div class="zoom-buttons">
+                <button id="zoom-in" title="הגדלה">+</button>
+                <button id="zoom-out" title="הקטנה">−</button>
+            </div>
+        </div>
+
+        <div class="machine" id="machine">
+            <div class="m-box"><span class="m-label">x</span><span class="m-value" id="mv-x">1</span></div>
+            <span class="m-arrow">←</span>
+            <div class="m-box fn"><span class="m-label">המכונה</span><span class="m-value">f</span></div>
+            <span class="m-arrow">←</span>
+            <div class="m-box out-f"><span class="m-label" dir="ltr">f(x)</span><span class="m-value" id="mv-fx">1</span></div>
+            <span class="m-arrow" id="m-arrow2" hidden>←</span>
+            <div class="m-box fn g-machine" id="m-gbox" hidden><span class="m-label">המכונה</span><span class="m-value" id="mv-gname">g</span></div>
+            <span class="m-arrow" id="m-arrow3" hidden>←</span>
+            <div class="m-box out-g" id="m-gout" hidden><span class="m-label" dir="ltr">g(f(x))</span><span class="m-value" id="mv-gfx">1</span></div>
+            <div class="cancel-note" id="cancel-note" hidden>✓ ההופכית ביטלה את <span dir="ltr">f</span> — חזרנו ל‑<span dir="ltr">x</span> המקורי!</div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <!-- f(x) -->
+        <div class="panel f-panel">
+            <div class="panel-head"><h2>🔵 הפונקציה <span dir="ltr">f(x)</span></h2></div>
+            <div class="formula" id="f-formula">f(x) = 1·x + 0</div>
+            <div class="type-row" id="f-types"></div>
+            <div class="slider-row">
+                <span class="name">m</span>
+                <input type="range" id="f-m" min="-5" max="5" step="0.1" value="1">
+                <span class="value-chip" id="f-m-val" title="לחצו לאיפוס">1</span>
+            </div>
+            <div class="slider-row">
+                <span class="name">b</span>
+                <input type="range" id="f-b" min="-10" max="10" step="0.5" value="0">
+                <span class="value-chip" id="f-b-val" title="לחצו לאיפוס">0</span>
+            </div>
+            <p class="hint"><span dir="ltr">m</span> משנה את <b>התלילות</b> (השיפוע) ו‑<span dir="ltr">b</span> מזיז את הגרף <b>למעלה ולמטה</b>.</p>
+        </div>
+
+        <!-- g(f(x)) -->
+        <div class="panel g-panel">
+            <div class="panel-head">
+                <h2>🟡 הרכבה <span dir="ltr">g(f(x))</span></h2>
+                <label class="switch">הפעלה
+                    <input type="checkbox" id="compose-on">
+                </label>
+            </div>
+            <div id="g-body" hidden>
+                <div class="formula" id="g-formula">g(f(x)) = 1·f(x) + 0</div>
+                <div class="type-row" id="g-types"></div>
+                <div id="g-sliders">
+                    <div class="slider-row">
+                        <span class="name">m</span>
+                        <input type="range" id="g-m" min="-5" max="5" step="0.1" value="1">
+                        <span class="value-chip" id="g-m-val" title="לחצו לאיפוס">1</span>
+                    </div>
+                    <div class="slider-row">
+                        <span class="name">b</span>
+                        <input type="range" id="g-b" min="-10" max="10" step="0.5" value="0">
+                        <span class="value-chip" id="g-b-val" title="לחצו לאיפוס">0</span>
+                    </div>
+                </div>
+                <div class="note" id="g-note" hidden></div>
+                <p class="hint"><span dir="ltr">g</span> מקבלת את <b>התוצאה של <span dir="ltr">f</span></b> ומפעילה עליה פעולה נוספת. בחרו <b><span dir="ltr">f⁻¹</span> ההופכית</b> כדי לבטל את <span dir="ltr">f</span>.</p>
+            </div>
+            <p class="hint" id="g-off-hint">הדליקו כדי לשרשר פונקציה שנייה על התוצאה של f.</p>
+        </div>
+
+        <!-- inverse -->
+        <div class="panel inv-panel">
+            <div class="panel-head">
+                <h2>🟣 הפונקציה ההופכית</h2>
+                <label class="switch">ציור
+                    <input type="checkbox" id="inverse-on">
+                </label>
+            </div>
+            <div class="formula" id="inv-formula">f⁻¹(x) = (x − 0) / 1</div>
+            <div class="note" id="inv-note" hidden></div>
+            <p class="hint">ההופכית היא <b>המכונה ההפוכה</b>: היא מקבלת את <span dir="ltr">f(x)</span> ומחזירה את <span dir="ltr">x</span>. בגרף היא <b>שיקוף</b> של <span dir="ltr">f</span> בקו המקווקו <span dir="ltr">y = x</span>.</p>
+        </div>
+
+        <div class="panel">
+            <button class="btn" id="reset">🔄 איפוס הכל</button>
+        </div>
+
+        <details class="explain" id="explain">
+            <summary>❓ מה זה בכלל פונקציה?</summary>
+            <div class="body">
+                <p>פונקציה היא <b>מכונה</b>: מכניסים לה מספר <code>x</code>, היא עושה עליו פעולה, ויוצא מספר אחר — <code>f(x)</code>. כל <code>x</code> מקבל בדיוק תשובה אחת.</p>
+
+                <h3>הגרף</h3>
+                <p>כל נקודה בגרף אומרת: "כשהכנסתי <code>x</code>, יצא <code>f(x)</code>". הצירים ממשיכים גם ל<b>מספרים שליליים</b> — שמאלה ולמטה מהאפס.</p>
+
+                <h3>m ו‑b בפונקציה ליניארית</h3>
+                <ul>
+                    <li><b>m</b> — השיפוע. גדול = עלייה תלולה, שלילי = הקו יורד, אפס = קו ישר ושטוח.</li>
+                    <li><b>b</b> — הגובה שבו הגרף חוצה את ציר ה‑y (כי כאשר <code>x = 0</code> מקבלים <code>f(0) = b</code>).</li>
+                </ul>
+
+                <h3>שלוש משפחות</h3>
+                <ul>
+                    <li><b>ליניארית</b> <code>m·x + b</code> — קו ישר.</li>
+                    <li><b>ריבועית</b> <code>m·x² + b</code> — פרבולה, "חיוך" או "עצוב" לפי הסימן של m.</li>
+                    <li><b>מעריכית</b> <code>m·2^x + b</code> — צומחת מהר מאוד: כל צעד ימינה <b>מכפיל</b> את התוצאה.</li>
+                </ul>
+
+                <h3>הרכבה <span dir="ltr">g(f(x))</span></h3>
+                <p>שתי מכונות בשרשרת: מה שיוצא מ‑f נכנס ל‑g. קודם מחשבים את <code>f(x)</code>, ואת התוצאה מכניסים ל‑g.</p>
+
+                <h3>הפונקציה ההופכית</h3>
+                <p>ההופכית <code>f⁻¹</code> מבטלת את מה ש‑f עשתה: <code>f⁻¹(f(x)) = x</code>. אם f מכפילה ב‑2 ומוסיפה 3, ההופכית מחסירה 3 ומחלקת ב‑2 — ומקבלים בחזרה בדיוק את המספר שהתחלנו איתו. לכן כשבוחרים ב‑g את ההופכית, הגרף של ההרכבה הופך לקו <code>y = x</code>.</p>
+            </div>
+        </details>
+    </div>
+</div>
+
+<script>
+(function () {
+    'use strict';
+
+    /* ============ math model ============ */
+    var FAMILIES = {
+        linear: {
+            label: 'ליניארית',
+            icon: '📏',
+            f: function (x, m, b) { return m * x + b; },
+            body: function (arg) { return 'm·' + arg + ' + b'; },
+            // inverse of y = m*x + b  ->  x = (y - b) / m
+            inv: function (y, m, b) { return m === 0 ? NaN : (y - b) / m; },
+            invText: function (m, b) { return '(x ' + minusB(b) + ') / ' + fmt(m); },
+            invIssue: function (m) {
+                return m === 0 ? 'כאשר ' + ltr('m = 0') + ' הקו שטוח — כל ' + ltr('x') + ' נותן את אותה תוצאה, ולכן אי אפשר לדעת מאיפה הגענו. אין פונקציה הופכית.' : '';
+            }
+        },
+        parabolic: {
+            label: 'ריבועית',
+            icon: '🥣',
+            f: function (x, m, b) { return m * x * x + b; },
+            body: function (arg) { return 'm·' + arg + '² + b'; },
+            // inverse of y = m*x^2 + b  ->  x = sqrt((y - b) / m), principal (x >= 0) branch
+            inv: function (y, m, b) {
+                if (m === 0) return NaN;
+                var t = (y - b) / m;
+                return t < 0 ? NaN : Math.sqrt(t);
+            },
+            invText: function (m, b) { return '√((x ' + minusB(b) + ') / ' + fmt(m) + ')'; },
+            invIssue: function (m) {
+                if (m === 0) return 'כאשר ' + ltr('m = 0') + ' הפרבולה נעלמת והגרף שטוח — אין פונקציה הופכית.';
+                return 'לפרבולה יש שתי זרועות: מספר והמספר הנגדי שלו נותנים את אותה תוצאה. לכן ההופכית מחזירה תמיד את החצי החיובי, והגרף של ההרכבה יוצא ' + ltr('V') + ' ולא קו ישר.';
+            }
+        },
+        exponential: {
+            label: 'מעריכית',
+            icon: '🚀',
+            f: function (x, m, b) { return m * Math.pow(2, x) + b; },
+            body: function (arg) { return 'm·2^' + arg + ' + b'; },
+            // inverse of y = m*2^x + b  ->  x = log2((y - b) / m)
+            inv: function (y, m, b) {
+                if (m === 0) return NaN;
+                var t = (y - b) / m;
+                return t <= 0 ? NaN : Math.log(t) / Math.LN2;
+            },
+            invText: function (m, b) { return 'log₂((x ' + minusB(b) + ') / ' + fmt(m) + ')'; },
+            invIssue: function (m) {
+                if (m === 0) return 'כאשר ' + ltr('m = 0') + ' אין צמיחה מעריכית והגרף שטוח — אין פונקציה הופכית.';
+                return 'הפונקציה המעריכית לא מגיעה לכל המספרים, ולכן ההופכית (הלוגריתם) מוגדרת רק בחלק מהערכים.';
+            }
+        }
+    };
+
+    var TYPE_KEYS = ['linear', 'parabolic', 'exponential'];
+    var INVERSE_KEY = 'inverse';
+
+    var DEFAULTS = { fType: 'linear', fm: 1, fb: 0, gType: 'linear', gm: 1, gb: 0, range: 10 };
+
+    var state = {
+        fType: DEFAULTS.fType, fm: DEFAULTS.fm, fb: DEFAULTS.fb,
+        gType: DEFAULTS.gType, gm: DEFAULTS.gm, gb: DEFAULTS.gb,
+        compose: false, showInverse: false,
+        range: DEFAULTS.range,
+        traceX: 1, hasTrace: false
+    };
+
+    function fmt(v) {
+        if (!isFinite(v)) return '—';
+        var r = Math.round(v * 100) / 100;
+        if (Object.is(r, -0)) r = 0;
+        return String(r);
+    }
+
+    // Wrap a Latin/math fragment so RTL text around it can't reorder it.
+    function ltr(t) { return '\u2066' + t + '\u2069'; }
+
+    // "+ b" written with a real sign, so b = -3 reads "− 3" and not "+ -3".
+    function plusB(b) { return b < 0 ? '− ' + fmt(-b) : '+ ' + fmt(b); }
+
+    // "- b" (as it appears inside the inverse), with the same treatment.
+    function minusB(b) { return b < 0 ? '+ ' + fmt(-b) : '− ' + fmt(b); }
+
+    function evalF(x) { return FAMILIES[state.fType].f(x, state.fm, state.fb); }
+
+    function evalG(u) {
+        if (state.gType === INVERSE_KEY) return FAMILIES[state.fType].inv(u, state.fm, state.fb);
+        return FAMILIES[state.gType].f(u, state.gm, state.gb);
+    }
+
+    function evalComposed(x) {
+        var u = evalF(x);
+        if (!isFinite(u)) return NaN;
+        return evalG(u);
+    }
+
+    function evalInverse(y) { return FAMILIES[state.fType].inv(y, state.fm, state.fb); }
+
+    /* ============ dom ============ */
+    var $ = function (id) { return document.getElementById(id); };
+    var canvas = $('plot');
+    var ctx = canvas.getContext('2d');
+    var W = 0, H = 0;
+
+    /* ============ canvas sizing ============ */
+    function resize() {
+        var rect = canvas.parentElement.getBoundingClientRect();
+        var dpr = window.devicePixelRatio || 1;
+        W = Math.max(1, Math.round(rect.width));
+        H = Math.max(1, Math.round(rect.height));
+        canvas.width = Math.round(W * dpr);
+        canvas.height = Math.round(H * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.direction = 'ltr'; // the page is RTL; numbers on the axes are not
+        draw();
+    }
+
+    /* ============ coordinate transforms ============ */
+    // The visible x-range is always [-range, range]; the y-range keeps squares square.
+    function scale() { return (W / 2) / state.range; }
+    function yRange() { return (H / 2) / scale(); }
+    function toPX(x) { return W / 2 + x * scale(); }
+    function toPY(y) { return H / 2 - y * scale(); }
+    function fromPX(px) { return (px - W / 2) / scale(); }
+
+    /* ============ drawing ============ */
+    function niceStep(span) {
+        // aim for ~10 gridlines across the visible span
+        var raw = span / 10;
+        var pow = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+        var n = raw / pow;
+        var mult = n >= 5 ? 5 : n >= 2 ? 2 : 1;
+        return mult * pow;
+    }
+
+    function drawGrid() {
+        var step = niceStep(state.range * 2);
+        var yr = yRange();
+        var x0 = toPX(0), y0 = toPY(0);
+        var i;
+
+        ctx.lineWidth = 1;
+        ctx.font = '11px "Segoe UI", Tahoma, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+
+        // vertical lines
+        ctx.strokeStyle = 'rgba(255,255,255,0.07)';
+        ctx.beginPath();
+        for (i = -Math.ceil(state.range / step); i <= Math.ceil(state.range / step); i++) {
+            var gx = Math.round(toPX(i * step)) + 0.5;
+            ctx.moveTo(gx, 0);
+            ctx.lineTo(gx, H);
+        }
+        for (i = -Math.ceil(yr / step); i <= Math.ceil(yr / step); i++) {
+            var gy = Math.round(toPY(i * step)) + 0.5;
+            ctx.moveTo(0, gy);
+            ctx.lineTo(W, gy);
+        }
+        ctx.stroke();
+
+        // axes
+        ctx.strokeStyle = 'rgba(255,255,255,0.55)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(0, Math.round(y0) + 0.5);
+        ctx.lineTo(W, Math.round(y0) + 0.5);
+        ctx.moveTo(Math.round(x0) + 0.5, 0);
+        ctx.lineTo(Math.round(x0) + 0.5, H);
+        ctx.stroke();
+
+        // arrowheads (positive directions)
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        arrow(W - 2, y0, 1, 0);
+        arrow(x0, 2, 0, -1);
+        // negative directions, so both signs read as "real"
+        arrow(2, y0, -1, 0);
+        arrow(x0, H - 2, 0, 1);
+
+        // tick labels
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        var labelY = clamp(y0 + 5, 4, H - 18);
+        for (i = -Math.ceil(state.range / step); i <= Math.ceil(state.range / step); i++) {
+            if (i === 0) continue;
+            var v = i * step;
+            var px = toPX(v);
+            if (px < 14 || px > W - 14) continue;
+            ctx.fillText(fmt(v), px, labelY);
+        }
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        var labelX = clamp(x0 - 6, 22, W - 4);
+        for (i = -Math.ceil(yr / step); i <= Math.ceil(yr / step); i++) {
+            if (i === 0) continue;
+            var vy = i * step;
+            var py = toPY(vy);
+            if (py < 10 || py > H - 10) continue;
+            ctx.fillText(fmt(vy), labelX, py);
+        }
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'top';
+        ctx.fillText('0', clamp(x0 - 5, 10, W - 4), clamp(y0 + 4, 0, H - 14));
+
+        // axis names
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.textAlign = 'right';
+        ctx.fillText('x', W - 6, clamp(y0 + 6, 0, H - 16));
+        ctx.textAlign = 'left';
+        ctx.fillText('y', clamp(x0 + 6, 0, W - 14), 4);
+    }
+
+    function arrow(px, py, dx, dy) {
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px - dx * 9 - dy * 5, py - dy * 9 - dx * 5);
+        ctx.lineTo(px - dx * 9 + dy * 5, py - dy * 9 + dx * 5);
+        ctx.closePath();
+        ctx.fill();
+    }
+
+    function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
+
+    // Draws a curve from a sampler that returns [px, py] or null for a gap.
+    function drawCurve(sampler, color, width, dashed) {
+        var margin = H * 4; // let steep curves leave the view without huge coordinates
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.setLineDash(dashed ? [8, 6] : []);
+        ctx.beginPath();
+        var pen = false;
+        for (var i = 0; i <= W; i++) {
+            var pt = sampler(i);
+            if (!pt || !isFinite(pt[0]) || !isFinite(pt[1]) || pt[1] < -margin || pt[1] > H + margin) {
+                pen = false;
+                continue;
+            }
+            if (pen) ctx.lineTo(pt[0], pt[1]);
+            else { ctx.moveTo(pt[0], pt[1]); pen = true; }
+        }
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function drawIdentityLine() {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.28)';
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(toPX(-state.range * 2), toPY(-state.range * 2));
+        ctx.lineTo(toPX(state.range * 2), toPY(state.range * 2));
+        ctx.stroke();
+        ctx.restore();
+
+        // label the line at a point on it that is inside the view
+        var t = Math.min(state.range, yRange()) * 0.8;
+        ctx.save();
+        ctx.fillStyle = 'rgba(255,255,255,0.45)';
+        ctx.font = '12px "Segoe UI", Tahoma, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'bottom';
+        ctx.fillText('y = x', clamp(toPX(t) + 6, 4, W - 44), clamp(toPY(t) - 4, 14, H - 4));
+        ctx.restore();
+    }
+
+    function drawTrace() {
+        if (!state.hasTrace) return;
+        var x = state.traceX;
+        var y = evalF(x);
+        if (!isFinite(y)) return;
+        var px = toPX(x), py = toPY(y);
+        if (py < -H || py > 2 * H) return;
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px, toPY(0));
+        ctx.moveTo(px, py);
+        ctx.lineTo(toPX(0), py);
+        ctx.stroke();
+        ctx.restore();
+
+        // point on f
+        dot(px, py, getVar('--f-color'));
+
+        // point on the composed curve
+        if (state.compose) {
+            var gy = evalComposed(x);
+            if (isFinite(gy)) dot(px, toPY(gy), getVar('--g-color'));
+        }
+
+        // readout bubble
+        var lines = ['x = ' + fmt(x), 'f(x) = ' + fmt(y)];
+        if (state.compose) lines.push('g(f(x)) = ' + fmt(evalComposed(x)));
+        ctx.save();
+        ctx.font = '13px "Segoe UI", Tahoma, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        var wBox = 0;
+        for (var i = 0; i < lines.length; i++) wBox = Math.max(wBox, ctx.measureText(lines[i]).width);
+        wBox += 16;
+        var hBox = lines.length * 18 + 10;
+        var bx = clamp(px + 12, 4, W - wBox - 4);
+        var by = clamp(py - hBox - 12, 4, H - hBox - 4);
+        ctx.fillStyle = 'rgba(6,18,31,0.88)';
+        ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+        ctx.lineWidth = 1;
+        roundRect(bx, by, wBox, hBox, 8);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#f0f4ff';
+        for (var j = 0; j < lines.length; j++) ctx.fillText(lines[j], bx + 8, by + 6 + j * 18);
+        ctx.restore();
+    }
+
+    function dot(px, py, color) {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.strokeStyle = '#06121f';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(px, py, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+    }
+
+    function roundRect(x, y, w, h, r) {
+        ctx.beginPath();
+        ctx.moveTo(x + r, y);
+        ctx.arcTo(x + w, y, x + w, y + h, r);
+        ctx.arcTo(x + w, y + h, x, y + h, r);
+        ctx.arcTo(x, y + h, x, y, r);
+        ctx.arcTo(x, y, x + w, y, r);
+        ctx.closePath();
+    }
+
+    var varCache = {};
+    function getVar(name) {
+        if (!varCache[name]) {
+            varCache[name] = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        }
+        return varCache[name];
+    }
+
+    function draw() {
+        ctx.clearRect(0, 0, W, H);
+        drawGrid();
+
+        if (state.showInverse) drawIdentityLine();
+
+        // f(x)
+        drawCurve(function (i) {
+            var x = fromPX(i);
+            var y = evalF(x);
+            return isFinite(y) ? [i, toPY(y)] : null;
+        }, getVar('--f-color'), 3, false);
+
+        // f inverse, drawn by reflecting the sampled points of f over y = x
+        if (state.showInverse) {
+            drawCurve(function (i) {
+                var y = fromPX(i);      // sweep over the *output* values of f
+                var x = evalInverse(y); // ...and ask which input produced them
+                return isFinite(x) ? [toPX(y), toPY(x)] : null;
+            }, getVar('--inv-color'), 2.5, true);
+        }
+
+        // g(f(x))
+        if (state.compose) {
+            drawCurve(function (i) {
+                var x = fromPX(i);
+                var y = evalComposed(x);
+                return isFinite(y) ? [i, toPY(y)] : null;
+            }, getVar('--g-color'), 3, false);
+        }
+
+        drawTrace();
+    }
+
+    /* ============ formulas & labels ============ */
+    function withParams(text, m, b) {
+        return text.replace('m', fmt(m)).replace('+ b', plusB(b));
+    }
+
+    function updateFormulas() {
+        var fam = FAMILIES[state.fType];
+        $('f-formula').textContent = 'f(x) = ' + withParams(fam.body('x'), state.fm, state.fb);
+
+        // g
+        var hasInverse = state.fm !== 0;
+        if (state.gType === INVERSE_KEY) {
+            $('g-formula').textContent = hasInverse ? 'g(f(x)) = f⁻¹(f(x)) = x' : 'g(f(x)) = f⁻¹(f(x)) = —';
+            $('mv-gname').textContent = 'f⁻¹';
+        } else {
+            var gfam = FAMILIES[state.gType];
+            $('g-formula').textContent = 'g(f(x)) = ' + withParams(gfam.body('f(x)'), state.gm, state.gb);
+            $('mv-gname').textContent = 'g';
+        }
+        $('g-sliders').hidden = state.gType === INVERSE_KEY;
+
+        // g note (only meaningful in inverse mode)
+        var gNote = $('g-note');
+        if (state.gType === INVERSE_KEY) {
+            var issue = fam.invIssue(state.fm);
+            gNote.textContent = issue || 'ההרכבה מבטלת את ' + ltr('f') + ', ולכן הגרף הצהוב הוא בדיוק הקו ' + ltr('y = x') + '.';
+            gNote.hidden = false;
+            gNote.style.color = issue ? '' : 'var(--ok)';
+            gNote.style.background = issue ? '' : 'rgba(74,222,128,0.12)';
+            gNote.style.borderColor = issue ? '' : 'rgba(74,222,128,0.4)';
+        } else {
+            gNote.hidden = true;
+        }
+
+        // inverse panel
+        $('inv-formula').textContent = 'f⁻¹(x) = ' + (hasInverse ? fam.invText(state.fm, state.fb) : '—');
+        var invIssue = fam.invIssue(state.fm);
+        $('inv-note').hidden = !invIssue;
+        $('inv-note').textContent = invIssue;
+    }
+
+    function updateMachine() {
+        var x = state.traceX;
+        var fx = evalF(x);
+        $('mv-x').textContent = fmt(x);
+        $('mv-fx').textContent = fmt(fx);
+
+        var on = state.compose;
+        $('m-arrow2').hidden = !on;
+        $('m-gbox').hidden = !on;
+        $('m-arrow3').hidden = !on;
+        $('m-gout').hidden = !on;
+
+        var cancelled = false;
+        if (on) {
+            var gv = evalComposed(x);
+            $('mv-gfx').textContent = fmt(gv);
+            cancelled = state.gType === INVERSE_KEY && isFinite(gv) && Math.abs(gv - x) < 1e-6;
+        }
+        $('machine').dataset.cancel = cancelled ? '1' : '0';
+        $('cancel-note').hidden = !cancelled;
+    }
+
+    function updateLegend() {
+        $('legend-g').hidden = !state.compose;
+        $('legend-inv').hidden = !state.showInverse;
+    }
+
+    function refresh() {
+        updateFormulas();
+        updateMachine();
+        updateLegend();
+        draw();
+    }
+
+    /* ============ controls ============ */
+    function buildTypeButtons(container, keys, current, onPick) {
+        container.innerHTML = '';
+        keys.forEach(function (key) {
+            var btn = document.createElement('button');
+            btn.className = 'type-btn';
+            btn.dataset.key = key;
+            if (key === INVERSE_KEY) {
+                btn.classList.add('inverse-choice');
+                btn.textContent = '↩️ f⁻¹ ההופכית';
+            } else {
+                btn.textContent = FAMILIES[key].icon + ' ' + FAMILIES[key].label;
+            }
+            if (key === current) btn.classList.add('active');
+            btn.addEventListener('click', function () {
+                onPick(key);
+                Array.prototype.forEach.call(container.children, function (c) {
+                    c.classList.toggle('active', c.dataset.key === key);
+                });
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    function bindSlider(input, chip, key, defaultValue) {
+        function apply() {
+            state[key] = parseFloat(input.value);
+            chip.textContent = fmt(state[key]);
+            refresh();
+        }
+        input.addEventListener('input', apply);
+        chip.addEventListener('click', function () {
+            input.value = defaultValue;
+            apply();
+        });
+        apply();
+    }
+
+    buildTypeButtons($('f-types'), TYPE_KEYS, state.fType, function (key) {
+        state.fType = key;
+        refresh();
+    });
+
+    buildTypeButtons($('g-types'), TYPE_KEYS.concat([INVERSE_KEY]), state.gType, function (key) {
+        state.gType = key;
+        refresh();
+    });
+
+    bindSlider($('f-m'), $('f-m-val'), 'fm', DEFAULTS.fm);
+    bindSlider($('f-b'), $('f-b-val'), 'fb', DEFAULTS.fb);
+    bindSlider($('g-m'), $('g-m-val'), 'gm', DEFAULTS.gm);
+    bindSlider($('g-b'), $('g-b-val'), 'gb', DEFAULTS.gb);
+
+    $('compose-on').addEventListener('change', function () {
+        state.compose = this.checked;
+        $('g-body').hidden = !state.compose;
+        $('g-off-hint').hidden = state.compose;
+        refresh();
+    });
+
+    $('inverse-on').addEventListener('change', function () {
+        state.showInverse = this.checked;
+        refresh();
+    });
+
+    function zoom(factor) {
+        state.range = clamp(state.range * factor, 1, 200);
+        refresh();
+    }
+
+    $('zoom-in').addEventListener('click', function () { zoom(1 / 1.25); });
+    $('zoom-out').addEventListener('click', function () { zoom(1.25); });
+
+    canvas.addEventListener('wheel', function (e) {
+        e.preventDefault();
+        zoom(e.deltaY > 0 ? 1.12 : 1 / 1.12);
+    }, { passive: false });
+
+    $('reset').addEventListener('click', function () {
+        state.fType = DEFAULTS.fType;
+        state.gType = DEFAULTS.gType;
+        state.range = DEFAULTS.range;
+        state.compose = false;
+        state.showInverse = false;
+        state.traceX = 1;
+        state.hasTrace = false;
+        $('compose-on').checked = false;
+        $('inverse-on').checked = false;
+        $('g-body').hidden = true;
+        $('g-off-hint').hidden = false;
+        $('f-m').value = DEFAULTS.fm;
+        $('f-b').value = DEFAULTS.fb;
+        $('g-m').value = DEFAULTS.gm;
+        $('g-b').value = DEFAULTS.gb;
+        state.fm = DEFAULTS.fm; state.fb = DEFAULTS.fb;
+        state.gm = DEFAULTS.gm; state.gb = DEFAULTS.gb;
+        $('f-m-val').textContent = fmt(state.fm);
+        $('f-b-val').textContent = fmt(state.fb);
+        $('g-m-val').textContent = fmt(state.gm);
+        $('g-b-val').textContent = fmt(state.gb);
+        buildTypeButtons($('f-types'), TYPE_KEYS, state.fType, function (key) { state.fType = key; refresh(); });
+        buildTypeButtons($('g-types'), TYPE_KEYS.concat([INVERSE_KEY]), state.gType, function (key) { state.gType = key; refresh(); });
+        refresh();
+    });
+
+    /* ============ tracing ============ */
+    function trace(clientX) {
+        var rect = canvas.getBoundingClientRect();
+        state.traceX = fromPX(clientX - rect.left);
+        state.hasTrace = true;
+        updateMachine();
+        draw();
+    }
+
+    canvas.addEventListener('pointermove', function (e) { trace(e.clientX); });
+    canvas.addEventListener('pointerdown', function (e) {
+        canvas.setPointerCapture(e.pointerId);
+        trace(e.clientX);
+    });
+    canvas.addEventListener('pointerleave', function () {
+        state.hasTrace = false;
+        draw();
+    });
+
+    /* ============ start ============ */
+    window.addEventListener('resize', resize);
+    if (window.matchMedia('(max-width: 900px)').matches === false) $('explain').open = true;
+    resize();
+    refresh();
+})();
+</script>
+</body>
+</html>

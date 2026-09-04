@@ -58,6 +58,7 @@ harel-playground/
 | `public/games/hebrew-piano/` | Learn piano notes Guitar Hero style! |
 | `public/games/read-it-to-me/` | Practice reading Hebrew words with nikud! |
 | `public/games/division-remainder/` | Practice division with remainders for 6th grade! |
+| `public/games/function-explorer/` | Plot functions, drag m and b, compose g(f(x)) and see the inverse! |
 
 ## Development
 

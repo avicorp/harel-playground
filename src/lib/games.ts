@@ -104,6 +104,15 @@ export const games: Game[] = [
     description: "Practice division with remainders for 6th grade! Fill in the quotient and remainder — 30 questions with detailed explanations.",
     path: "/games/division-remainder/index.html",
   },
+  {
+    slug: "function-explorer",
+    title: "Function Explorer",
+    titleHe: "חוקר הפונקציות",
+    emoji: "📈",
+    description:
+      "Explore functions! Drag the m and b sliders, switch between linear, parabolic and exponential, compose g(f(x)), and see the inverse function cancel f.",
+    path: "/games/function-explorer/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

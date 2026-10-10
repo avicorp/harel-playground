@@ -30,3 +30,22 @@ a {
   color: inherit;
   text-decoration: none;
 }
+
+/* Game menu: scrollable list + search */
+.game-list {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(233, 69, 96, 0.6) transparent;
+}
+
+.game-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.game-list::-webkit-scrollbar-thumb {
+  background: rgba(233, 69, 96, 0.6);
+  border-radius: 4px;
+}
+
+.game-search-input::placeholder {
+  color: var(--text-secondary);
+}

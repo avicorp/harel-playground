@@ -113,6 +113,15 @@ export const games: Game[] = [
       "Explore functions! Drag the m and b sliders, switch between linear, parabolic and exponential, compose g(f(x)), and see the inverse function cancel f.",
     path: "/games/function-explorer/index.html",
   },
+  {
+    slug: "english-learning-v2",
+    title: "Learn English 2.0",
+    titleHe: "לומדים אנגלית 2",
+    emoji: "🎨",
+    description:
+      "The new Learn English! Words with pictures and sounds, plus a brand-new Colors game: listen and tap, guess the color, and mix paints.",
+    path: "/games/english-learning-v2/index.html",
+  },
 ];
 
 export function getLatestGame(): Game {

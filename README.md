@@ -17,6 +17,7 @@ The games are created with Claude Code.
 | **Yearly Calendar** 📅 | A yearly calendar with Israeli holidays and special dates |
 | **Hebrew Verbs** 📝 | Learn verb conjugation in Hebrew |
 | **Magic Piano** 🎹 | Learn piano notes Guitar Hero style in Hebrew |
+| **Learn English 2.0** 🎨 | New version of Learn English with a Colors game (listen & tap, what color is it, mix paints) and a fresh look |
 
 ## Getting Started
 

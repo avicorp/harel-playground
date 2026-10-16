@@ -18,7 +18,7 @@ The games are created with Claude Code.
 | **Hebrew Verbs** 📝 | Learn verb conjugation in Hebrew |
 | **Magic Piano** 🎹 | Learn piano notes Guitar Hero style in Hebrew |
 | **Learn English 2.0** 🎨 | New version of Learn English with a Colors game (listen & tap, what color is it, mix paints) and a fresh look |
-| **Learn English 3.0** 📄 | The class word list for units 1+2 in 9 categories, with 4 games: listen & choose, word → picture, picture → word, English → Hebrew |
+| **Learn English 3.0** 📄 | The class word list for units 1+2 in 9 categories (plus the older topics). Every category has the same 4 games: listen & choose, word → picture, picture → word, English → Hebrew |
 
 ## Getting Started
 

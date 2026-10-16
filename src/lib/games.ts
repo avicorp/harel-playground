@@ -128,7 +128,7 @@ export const games: Game[] = [
     titleHe: "לומדים אנגלית 3",
     emoji: "📄",
     description:
-      "Learn English 3.0 — the class word list for units 1+2 in 9 categories, with 4 games: listen and choose, word to picture, picture to word, and English to Hebrew.",
+      "Learn English 3.0 — the class word list for units 1+2 in 9 new categories, plus all the older topics. Every category has the same 4 games: listen and choose, word to picture, picture to word, and English to Hebrew.",
     path: "/games/english-learning-v3/index.html",
   },
 ];

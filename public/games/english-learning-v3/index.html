@@ -186,7 +186,6 @@
       border-radius: 16px; background: #F4F2FF;
       display: flex; align-items: center; justify-content: center;
     }
-    .mode-card.color-mode .mode-icon { background: linear-gradient(135deg, #FFE3EE, #FFF4C2); }
     .mode-name { font-size: 1em; font-weight: 800; }
     .mode-desc { font-size: 0.8em; color: var(--text-light); margin-top: 2px; line-height: 1.35; }
     .mode-card.selected {
@@ -297,12 +296,6 @@
     .speaker-btn:active { transform: translateY(4px); box-shadow: 0 1px 0 var(--primary-dark); }
     .speaker-btn.big { width: 96px; height: 96px; font-size: 2.6em; animation: ring 2s ease-in-out infinite; }
     @keyframes ring { 0%, 100% { box-shadow: 0 5px 0 var(--primary-dark), 0 0 0 0 rgba(108,92,231,0.45); } 60% { box-shadow: 0 5px 0 var(--primary-dark), 0 0 0 18px rgba(108,92,231,0); } }
-    .hint-btn {
-      font-family: var(--font); font-weight: 700;
-      background: none; border: 2px dashed var(--line); color: var(--text-light);
-      padding: 6px 14px; border-radius: 14px; cursor: pointer; margin-top: 10px; margin-inline-start: 8px;
-    }
-
     /* Paint blobs (colors) */
     .swatch {
       display: inline-block; border-radius: 50%;
@@ -314,23 +307,8 @@
     .prompt-swatch { width: 120px; height: 120px; animation: floaty 3s ease-in-out infinite; }
     .option-swatch { width: 54px; height: 54px; }
 
-    .mix-row { display: flex; align-items: center; justify-content: center; gap: 12px; flex-wrap: wrap; }
-    .mix-item { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-    .mix-item .swatch { width: 78px; height: 78px; }
-    .mix-label { font-weight: 800; direction: ltr; font-size: 1em; }
-    .mix-op { font-size: 2em; font-weight: 900; color: var(--text-light); }
-    .mix-result {
-      width: 78px; height: 78px; border-radius: 50%;
-      background: repeating-conic-gradient(#EEE 0 25%, #FFF 0 50%) 50% / 20px 20px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 2em; font-weight: 900; color: var(--text-light);
-      border: 3px dashed #CCC; transition: background 0.6s, border 0.6s;
-    }
-    .mix-result.filled { border: 3px solid rgba(0,0,0,0.06); color: transparent; animation: popCorrect 0.5s ease; }
-
     /* Options */
     .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; width: 100%; max-width: 520px; }
-    .options-grid.six { grid-template-columns: repeat(3, 1fr); }
     .option-btn {
       padding: 18px 10px; min-height: 84px;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
@@ -354,22 +332,19 @@
       background: none; border: none; font-size: 0.85em; cursor: pointer; opacity: 0.4;
     }
     .option-btn .option-speaker:hover { opacity: 1; }
-    /* Option painted in its color (What color is it?) */
-    .option-btn.painted { color: #fff; text-shadow: 0 2px 0 rgba(0,0,0,0.25); }
-    .option-btn.painted.light-paint { color: var(--text); text-shadow: none; }
 
     .option-btn.correct {
       outline: 4px solid var(--success); outline-offset: -4px;
       box-shadow: 0 6px 0 var(--success-dark), 0 10px 24px rgba(46, 204, 113, 0.3);
       animation: popCorrect 0.45s ease;
+      background: #E7FBEF;
     }
-    .option-btn.correct:not(.painted) { background: #E7FBEF; }
     .option-btn.wrong {
       outline: 4px solid var(--error); outline-offset: -4px;
       box-shadow: 0 6px 0 var(--error-dark);
       animation: shake 0.4s ease;
+      background: #FFECEC;
     }
-    .option-btn.wrong:not(.painted) { background: #FFECEC; }
     .option-btn.dim { opacity: 0.45; }
     .options-grid.locked .option-btn { pointer-events: none; }
 
@@ -471,9 +446,7 @@
       .prompt-emoji { font-size: 3.6em; }
       .prompt-word { font-size: 1.6em; }
       .option-btn { padding: 14px 6px; font-size: 1.05em; min-height: 72px; }
-      .options-grid.six { gap: 10px; }
       .option-swatch { width: 44px; height: 44px; }
-      .mix-item .swatch, .mix-result { width: 62px; height: 62px; }
       .round-card { padding: 10px 16px; min-width: 80px; }
       .option-btn .key-hint { display: none; }
     }
@@ -579,43 +552,6 @@ const COLORS = [
   { id: "gray",      en: "Gray",       he: "אפור",   hex: "#9E9E9E", light: true },
 ];
 const colorById = id => COLORS.find(c => c.id === id);
-
-// "What color is it?" — each object has one clear color
-const COLOR_OBJECTS = [
-  { emoji: "🍌", en: "Banana",     he: "בננה",    color: "yellow" },
-  { emoji: "🌞", en: "Sun",        he: "שמש",     color: "yellow" },
-  { emoji: "🍓", en: "Strawberry", he: "תות",     color: "red" },
-  { emoji: "🍒", en: "Cherries",   he: "דובדבנים", color: "red" },
-  { emoji: "🥕", en: "Carrot",     he: "גזר",     color: "orange" },
-  { emoji: "🎃", en: "Pumpkin",    he: "דלעת",    color: "orange" },
-  { emoji: "🐸", en: "Frog",       he: "צפרדע",   color: "green" },
-  { emoji: "🥦", en: "Broccoli",   he: "ברוקולי", color: "green" },
-  { emoji: "🐳", en: "Whale",      he: "לוויתן",  color: "blue" },
-  { emoji: "🫐", en: "Blueberries", he: "אוכמניות", color: "blue" },
-  { emoji: "🍆", en: "Eggplant",   he: "חציל",    color: "purple" },
-  { emoji: "🍇", en: "Grapes",     he: "ענבים",   color: "purple" },
-  { emoji: "🐷", en: "Pig",        he: "חזיר",    color: "pink" },
-  { emoji: "🌸", en: "Flower",     he: "פרח",     color: "pink" },
-  { emoji: "🍫", en: "Chocolate",  he: "שוקולד",  color: "brown" },
-  { emoji: "🐻", en: "Bear",       he: "דוב",     color: "brown" },
-  { emoji: "🎱", en: "Ball",       he: "כדור",    color: "black" },
-  { emoji: "🎩", en: "Hat",        he: "כובע",    color: "black" },
-  { emoji: "🥛", en: "Milk",       he: "חלב",     color: "white" },
-  { emoji: "☁️", en: "Cloud",      he: "ענן",     color: "white" },
-  { emoji: "🐘", en: "Elephant",   he: "פיל",     color: "gray" },
-  { emoji: "🐭", en: "Mouse",      he: "עכבר",    color: "gray" },
-];
-
-// "Mix the paint"
-const COLOR_MIXES = [
-  { a: "red",    b: "yellow", result: "orange" },
-  { a: "red",    b: "blue",   result: "purple" },
-  { a: "blue",   b: "yellow", result: "green" },
-  { a: "red",    b: "white",  result: "pink" },
-  { a: "black",  b: "white",  result: "gray" },
-  { a: "blue",   b: "white",  result: "lightblue" },
-  { a: "red",    b: "green",  result: "brown" },
-];
 
 // Drawn pictures for words that have no clear emoji
 const BALL = (x, y, r) => `<circle cx="${x}" cy="${y}" r="${r}" fill="#FF7043" stroke="#D84315" stroke-width="3"/><path d="M${x - r * 0.7} ${y - r * 0.3} Q${x} ${y + r * 0.5} ${x + r * 0.7} ${y - r * 0.3}" fill="none" stroke="#fff" stroke-width="3"/>`;
@@ -847,24 +783,13 @@ const TOPICS = [
   }
 ];
 
-const BASIC_MODES = [
-  { id: "image-to-english",  icon: "🖼️", nameHe: "תמונה ← אנגלית", descHe: "רואים תמונה ובוחרים את המילה באנגלית" },
-  { id: "english-to-hebrew", icon: "🇬🇧", nameHe: "אנגלית ← עברית", descHe: "רואים מילה באנגלית ובוחרים תרגום" },
-  { id: "hebrew-to-english", icon: "🇮🇱", nameHe: "עברית ← אנגלית", descHe: "רואים מילה בעברית ובוחרים באנגלית" },
-];
-const COLOR_MODES = [
-  { id: "color-listen", icon: "👂", nameHe: "שומעים וצובעים", descHe: "שומעים צבע באנגלית ולוחצים על הכתם הנכון", color: true },
-  { id: "color-object", icon: "🍌", nameHe: "איזה צבע זה?", descHe: "רואים חפץ ובוחרים את הצבע שלו באנגלית", color: true },
-  { id: "color-mix",    icon: "🧪", nameHe: "מערבבים צבעים", descHe: "אדום + צהוב = מה יוצא? בוחרים באנגלית", color: true },
-];
-// The 4 games for the units 1+2 word lists
-const UNIT_MODES = [
+// The 4 games — every topic plays these
+const MODES = [
   { id: "unit-listen",       icon: "👂", nameHe: "שומעים ובוחרים",   descHe: "שומעים מילה באנגלית ובוחרים כפתור עם תמונה ומילה" },
   { id: "unit-word-to-pic",  icon: "🔤", nameHe: "מילה ← תמונה",    descHe: "רואים מילה באנגלית ובוחרים את התמונה הנכונה" },
   { id: "unit-pic-to-word",  icon: "🖼️", nameHe: "תמונה ← מילה",    descHe: "רואים רק תמונה ובוחרים את המילה באנגלית" },
   { id: "unit-en-to-he",     icon: "🇬🇧", nameHe: "אנגלית ← עברית", descHe: "רואים מילה באנגלית ובוחרים את התרגום בעברית" },
 ];
-const ALL_MODES = [...UNIT_MODES, ...COLOR_MODES, ...BASIC_MODES];
 
 const WORDS_PER_ROUND = 10;
 const ROUND_OPTIONS = [1, 3, 5];
@@ -914,7 +839,6 @@ function speak(text, lang) {
 }
 const speakEnglish = t => speak(t, 'en');
 const sayOf = w => w.say || w.en;
-const speakHebrew = t => speak(t, 'he');
 
 let audioCtx = null;
 function tone(freq, start, dur, type = 'sine', vol = 0.18) {
@@ -1010,11 +934,6 @@ function bestLabel(topicId) {
   return best ? `🏆 ${best}` : '';
 }
 
-function modesForTopic(topicId) {
-  if (TOPICS.find(t => t.id === topicId)?.unit) return UNIT_MODES;
-  return topicId === 'colors' ? [...COLOR_MODES, ...BASIC_MODES] : BASIC_MODES;
-}
-
 function buildModes() {
   const modeGrid = document.getElementById('mode-grid');
   modeGrid.innerHTML = '';
@@ -1024,8 +943,8 @@ function buildModes() {
     return;
   }
   modeGrid.style.gridTemplateColumns = '';
-  modesForTopic(selectedTopic).forEach(mode => {
-    const card = el('button', 'chunky mode-card' + (mode.color ? ' color-mode' : ''), `
+  MODES.forEach(mode => {
+    const card = el('button', 'chunky mode-card', `
       <span class="mode-icon">${mode.icon}</span>
       <div>
         <div class="mode-name">${mode.nameHe}</div>
@@ -1040,9 +959,7 @@ function buildModes() {
 function selectTopic(id) {
   sfx.tap();
   selectedTopic = id;
-  if (selectedMode && !modesForTopic(id).some(m => m.id === selectedMode)) selectedMode = null;
-  if (id === 'colors' && !selectedMode) selectedMode = 'color-listen';
-  if (!selectedMode) selectedMode = modesForTopic(id)[0].id;
+  if (!selectedMode) selectedMode = MODES[0].id;
   buildModes();
   refreshSelections();
 }
@@ -1061,158 +978,49 @@ function refreshSelections() {
 
 // ============================================================
 //  QUESTION BUILDERS
-//  Each returns { key, prompt: Element, options: [{key, html, cls, style, speakEn}],
-//                 columns, autoSpeak(), answerEn, answerHe, onReveal() }
+//  Each returns { key, prompt: Element, options: [{key, html, cls, speakEn, speakHe}],
+//                 autoSpeak(), answerEn, answerSay, answerHe }
 // ============================================================
 function buildPool() {
   const topic = TOPICS.find(t => t.id === selectedTopic);
-  if (selectedMode === 'color-object') return sample(COLOR_OBJECTS, WORDS_PER_ROUND);
-  if (selectedMode === 'color-mix') return sample(COLOR_MIXES, WORDS_PER_ROUND);
   return sample(topic.words, WORDS_PER_ROUND);
 }
 
-function makeQuestion(item) {
+function makeQuestion(word) {
   const topic = TOPICS.find(t => t.id === selectedTopic);
   const prompt = el('div', 'prompt-card');
-
-  // ---------- COLOR GAMES ----------
-  if (selectedMode === 'color-listen') {
-    const c = colorById(item.color);
-    const choices = shuffleArray([c, ...sample(COLORS.filter(x => x.id !== c.id), 5)]);
-    prompt.appendChild(el('div', 'prompt-question', 'איזה צבע שמעתם?'));
-    const row = el('div');
-    row.appendChild(speakerButton(c.en, 'en', 'speaker-btn big', 'Listen'));
-    prompt.appendChild(row);
-    const hint = el('button', 'hint-btn', '👀 רמז');
-    hint.addEventListener('click', () => { hint.outerHTML = `<div class="prompt-word english" style="font-size:1.5em;margin-top:8px">${c.en}</div>`; });
-    prompt.appendChild(hint);
-    return {
-      key: c.id, prompt, columns: 'six',
-      options: choices.map(o => ({ key: o.id, html: swatchHtml(o.id, 'option-swatch') })),
-      autoSpeak: () => speakEnglish(c.en),
-      answerEn: c.en, answerHe: c.he,
-    };
-  }
-
-  if (selectedMode === 'color-object') {
-    const c = colorById(item.color);
-    const choices = shuffleArray([c, ...sample(COLORS.filter(x => x.id !== c.id), 3)]);
-    prompt.innerHTML = `
-      <span class="prompt-emoji">${item.emoji}</span>
-      <div class="prompt-word english" style="font-size:1.5em">${item.en}</div>
-      <div class="prompt-question">איזה צבע?</div>`;
-    prompt.appendChild(speakerButton(`What color is the ${item.en.toLowerCase()}?`, 'en'));
-    return {
-      key: c.id, prompt,
-      options: choices.map(o => ({
-        key: o.id, speakEn: o.en,
-        html: `<span class="option-text english">${o.en}</span>`,
-        cls: 'painted' + (o.light ? ' light-paint' : ''),
-        style: `background:${o.hex}`,
-      })),
-      autoSpeak: () => speakEnglish(`What color is the ${item.en.toLowerCase()}?`),
-      answerEn: `The ${item.en.toLowerCase()} is ${c.en.toLowerCase()}`, answerHe: c.he,
-    };
-  }
-
-  if (selectedMode === 'color-mix') {
-    const a = colorById(item.a), b = colorById(item.b), r = colorById(item.result);
-    const wrong = sample(COLORS.filter(x => ![r.id, a.id, b.id].includes(x.id)), 3);
-    const choices = shuffleArray([r, ...wrong]);
-    prompt.innerHTML = `
-      <div class="mix-row">
-        <div class="mix-item">${swatchHtml(a.id)}<span class="mix-label">${a.en}</span></div>
-        <div class="mix-op">+</div>
-        <div class="mix-item">${swatchHtml(b.id)}<span class="mix-label">${b.en}</span></div>
-        <div class="mix-op">=</div>
-        <div class="mix-item"><div class="mix-result" id="mix-result">?</div><span class="mix-label" id="mix-label">&nbsp;</span></div>
-      </div>
-      <div class="prompt-question">מה יוצא כשמערבבים?</div>`;
-    prompt.appendChild(speakerButton(`${a.en} and ${b.en} make...`, 'en'));
-    return {
-      key: r.id, prompt,
-      options: choices.map(o => ({
-        key: o.id, speakEn: o.en,
-        html: `${swatchHtml(o.id, 'option-swatch')}<span class="option-text english">${o.en}</span>`,
-      })),
-      autoSpeak: () => speakEnglish(`${a.en} and ${b.en} make...`),
-      answerEn: `${a.en} and ${b.en} make ${r.en.toLowerCase()}`, answerHe: r.he,
-      onReveal: () => {
-        const res = document.getElementById('mix-result');
-        if (!res) return;
-        res.style.background = r.hex;
-        res.classList.add('filled');
-        document.getElementById('mix-label').textContent = r.en;
-      },
-    };
-  }
-
-  // ---------- UNITS 1+2 GAMES ----------
-  if (selectedMode.startsWith('unit-')) {
-    const word = item;
-    const picKey = w => w.color || w.pic || w.emoji;
-    // Wrong answers never share the right answer's picture or translation
-    const others = topic.words.filter(w => w.en !== word.en && picKey(w) !== picKey(word) && w.he !== word.he);
-    const choices = shuffleArray([word, ...sample(others, 3)]);
-    let autoSpeak = () => {};
-    let optionFor;
-
-    if (selectedMode === 'unit-listen') {
-      prompt.appendChild(el('div', 'prompt-question', 'מה שמעתם?'));
-      const row = el('div');
-      row.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn big', 'Listen'));
-      prompt.appendChild(row);
-      autoSpeak = () => speakEnglish(sayOf(word));
-      optionFor = o => ({ key: o.en, html: `${visualHtml(o, 'option')}<span class="option-text english">${o.en}</span>` });
-    } else if (selectedMode === 'unit-word-to-pic') {
-      prompt.innerHTML = `<div class="prompt-word english">${word.en}</div><div class="prompt-question">איזו תמונה מתאימה?</div>`;
-      prompt.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn', 'Listen'));
-      optionFor = o => ({ key: o.en, cls: 'pic-only', html: visualHtml(o, 'option') });
-    } else if (selectedMode === 'unit-pic-to-word') {
-      prompt.innerHTML = `${visualHtml(word, 'prompt')}<div class="prompt-question">מה זה באנגלית?</div>`;
-      optionFor = o => ({ key: o.en, speakEn: sayOf(o), html: `<span class="option-text english">${o.en}</span>` });
-    } else {
-      prompt.innerHTML = `<div class="prompt-word english">${word.en}</div><div class="prompt-question">מה זה בעברית?</div>`;
-      prompt.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn', 'Listen'));
-      autoSpeak = () => speakEnglish(sayOf(word));
-      optionFor = o => ({ key: o.en, speakHe: o.he, html: `<span class="option-text hebrew">${o.he}</span>` });
-    }
-
-    return {
-      key: word.en, prompt, autoSpeak,
-      options: choices.map(optionFor),
-      answerEn: word.en, answerSay: sayOf(word), answerHe: word.he,
-    };
-  }
-
-  // ---------- WORD GAMES (any topic, colors included) ----------
-  const word = item;
-  const choices = shuffleArray([word, ...sample(topic.words.filter(w => w.en !== word.en), 3)]);
+  const picKey = w => w.color || w.pic || w.emoji;
+  // Wrong answers never share the right answer's picture or translation
+  const others = topic.words.filter(w => w.en !== word.en && picKey(w) !== picKey(word) && w.he !== word.he);
+  const choices = shuffleArray([word, ...sample(others, 3)]);
   let autoSpeak = () => {};
+  let optionFor;
 
-  if (selectedMode === 'image-to-english') {
+  if (selectedMode === 'unit-listen') {
+    prompt.appendChild(el('div', 'prompt-question', 'מה שמעתם?'));
+    const row = el('div');
+    row.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn big', 'Listen'));
+    prompt.appendChild(row);
+    autoSpeak = () => speakEnglish(sayOf(word));
+    optionFor = o => ({ key: o.en, html: `${visualHtml(o, 'option')}<span class="option-text english">${o.en}</span>` });
+  } else if (selectedMode === 'unit-word-to-pic') {
+    prompt.innerHTML = `<div class="prompt-word english">${word.en}</div><div class="prompt-question">איזו תמונה מתאימה?</div>`;
+    prompt.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn', 'Listen'));
+    optionFor = o => ({ key: o.en, cls: 'pic-only', html: visualHtml(o, 'option') });
+  } else if (selectedMode === 'unit-pic-to-word') {
     prompt.innerHTML = `${visualHtml(word, 'prompt')}<div class="prompt-question">מה זה באנגלית?</div>`;
-    prompt.appendChild(speakerButton(word.he, 'he', 'speaker-btn', 'שמע בעברית'));
-  } else if (selectedMode === 'english-to-hebrew') {
-    prompt.innerHTML = `${visualHtml(word, 'prompt')}<div class="prompt-word english">${word.en}</div><div class="prompt-question">מה זה בעברית?</div>`;
-    prompt.appendChild(speakerButton(word.en, 'en', 'speaker-btn', 'Listen'));
-    autoSpeak = () => speakEnglish(word.en);
+    optionFor = o => ({ key: o.en, speakEn: sayOf(o), html: `<span class="option-text english">${o.en}</span>` });
   } else {
-    prompt.innerHTML = `${visualHtml(word, 'prompt')}<div class="prompt-word hebrew">${word.he}</div><div class="prompt-question">מה זה באנגלית?</div>`;
-    prompt.appendChild(speakerButton(word.he, 'he', 'speaker-btn', 'שמע בעברית'));
-    autoSpeak = () => speakHebrew(word.he);
+    prompt.innerHTML = `<div class="prompt-word english">${word.en}</div><div class="prompt-question">מה זה בעברית?</div>`;
+    prompt.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn', 'Listen'));
+    autoSpeak = () => speakEnglish(sayOf(word));
+    optionFor = o => ({ key: o.en, speakHe: o.he, html: `<span class="option-text hebrew">${o.he}</span>` });
   }
 
   return {
     key: word.en, prompt, autoSpeak,
-    options: choices.map(o => {
-      if (selectedMode === 'english-to-hebrew') {
-        return { key: o.en, speakHe: o.he, html: `<span class="option-text hebrew">${o.he}</span>` };
-      }
-      const pic = selectedMode === 'image-to-english' ? visualHtml(o, 'option') : '';
-      return { key: o.en, speakEn: o.en, html: `${pic}<span class="option-text english">${o.en}</span>` };
-    }),
-    answerEn: word.en, answerHe: word.he,
+    options: choices.map(optionFor),
+    answerEn: word.en, answerSay: sayOf(word), answerHe: word.he,
   };
 }
 
@@ -1224,7 +1032,7 @@ function startGame() {
   document.getElementById('confetti-container').innerHTML = '';
   currentRound = 0; score = 0; correctCount = 0; totalAnswered = 0; streak = 0; bestStreak = 0;
   const topic = TOPICS.find(t => t.id === selectedTopic);
-  const mode = ALL_MODES.find(m => m.id === selectedMode);
+  const mode = MODES.find(m => m.id === selectedMode);
   document.getElementById('game-header-title').textContent = `${topic.icon} ${topic.nameHe} · ${mode.nameHe}`;
   updateHud();
   showScreen('game-screen');
@@ -1266,10 +1074,9 @@ function showQuestion() {
   area.innerHTML = '';
   area.appendChild(q.prompt);
 
-  const grid = el('div', 'options-grid' + (q.columns ? ' ' + q.columns : ''));
+  const grid = el('div', 'options-grid');
   q.options.forEach((opt, i) => {
     const btn = el('button', 'chunky option-btn' + (opt.cls ? ' ' + opt.cls : ''), opt.html);
-    if (opt.style) btn.setAttribute('style', opt.style);
     btn.dataset.key = opt.key;
     if (opt.speakEn) btn.appendChild(speakerButton(opt.speakEn, 'en', 'option-speaker', 'Listen'));
     if (opt.speakHe) btn.appendChild(speakerButton(opt.speakHe, 'he', 'option-speaker', 'שמע'));
@@ -1290,7 +1097,6 @@ function handleAnswer(btn, chosenKey, grid) {
   const isCorrect = chosenKey === q.key;
   totalAnswered++;
   grid.classList.add('locked');
-  if (q.onReveal) q.onReveal();
 
   if (isCorrect) {
     btn.classList.add('correct');

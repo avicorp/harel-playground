@@ -60,6 +60,7 @@ harel-playground/
 | `public/games/division-remainder/` | Practice division with remainders for 6th grade! |
 | `public/games/function-explorer/` | Plot functions, drag m and b, compose g(f(x)) and see the inverse! |
 | `public/games/english-learning-v2/` | Learn English 2.0 — words plus a new Colors game (listen, guess, mix paints)! |
+| `public/games/english-learning-v3/` | Learn English 3.0 — units 1+2 word list with 4 games (listen, word→picture, picture→word, English→Hebrew)! |
 
 ## Development
 

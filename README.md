@@ -11,14 +11,12 @@ The games are created with Claude Code.
 | **Balloon Popper** 🎈 | Pop balloons, upgrade characters, unlock abilities |
 | **Fruit Ninja** 🍉 | Swipe to slice flying fruits! Avoid bombs and chain combos |
 | **Robot Chef** 🤖 | Pick ingredients, chop them, and serve to a robot judge |
-| **Learn English** 📚 | Learn English words with pictures, sounds, and Hebrew translations |
 | **Division Practice** ➗ | Practice division with numbers from 1 to 100 |
 | **Ninja Turtles** 🐢 | Choose your Ninja Turtle and smash bricks! Cowabunga! |
 | **Yearly Calendar** 📅 | A yearly calendar with Israeli holidays and special dates |
 | **Hebrew Verbs** 📝 | Learn verb conjugation in Hebrew |
 | **Magic Piano** 🎹 | Learn piano notes Guitar Hero style in Hebrew |
-| **Learn English 2.0** 🎨 | New version of Learn English with a Colors game (listen & tap, what color is it, mix paints) and a fresh look |
-| **Learn English 3.0** 📄 | The class word list for units 1+2 in 9 categories (plus the older topics). Every category has the same 4 games: listen & choose, word → picture, picture → word, English → Hebrew |
+| **Learn English 3.0** 📄 | The class word list for units 1+2 in 10 categories (plus the older topics). Every category has the same 4 games: listen & choose, word → picture, picture → word, English → Hebrew |
 
 ## Getting Started
 

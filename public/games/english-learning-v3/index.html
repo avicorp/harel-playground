@@ -565,6 +565,8 @@ const PICS = {
   desk: SVG(`${GROUND}<rect x="12" y="36" width="96" height="10" rx="3" fill="#A1887F"/><rect x="62" y="46" width="40" height="24" fill="#8D6E63"/><rect x="76" y="55" width="12" height="4" rx="2" fill="#5D4037"/><rect x="18" y="46" width="7" height="45" fill="#6D4C41"/><rect x="95" y="70" width="7" height="21" fill="#6D4C41"/><rect x="26" y="26" width="26" height="10" rx="2" fill="#3D9DF2"/><rect x="30" y="18" width="20" height="8" rx="2" fill="#FF7AA2"/>`),
   classroom: SVG(`<rect x="8" y="6" width="104" height="60" rx="4" fill="#6D4C41"/><rect x="14" y="12" width="92" height="48" fill="#2E7D32"/><text x="60" y="47" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="26" fill="#fff">ABC</text><rect x="16" y="78" width="30" height="6" rx="2" fill="#A1887F"/><rect x="20" y="84" width="4" height="10" fill="#6D4C41"/><rect x="38" y="84" width="4" height="10" fill="#6D4C41"/><rect x="74" y="78" width="30" height="6" rx="2" fill="#A1887F"/><rect x="78" y="84" width="4" height="10" fill="#6D4C41"/><rect x="96" y="84" width="4" height="10" fill="#6D4C41"/>`),
   roof: SVG(`${GROUND}<rect x="30" y="52" width="60" height="40" fill="#E9E6F2" stroke="#C9C4DD" stroke-width="2"/><rect x="53" y="68" width="14" height="24" fill="#D5D0E6"/><polygon points="18,54 60,18 102,54" fill="#E53935" stroke="#B71C1C" stroke-width="3" stroke-linejoin="round"/><path d="M112 4 L92 20" stroke="#FFB800" stroke-width="5" stroke-linecap="round"/><path d="M92 20 L94 10 M92 20 L102 18" stroke="#FFB800" stroke-width="5" stroke-linecap="round"/>`),
+  glue: SVG(`<rect x="44" y="34" width="32" height="58" rx="8" fill="#FFFFFF" stroke="#8E8AB0" stroke-width="3"/><rect x="44" y="52" width="32" height="22" fill="#FF7043"/><text x="60" y="68" text-anchor="middle" font-family="Arial, sans-serif" font-weight="bold" font-size="10" fill="#fff">GLUE</text><path d="M52 34 L56 16 L64 16 L68 34 Z" fill="#FFB800" stroke="#C68A00" stroke-width="2" stroke-linejoin="round"/><rect x="57" y="8" width="6" height="9" rx="2" fill="#FFB800"/>`),
+  poster: SVG(`<line x1="60" y1="2" x2="60" y2="10" stroke="#8E8AB0" stroke-width="3"/><circle cx="60" cy="10" r="4" fill="#E53935"/><rect x="24" y="12" width="72" height="84" rx="4" fill="#FFF4C2" stroke="#C9A227" stroke-width="3"/><circle cx="60" cy="40" r="14" fill="#FFB800"/><rect x="34" y="62" width="52" height="7" rx="3" fill="#6C5CE7"/><rect x="40" y="75" width="40" height="6" rx="3" fill="#A29BFE"/>`),
   fall: SVG(`${GROUND}<rect x="6" y="40" width="8" height="52" rx="2" fill="#6D4C41"/><rect x="10" y="62" width="64" height="16" rx="4" fill="#5C6BC0"/><rect x="16" y="52" width="20" height="11" rx="5" fill="#fff" stroke="#C9C4DD" stroke-width="2"/><rect x="66" y="78" width="6" height="14" fill="#6D4C41"/><rect x="12" y="78" width="6" height="14" fill="#6D4C41"/><text x="88" y="70" font-size="34" transform="rotate(140 88 58)">🐒</text><path d="M70 22 Q92 18 100 40" fill="none" stroke="#B9B4D6" stroke-width="3" stroke-dasharray="4 4"/>`),
 };
 
@@ -623,6 +625,22 @@ const UNIT_TOPICS = [
       { emoji: "🎂", en: "Cake", he: "עוגה" },
       { emoji: "🖍️", en: "Crayons", he: "צבעי פסטל" },
       { emoji: "🌳", en: "Tree", he: "עץ" },
+      { emoji: "🍌", en: "Banana", he: "בננה" },
+      { emoji: "🚌", en: "Bus", he: "אוטובוס" },
+    ]
+  },
+  {
+    id: "u-supplies", nameHe: "ציוד לבית הספר", nameEn: "School Supplies", icon: "🎒",
+    words: [
+      { emoji: "🎒", en: "Bag", he: "תיק" },
+      { emoji: "📕", en: "Book", he: "ספר" },
+      { pic: "glue", en: "Glue", he: "דבק" },
+      { emoji: "🖊️", en: "Pen", he: "עט" },
+      { emoji: "✏️", en: "Pencil", he: "עיפרון" },
+      { emoji: "📄", en: "Paper", he: "נייר" },
+      { emoji: "✂️", en: "Scissors", he: "מספריים" },
+      { emoji: "📏", en: "Ruler", he: "סרגל" },
+      { pic: "poster", en: "Poster", he: "פוסטר/מודעה" },
     ]
   },
   {

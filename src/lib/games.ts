@@ -41,14 +41,6 @@ export const games: Game[] = [
     path: "/games/restaurant/index.html",
   },
   {
-    slug: "english-learning",
-    title: "Learn English",
-    titleHe: "לומדים אנגלית",
-    emoji: "📚",
-    description: "Learn English words with pictures, sounds, and Hebrew translations!",
-    path: "/games/english-learning/index.html",
-  },
-  {
     slug: "division-practice",
     title: "Division Practice",
     titleHe: "תרגול חילוק",
@@ -114,21 +106,12 @@ export const games: Game[] = [
     path: "/games/function-explorer/index.html",
   },
   {
-    slug: "english-learning-v2",
-    title: "Learn English 2.0",
-    titleHe: "לומדים אנגלית 2",
-    emoji: "🎨",
-    description:
-      "The new Learn English! Words with pictures and sounds, plus a brand-new Colors game: listen and tap, guess the color, and mix paints.",
-    path: "/games/english-learning-v2/index.html",
-  },
-  {
     slug: "english-learning-v3",
     title: "Learn English 3.0",
     titleHe: "לומדים אנגלית 3",
     emoji: "📄",
     description:
-      "Learn English 3.0 — the class word list for units 1+2 in 9 new categories, plus all the older topics. Every category has the same 4 games: listen and choose, word to picture, picture to word, and English to Hebrew.",
+      "Learn English 3.0 — the class word list for units 1+2 in 10 new categories, plus all the older topics. Every category has the same 4 games: listen and choose, word to picture, picture to word, and English to Hebrew.",
     path: "/games/english-learning-v3/index.html",
   },
 ];

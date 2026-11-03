@@ -224,6 +224,96 @@
     }
     @keyframes pulse { 0%, 100% { scale: 1; } 50% { scale: 1.05; } }
 
+    /* ===== TEST PREP (6.11) ===== */
+    .test-banner {
+      width: 100%; max-width: 760px; margin-bottom: 16px; padding: 20px 18px 18px;
+      border-radius: 30px; position: relative; overflow: hidden;
+      background: linear-gradient(#FFFFFF, #F7F4FF) padding-box,
+                  linear-gradient(135deg, #FF7AA2, #FFB800, #2ECC71, #3D9DF2, #6C5CE7) border-box;
+      border: 4px solid transparent;
+      box-shadow: 0 10px 0 #D9D3FA, 0 18px 40px rgba(108, 92, 231, 0.18);
+    }
+    .test-head { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+    .test-icon {
+      font-size: 2em; width: 62px; height: 62px; flex-shrink: 0; border-radius: 20px;
+      background: #F1EEFF; display: flex; align-items: center; justify-content: center;
+      animation: bounce 2.4s ease-in-out infinite;
+    }
+    .test-title { font-size: 1.45em; font-weight: 900; color: var(--primary); line-height: 1.15; }
+    .test-sub { font-size: 0.95em; color: var(--text-light); font-weight: 600; margin-top: 2px; }
+    .countdown {
+      margin-inline-start: auto;
+      background: linear-gradient(135deg, #FFD166, #FFB800); color: #6B4A00;
+      font-weight: 900; font-size: 1em; padding: 9px 16px; border-radius: 30px;
+      box-shadow: 0 4px 0 #D99A00; white-space: nowrap;
+      animation: wiggle 2.5s ease-in-out infinite;
+    }
+    .countdown.today { background: linear-gradient(135deg, #FF7AA2, #FF5A5F); color: #fff; box-shadow: 0 4px 0 var(--error-dark); }
+    .countdown.past { background: #E7FBEF; color: var(--success-dark); box-shadow: 0 4px 0 #BDEBD0; animation: none; }
+    .test-facts { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin: 6px 0 14px; }
+    .fact {
+      background: #fff; border-radius: 20px; padding: 6px 12px; font-weight: 800; font-size: 0.9em;
+      box-shadow: 0 3px 0 var(--line); color: var(--text);
+    }
+    .fact b { color: var(--primary); }
+    .test-actions { display: flex; justify-content: center; }
+    .test-btn {
+      font-family: var(--font);
+      background: linear-gradient(135deg, #8E7CFF, var(--primary));
+      color: #fff; border: none;
+      padding: 16px 40px; font-size: 1.3em; font-weight: 900;
+      border-radius: 60px; cursor: pointer;
+      box-shadow: 0 7px 0 var(--primary-dark), 0 12px 26px rgba(108, 92, 231, 0.4);
+      transition: transform 0.12s, box-shadow 0.12s, filter 0.2s;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    .test-btn:hover { filter: brightness(1.06); }
+    .test-btn:active { transform: translateY(6px); box-shadow: 0 1px 0 var(--primary-dark); }
+    .word-rows { margin-top: 14px; }
+    .word-rows summary {
+      cursor: pointer; font-weight: 800; color: var(--primary); list-style: none;
+      padding: 8px 12px; border-radius: 14px; background: #F1EEFF; display: inline-block;
+    }
+    .word-rows summary::-webkit-details-marker { display: none; }
+    .word-rows[open] summary { margin-bottom: 10px; }
+    .word-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin: 0 0 8px; }
+    .row-label {
+      font-size: 0.8em; font-weight: 800; color: #fff; background: var(--accent);
+      padding: 3px 10px; border-radius: 20px; flex-shrink: 0;
+    }
+    .word-chip {
+      display: inline-flex; align-items: center; gap: 7px; padding: 6px 10px 6px 12px;
+      border-radius: 16px; font-weight: 800; color: var(--text); font-size: 0.95em;
+      box-shadow: 0 4px 0 var(--line), 0 6px 14px rgba(60, 40, 120, 0.06);
+    }
+    .word-chip:hover { box-shadow: 0 6px 0 var(--line), 0 8px 18px rgba(60, 40, 120, 0.1); }
+    .word-chip .chip-emoji { font-size: 1.35em; line-height: 1; }
+    .word-chip .chip-pic { width: 36px; height: 30px; }
+    .word-chip .chip-swatch { width: 24px; height: 24px; }
+    .word-chip .chip-en { direction: ltr; unicode-bidi: isolate; color: var(--primary); }
+    .word-chip .chip-he { color: var(--text-light); font-size: 0.85em; font-weight: 700; }
+    .word-chip .chip-speaker { opacity: 0.5; font-size: 0.9em; }
+    .topic-card .test-badge {
+      position: absolute; top: -8px; right: -6px;
+      background: var(--primary); color: #fff; font-size: 0.7em; font-weight: 800;
+      padding: 3px 9px; border-radius: 20px; transform: rotate(8deg);
+      box-shadow: 0 3px 8px rgba(108, 92, 231, 0.5);
+      animation: wiggle 2.5s ease-in-out infinite;
+    }
+    .topic-card.test-topic { background: linear-gradient(180deg, #FFFFFF, #EEE9FF); }
+    .mode-card.mix-mode { grid-column: 1 / -1; }
+    .mode-card.mix-mode .mode-icon { background: linear-gradient(135deg, #FFE3EE, #E6E9FF); }
+    .type-tag {
+      display: inline-flex; align-items: center; gap: 4px; background: #F1EEFF; color: var(--primary);
+      padding: 3px 10px; border-radius: 20px; font-size: 0.85em;
+    }
+
+    /* Review list on results */
+    .review-box { background: #FFF6F6; border-radius: 20px; padding: 12px 12px 8px; margin-bottom: 18px; text-align: right; }
+    .review-box.clean { background: #E7FBEF; text-align: center; font-weight: 800; color: var(--success-dark); padding: 12px; }
+    .review-title { font-weight: 800; color: var(--error-dark); margin-bottom: 8px; font-size: 0.95em; }
+    .review-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
     /* ===== HEADER ===== */
     .header {
       width: 100%;
@@ -449,6 +539,10 @@
       .option-swatch { width: 44px; height: 44px; }
       .round-card { padding: 10px 16px; min-width: 80px; }
       .option-btn .key-hint { display: none; }
+      .test-title { font-size: 1.2em; }
+      .countdown { margin-inline-start: 0; }
+      .test-btn { padding: 14px 28px; font-size: 1.1em; }
+      .mode-card.mix-mode { grid-column: auto; }
     }
     @media (min-width: 820px) {
       .topic-grid { grid-template-columns: repeat(6, 1fr); }
@@ -467,8 +561,32 @@
   <div class="hero">
     <div class="hero-mascots"><span>🦉</span><span>📄</span><span>📚</span></div>
     <div class="hero-title">לומדים אנגלית 3!</div>
-    <div class="hero-sub">Learn English 3.0 — Units 1+2 words!</div>
+    <div class="hero-sub">Learn English 3.0 — Test 6.11 practice + Units 1+2 words!</div>
   </div>
+
+  <section class="test-banner" id="test-banner">
+    <div class="test-head">
+      <div class="test-icon">📝</div>
+      <div>
+        <div class="test-title">מתכוננים למבחן באנגלית!</div>
+        <div class="test-sub">יום שישי 6.11 · המילים של תרגיל 23</div>
+      </div>
+      <div class="countdown" id="countdown"></div>
+    </div>
+    <div class="test-facts">
+      <div class="fact">🔤 <b id="test-word-count">24</b> מילים</div>
+      <div class="fact">🎲 <b>20</b> שאלות מעורבות</div>
+      <div class="fact">📚 מתוך מאגר של <b>50</b> שאלות</div>
+      <div class="fact">👂🔤🖼️🇬🇧 כל סוגי המשחקים</div>
+    </div>
+    <div class="test-actions">
+      <button class="test-btn" id="test-btn">🚀 תרגול מבחן — 20 שאלות</button>
+    </div>
+    <details class="word-rows" id="word-rows">
+      <summary>📖 הצגת המילים למבחן (לחצו על מילה כדי לשמוע)</summary>
+      <div id="word-rows-list"></div>
+    </details>
+  </section>
 
   <section class="step" id="step-topic">
     <div class="step-head"><div class="step-num">1</div><div class="step-title">בחרו נושא</div></div>
@@ -518,6 +636,7 @@
     <div class="results-subtitle" id="results-subtitle">סיימת את המשחק</div>
     <div id="record-slot"></div>
     <div class="stars-container" id="stars-container"></div>
+    <div id="review-slot"></div>
     <div class="results-stats">
       <div class="stat"><div class="stat-value" id="stat-correct">0</div><div class="stat-label">נכונות</div></div>
       <div class="stat"><div class="stat-value" id="stat-total">0</div><div class="stat-label">שאלות</div></div>
@@ -525,6 +644,7 @@
     </div>
     <div class="results-btns">
       <button class="results-btn primary-btn" id="replay-btn">🔄 שחקו שוב</button>
+      <button class="results-btn secondary-btn" id="results-test-btn" style="display:none">📝 עוד תרגול מבחן</button>
       <button class="results-btn secondary-btn" id="results-home-btn">🏠 חזרה</button>
     </div>
   </div>
@@ -694,7 +814,39 @@ const UNIT_TOPICS = [
   },
 ].map(t => ({ ...t, unit: true, isNew: true }));
 
+// ---------- TEST 6.11 (exercise 23) ----------
+// The exact words from the teacher's message, kept in the same 6 rows.
+const TEST_DATE = new Date(2026, 10, 6); // 6 November 2026 (month is 0-based)
+const EXTRA_WORDS = [
+  { emoji: "6️⃣", en: "Six", he: "שש" },
+];
+const TEST_ROWS = [
+  ["Sad", "Fall off", "Six", "Stand up"],
+  ["House", "Help", "Baby", "Happy"],
+  ["Window", "On", "White", "Doctor"],
+  ["Bed", "Green", "Girl", "Near"],
+  ["Pink", "Roof", "Yard", "Purple"],
+  ["Mother", "In", "Monkey", "Door"],
+];
+function findUnitWord(en) {
+  const key = en.toLowerCase();
+  for (const t of UNIT_TOPICS) {
+    const w = t.words.find(w => w.en.toLowerCase() === key || w.en.toLowerCase().split(' / ')[0] === key);
+    if (w) return { ...w, en, say: w.say && key !== w.en.toLowerCase() ? en : w.say };
+  }
+  const extra = EXTRA_WORDS.find(w => w.en.toLowerCase() === key);
+  if (extra) return { ...extra };
+  throw new Error('Missing test word: ' + en);
+}
+const TEST_WORD_ROWS = TEST_ROWS.map(row => row.map(findUnitWord));
+const TEST_WORDS = TEST_WORD_ROWS.flat();
+const TEST_TOPIC = {
+  id: "test-nov", nameHe: "מבחן 6.11", nameEn: "Test 6.11", icon: "📝",
+  words: TEST_WORDS, unit: true, test: true,
+};
+
 const TOPICS = [
+  TEST_TOPIC,
   ...UNIT_TOPICS,
   {
     id: "colors", nameHe: "צבעים", nameEn: "Colors", icon: "🎨",
@@ -808,9 +960,50 @@ const MODES = [
   { id: "unit-pic-to-word",  icon: "🖼️", nameHe: "תמונה ← מילה",    descHe: "רואים רק תמונה ובוחרים את המילה באנגלית" },
   { id: "unit-en-to-he",     icon: "🇬🇧", nameHe: "אנגלית ← עברית", descHe: "רואים מילה באנגלית ובוחרים את התרגום בעברית" },
 ];
+// Mixed mode: every question is a random one of the 4 games (like the real test)
+const MIX_MODE = { id: "mix", icon: "🎲", nameHe: "מעורב — כמו במבחן", descHe: "כל שאלה היא משחק אחר: שומעים, תמונה, מילה או עברית" };
+const modeById = id => MODES.find(m => m.id === id) || MIX_MODE;
 
 const WORDS_PER_ROUND = 10;
 const ROUND_OPTIONS = [1, 3, 5];
+
+// Test practice: a fixed bank of 50 questions (word × game type) built from the
+// 24 test words; every practice run picks 20 of them, mixing all game types.
+const TEST_BANK_SIZE = 50;
+const TEST_QUESTIONS = 20;
+function seededRandom(seed) {
+  return function () {
+    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+function buildTestBank() {
+  const rng = seededRandom(20261106);
+  const combos = [];
+  TEST_WORDS.forEach(word => MODES.forEach(m => combos.push({ word, modeId: m.id })));
+  for (let i = combos.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [combos[i], combos[j]] = [combos[j], combos[i]];
+  }
+  // Every word appears at least once, then fill up to 50 with more combos
+  const bank = [];
+  const seenWord = new Set();
+  combos.forEach(c => { if (!seenWord.has(c.word.en)) { seenWord.add(c.word.en); bank.push(c); } });
+  combos.forEach(c => { if (bank.length < TEST_BANK_SIZE && !bank.includes(c)) bank.push(c); });
+  return bank.slice(0, TEST_BANK_SIZE);
+}
+const TEST_BANK = buildTestBank();
+function pickTestQuestions() {
+  const pool = shuffleArray([...TEST_BANK]);
+  const picked = [];
+  const used = new Set();
+  // Prefer 20 different words, then fill from what is left
+  pool.forEach(c => { if (picked.length < TEST_QUESTIONS && !used.has(c.word.en)) { used.add(c.word.en); picked.push(c); } });
+  pool.forEach(c => { if (picked.length < TEST_QUESTIONS && !picked.includes(c)) picked.push(c); });
+  return shuffleArray(picked);
+}
 
 // ============================================================
 //  STATE
@@ -830,6 +1023,8 @@ let isAnswered = false;
 let currentQuestion = null;
 let advanceTimer = null;
 let soundOn = true;
+let isTestRun = false;
+let missedWords = [];
 
 // ============================================================
 //  STORAGE (best scores, sound pref) — optional, never required
@@ -909,19 +1104,57 @@ function speakerButton(text, lang, cls = 'speaker-btn', title = '🔊') {
   return b;
 }
 function sample(arr, n) { return shuffleArray([...arr]).slice(0, n); }
+function chipVisualHtml(word) {
+  if (word.color) return swatchHtml(word.color, 'chip-swatch');
+  if (word.pic) return `<span class="pic chip-pic">${PICS[word.pic]}</span>`;
+  return `<span class="chip-emoji">${word.emoji}</span>`;
+}
+function wordChip(word) {
+  const chip = el('button', 'chunky word-chip',
+    `${chipVisualHtml(word)}<span class="chip-en">${word.en}</span><span class="chip-he">${word.he}</span><span class="chip-speaker">🔊</span>`);
+  chip.title = 'Listen';
+  chip.addEventListener('click', () => speakEnglish(sayOf(word)));
+  return chip;
+}
 
 // ============================================================
 //  WELCOME SCREEN
 // ============================================================
+function buildTestBanner() {
+  // Countdown to the test
+  const today = new Date();
+  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const days = Math.round((TEST_DATE - start) / 86400000);
+  const cd = document.getElementById('countdown');
+  cd.classList.remove('today', 'past');
+  if (days > 1)        cd.textContent = `⏳ עוד ${days} ימים למבחן`;
+  else if (days === 1) cd.textContent = '⏳ המבחן מחר!';
+  else if (days === 0) { cd.textContent = '🎯 המבחן היום! בהצלחה!'; cd.classList.add('today'); }
+  else                 { cd.textContent = '✅ ממשיכים לתרגל!'; cd.classList.add('past'); }
+
+  document.getElementById('test-word-count').textContent = TEST_WORDS.length;
+
+  const list = document.getElementById('word-rows-list');
+  list.innerHTML = '';
+  TEST_WORD_ROWS.forEach((row, i) => {
+    const line = el('div', 'word-row');
+    line.appendChild(el('span', 'row-label', `שורה ${i + 1}`));
+    row.forEach(w => line.appendChild(wordChip(w)));
+    list.appendChild(line);
+  });
+}
+
 function buildWelcome() {
+  buildTestBanner();
   const unitGrid = document.getElementById('unit-topic-grid');
   const topicGrid = document.getElementById('topic-grid');
   unitGrid.innerHTML = '';
   topicGrid.innerHTML = '';
   TOPICS.forEach(topic => {
-    const card = el('button', 'chunky topic-card' + (topic.id === 'colors' ? ' colors-topic' : '') + (topic.unit ? ' unit-topic' : ''));
+    const card = el('button', 'chunky topic-card' + (topic.id === 'colors' ? ' colors-topic' : '') + (topic.unit ? ' unit-topic' : '') + (topic.test ? ' test-topic' : ''));
     card.dataset.id = topic.id;
     card.innerHTML = `
+      ${topic.test ? '<span class="test-badge">מבחן!</span>' : ''}
       <span class="topic-icon">${topic.icon}</span>
       <div class="topic-name-he">${topic.nameHe}</div>
       <div class="topic-name-en">${topic.nameEn}</div>
@@ -961,8 +1194,9 @@ function buildModes() {
     return;
   }
   modeGrid.style.gridTemplateColumns = '';
-  MODES.forEach(mode => {
-    const card = el('button', 'chunky mode-card', `
+  [...MODES, MIX_MODE].forEach(mode => {
+    const card = el('button', 'chunky mode-card' + (mode.id === 'mix' ? ' mix-mode' : ''), `
+      ${mode.id === 'mix' ? '<span class="new-badge">חדש!</span>' : ''}
       <span class="mode-icon">${mode.icon}</span>
       <div>
         <div class="mode-name">${mode.nameHe}</div>
@@ -977,7 +1211,7 @@ function buildModes() {
 function selectTopic(id) {
   sfx.tap();
   selectedTopic = id;
-  if (!selectedMode) selectedMode = MODES[0].id;
+  if (!selectedMode) selectedMode = id === TEST_TOPIC.id ? MIX_MODE.id : MODES[0].id;
   buildModes();
   refreshSelections();
 }
@@ -999,33 +1233,44 @@ function refreshSelections() {
 //  Each returns { key, prompt: Element, options: [{key, html, cls, speakEn, speakHe}],
 //                 autoSpeak(), answerEn, answerSay, answerHe }
 // ============================================================
+// A queue item is { word, modeId }. In mixed mode each word gets a random game type.
 function buildPool() {
+  if (isTestRun) return pickTestQuestions();
   const topic = TOPICS.find(t => t.id === selectedTopic);
-  return sample(topic.words, WORDS_PER_ROUND);
+  return sample(topic.words, WORDS_PER_ROUND).map(word => ({
+    word,
+    modeId: selectedMode === 'mix' ? MODES[Math.floor(Math.random() * MODES.length)].id : selectedMode,
+  }));
 }
 
-function makeQuestion(word) {
+function makeQuestion(item) {
+  const word = item.word;
+  const modeId = item.modeId;
   const topic = TOPICS.find(t => t.id === selectedTopic);
   const prompt = el('div', 'prompt-card');
   const picKey = w => w.color || w.pic || w.emoji;
   // Wrong answers never share the right answer's picture or translation
   const others = topic.words.filter(w => w.en !== word.en && picKey(w) !== picKey(word) && w.he !== word.he);
-  const choices = shuffleArray([word, ...sample(others, 3)]);
+  // For a color word, prefer other colors as the wrong answers
+  const sameKind = word.color ? others.filter(w => w.color) : [];
+  const distractors = sameKind.length >= 3 ? sample(sameKind, 3)
+    : [...sameKind, ...sample(others.filter(w => !sameKind.includes(w)), 3 - sameKind.length)];
+  const choices = shuffleArray([word, ...distractors]);
   let autoSpeak = () => {};
   let optionFor;
 
-  if (selectedMode === 'unit-listen') {
+  if (modeId === 'unit-listen') {
     prompt.appendChild(el('div', 'prompt-question', 'מה שמעתם?'));
     const row = el('div');
     row.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn big', 'Listen'));
     prompt.appendChild(row);
     autoSpeak = () => speakEnglish(sayOf(word));
     optionFor = o => ({ key: o.en, html: `${visualHtml(o, 'option')}<span class="option-text english">${o.en}</span>` });
-  } else if (selectedMode === 'unit-word-to-pic') {
+  } else if (modeId === 'unit-word-to-pic') {
     prompt.innerHTML = `<div class="prompt-word english">${word.en}</div><div class="prompt-question">איזו תמונה מתאימה?</div>`;
     prompt.appendChild(speakerButton(sayOf(word), 'en', 'speaker-btn', 'Listen'));
     optionFor = o => ({ key: o.en, cls: 'pic-only', html: visualHtml(o, 'option') });
-  } else if (selectedMode === 'unit-pic-to-word') {
+  } else if (modeId === 'unit-pic-to-word') {
     prompt.innerHTML = `${visualHtml(word, 'prompt')}<div class="prompt-question">מה זה באנגלית?</div>`;
     optionFor = o => ({ key: o.en, speakEn: sayOf(o), html: `<span class="option-text english">${o.en}</span>` });
   } else {
@@ -1036,7 +1281,7 @@ function makeQuestion(word) {
   }
 
   return {
-    key: word.en, prompt, autoSpeak,
+    key: word.en, prompt, autoSpeak, word, modeId,
     options: choices.map(optionFor),
     answerEn: word.en, answerSay: sayOf(word), answerHe: word.he,
   };
@@ -1049,12 +1294,25 @@ function startGame() {
   if (!selectedTopic || !selectedMode || !selectedRounds) return;
   document.getElementById('confetti-container').innerHTML = '';
   currentRound = 0; score = 0; correctCount = 0; totalAnswered = 0; streak = 0; bestStreak = 0;
+  missedWords = [];
   const topic = TOPICS.find(t => t.id === selectedTopic);
-  const mode = MODES.find(m => m.id === selectedMode);
-  document.getElementById('game-header-title').textContent = `${topic.icon} ${topic.nameHe} · ${mode.nameHe}`;
+  const mode = modeById(selectedMode);
+  document.getElementById('game-header-title').textContent = isTestRun
+    ? `📝 תרגול מבחן 6.11 · ${TEST_QUESTIONS} שאלות מעורבות`
+    : `${topic.icon} ${topic.nameHe} · ${mode.nameHe}`;
   updateHud();
   showScreen('game-screen');
   startNextRound();
+}
+
+// Test practice: 20 mixed questions out of the 50-question bank, one round
+function startTest() {
+  sfx.tap();
+  isTestRun = true;
+  selectedTopic = TEST_TOPIC.id;
+  selectedMode = MIX_MODE.id;
+  selectedRounds = 1;
+  startGame();
 }
 
 function startNextRound() {
@@ -1084,10 +1342,15 @@ function showQuestion() {
   const pct = (questionIndex / questionQueue.length) * 100;
   document.getElementById('progress-bar').style.width = Math.max(pct, 3) + '%';
   document.getElementById('progress-text').textContent = `שאלה ${questionIndex + 1} / ${questionQueue.length}`;
-  document.getElementById('round-text').textContent = selectedRounds > 1 ? `סיבוב ${currentRound} / ${selectedRounds}` : '';
 
   currentQuestion = makeQuestion(questionQueue[questionIndex]);
   const q = currentQuestion;
+  // In mixed games, show which game type this question is
+  const roundText = selectedRounds > 1 ? `סיבוב ${currentRound} / ${selectedRounds}` : '';
+  const m = modeById(q.modeId);
+  document.getElementById('round-text').innerHTML = selectedMode === 'mix'
+    ? `<span class="type-tag">${m.icon} ${m.nameHe}</span>${roundText ? ' · ' + roundText : ''}`
+    : roundText;
   const area = document.getElementById('question-area');
   area.innerHTML = '';
   area.appendChild(q.prompt);
@@ -1134,6 +1397,7 @@ function handleAnswer(btn, chosenKey, grid) {
   } else {
     btn.classList.add('wrong');
     streak = 0;
+    if (!missedWords.some(w => w.en === q.word.en)) missedWords.push(q.word);
     grid.querySelectorAll('.option-btn').forEach(b => {
       if (b.dataset.key === q.key) b.classList.add('correct');
       else if (b !== btn) b.classList.add('dim');
@@ -1189,6 +1453,24 @@ function showResults() {
   if (pct < 0.4)      { emoji = '💪'; title = 'לא מוותרים!'; subtitle = 'נסו שוב, אתם יכולים!'; }
   else if (pct < 0.7) { emoji = '😊'; title = 'לא רע!'; subtitle = 'כמעט שם, עוד פעם!'; }
   else if (pct < 0.9) { emoji = '🌟'; title = 'יופי!'; subtitle = 'עבודה מצוינת!'; }
+  if (isTestRun) {
+    subtitle = pct >= 0.9 ? 'מוכנים למבחן ב-6.11! 📝' : pct >= 0.7 ? 'עוד תרגול אחד ואתם מוכנים למבחן!' : 'חזרו על המילים למטה ונסו שוב!';
+  }
+
+  // Words to review (missed at least once)
+  const review = document.getElementById('review-slot');
+  review.innerHTML = '';
+  if (missedWords.length) {
+    const box = el('div', 'review-box');
+    box.appendChild(el('div', 'review-title', `📌 מילים לחזרה (${missedWords.length}) — לחצו כדי לשמוע:`));
+    const list = el('div', 'review-list');
+    missedWords.forEach(w => list.appendChild(wordChip(w)));
+    box.appendChild(list);
+    review.appendChild(box);
+  } else if (totalAnswered > 0) {
+    review.appendChild(el('div', 'review-box clean', '✨ אפס טעויות! כל המילים נכונות!'));
+  }
+  document.getElementById('results-test-btn').style.display = isTestRun ? '' : 'none';
 
   document.getElementById('results-emoji').textContent = emoji;
   document.getElementById('results-title').textContent = title;
@@ -1212,6 +1494,7 @@ function showResults() {
 function goHome() {
   clearTimeout(advanceTimer);
   if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+  isTestRun = false;
   buildWelcome();
   showScreen('welcome-screen');
 }
@@ -1255,7 +1538,9 @@ function launchConfetti() {
 // ============================================================
 //  EVENTS + INIT
 // ============================================================
-document.getElementById('start-btn').addEventListener('click', startGame);
+document.getElementById('start-btn').addEventListener('click', () => { isTestRun = false; startGame(); });
+document.getElementById('test-btn').addEventListener('click', startTest);
+document.getElementById('results-test-btn').addEventListener('click', startTest);
 document.getElementById('home-btn').addEventListener('click', goHome);
 document.getElementById('results-home-btn').addEventListener('click', goHome);
 document.getElementById('replay-btn').addEventListener('click', startGame);

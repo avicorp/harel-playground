@@ -111,7 +111,7 @@ export const games: Game[] = [
     titleHe: "לומדים אנגלית 3",
     emoji: "📄",
     description:
-      "Learn English 3.0 — the class word list for units 1+2 in 10 new categories, plus all the older topics. Every category has the same 4 games: listen and choose, word to picture, picture to word, and English to Hebrew.",
+      "Learn English 3.0 — get ready for the 6.11 test! Practice the 24 words of exercise 23 with 20 mixed questions out of a 50-question bank, plus the full units 1+2 word list. Every category has 4 games (listen, word to picture, picture to word, English to Hebrew) and a new mixed mode.",
     path: "/games/english-learning-v3/index.html",
   },
 ];

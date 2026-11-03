@@ -58,7 +58,7 @@ harel-playground/
 | `public/games/read-it-to-me/` | Practice reading Hebrew words with nikud! |
 | `public/games/division-remainder/` | Practice division with remainders for 6th grade! |
 | `public/games/function-explorer/` | Plot functions, drag m and b, compose g(f(x)) and see the inverse! |
-| `public/games/english-learning-v3/` | Learn English 3.0 — units 1+2 word list in 10 categories with 4 games (listen, word→picture, picture→word, English→Hebrew)! |
+| `public/games/english-learning-v3/` | Learn English 3.0 — test prep for 6.11 (24 words of exercise 23, 20 mixed questions out of a 50-question bank) plus units 1+2 word list in 10 categories with 4 games (listen, word→picture, picture→word, English→Hebrew) and a mixed mode! |
 
 ## Development
 

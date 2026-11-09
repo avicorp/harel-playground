@@ -702,6 +702,235 @@
       border-radius: 50%;
       pointer-events: none;
     }
+
+    /* ===== FULL TEXT READING ===== */
+    .btn-text {
+      background: linear-gradient(135deg, var(--btn-super), #ea580c);
+      color: white;
+      font-size: 24px;
+      padding: 14px 40px;
+      box-shadow: 0 4px 20px rgba(251, 146, 60, 0.35);
+      margin-bottom: 14px;
+    }
+
+    #texts-screen {
+      padding: 40px 20px;
+      overflow-y: auto;
+      gap: 20px;
+    }
+
+    .texts-title {
+      font-size: 36px;
+      font-weight: bold;
+    }
+
+    .texts-subtitle {
+      font-size: 18px;
+      color: var(--text-secondary);
+    }
+
+    .texts-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 100%;
+      max-width: 560px;
+    }
+
+    .text-card {
+      background: var(--bg-card);
+      border: 2px solid transparent;
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      cursor: pointer;
+      transition: all 0.25s;
+      text-align: right;
+    }
+
+    .text-card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--btn-super);
+      transform: translateY(-2px);
+    }
+
+    .text-card-emoji { font-size: 44px; }
+
+    .text-card-title {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .text-card-meta {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    #text-screen {
+      justify-content: flex-start;
+    }
+
+    .text-top-bar {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 20px;
+      background: rgba(10, 22, 40, 0.85);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      flex-shrink: 0;
+      z-index: 2;
+    }
+
+    .text-top-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: var(--text-primary);
+      text-align: center;
+      flex: 1;
+      padding: 0 10px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .text-top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .text-icon-btn {
+      background: var(--bg-card);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-primary);
+      border-radius: var(--radius-sm);
+      font-family: inherit;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+      padding: 8px 14px;
+      transition: background 0.15s;
+    }
+
+    .text-icon-btn:hover { background: var(--bg-card-hover); }
+
+    .text-scroll {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scroll-behavior: auto;
+    }
+
+    .text-page {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 28px 20px 40px;
+    }
+
+    .text-heading {
+      font-size: calc(var(--text-font, 44px) * 1.15);
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 28px;
+      color: var(--gold);
+      line-height: 1.6;
+    }
+
+    .text-paragraph {
+      margin-bottom: 26px;
+    }
+
+    .text-line {
+      font-size: var(--text-font, 44px);
+      line-height: 1.75;
+      padding: 8px 22px;
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-weight: 500;
+      white-space: nowrap;
+      letter-spacing: 0.01em;
+      word-spacing: 0.25em;
+    }
+
+    #text-body.wrap .text-line { white-space: normal; }
+
+    .text-line.odd  { background: rgba(255, 255, 255, 0.10); }
+    .text-line.even { background: rgba(74, 158, 255, 0.10); }
+
+    .text-end {
+      text-align: center;
+      padding: 30px 0 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .btn-read-done {
+      background: linear-gradient(135deg, var(--btn-syllable), #16a34a);
+      color: white;
+      font-size: 30px;
+      padding: 18px 60px;
+      box-shadow: 0 4px 24px rgba(74, 222, 128, 0.4);
+    }
+
+    .text-read-count {
+      font-size: 16px;
+      color: var(--text-muted);
+    }
+
+    .text-hint {
+      font-size: 18px;
+      color: var(--text-secondary);
+      min-height: 26px;
+      transition: opacity 0.3s;
+    }
+
+    .text-hint.slow-warning { color: var(--btn-super); }
+
+    /* Fireworks */
+    .fireworks-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 200;
+    }
+
+    .fireworks-message {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.6);
+      font-size: 54px;
+      font-weight: bold;
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(251, 191, 36, 0.8), 0 4px 12px rgba(0,0,0,0.6);
+      opacity: 0;
+      transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      pointer-events: none;
+      z-index: 201;
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .fireworks-message.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    @media (max-width: 600px) {
+      .text-line { padding: 6px 12px; }
+      .text-top-title { font-size: 18px; }
+      .fireworks-message { font-size: 36px; white-space: normal; width: 90%; }
+    }
   </style>
 </head>
 <body>
@@ -714,6 +943,7 @@
     <div id="start-char-name" class="character-name-label"></div>
     <div id="start-char-level" class="character-level-label"></div>
     <button class="btn btn-play" onclick="startGame()">שחק!</button>
+    <button class="btn btn-text" onclick="openFullText()">📖 קריאת טקסט מלא</button>
     <div class="start-links">
       <button class="btn-link" onclick="showScreen('quest')">מפת דמויות</button>
       <button class="btn-link" onclick="showScreen('settings')">הגדרות</button>
@@ -809,6 +1039,37 @@
     </div>
 
     <button class="btn btn-secondary settings-back" onclick="showScreen('start')">חזרה</button>
+  </div>
+
+  <!-- ===== TEXTS LIST SCREEN ===== -->
+  <div id="texts-screen" class="screen">
+    <div class="texts-title">קְרִיאַת טֶקְסְט מָלֵא</div>
+    <div class="texts-subtitle">בחר סיפור, קרא לאט עד הסוף — וקבל זיקוקים!</div>
+    <div id="texts-list" class="texts-list"></div>
+    <button class="btn btn-secondary" onclick="showScreen('start')">חזרה</button>
+  </div>
+
+  <!-- ===== FULL TEXT READER SCREEN ===== -->
+  <div id="text-screen" class="screen">
+    <div class="text-top-bar">
+      <button class="text-icon-btn" onclick="closeTextReader()">→ חזרה</button>
+      <div id="text-top-title" class="text-top-title"></div>
+      <div class="text-top-actions">
+        <button class="text-icon-btn" onclick="changeTextFont(-1)" title="הקטן">A-</button>
+        <button class="text-icon-btn" onclick="changeTextFont(1)" title="הגדל">A+</button>
+      </div>
+    </div>
+    <div id="text-scroll" class="text-scroll">
+      <div class="text-page">
+        <div id="text-heading" class="text-heading"></div>
+        <div id="text-body"></div>
+        <div class="text-end">
+          <div id="text-hint" class="text-hint"></div>
+          <button class="btn btn-read-done" onclick="textReadDone()">קָרָאתִי!</button>
+          <div id="text-read-count" class="text-read-count"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
 <script>
@@ -1098,7 +1359,9 @@ const screens = {
   game: document.getElementById('game-screen'),
   complete: document.getElementById('complete-screen'),
   quest: document.getElementById('quest-screen'),
-  settings: document.getElementById('settings-screen')
+  settings: document.getElementById('settings-screen'),
+  texts: document.getElementById('texts-screen'),
+  text: document.getElementById('text-screen')
 };
 
 function showScreen(name) {
@@ -1108,6 +1371,7 @@ function showScreen(name) {
   if (name === 'start') renderStartScreen();
   if (name === 'quest') renderQuestMap();
   if (name === 'settings') renderSettings();
+  if (name === 'texts') renderTextsList();
 }
 
 // ===== START SCREEN =====
@@ -1590,6 +1854,474 @@ function shuffle(arr) {
   }
   return a;
 }
+
+// ===== FULL TEXT STORIES =====
+// Each story is a list of paragraphs. Paragraphs are split into lines of
+// at most TEXT_MAX_WORDS words at render time (sentence boundaries first).
+const TEXT_MAX_WORDS = 4;
+const TEXT_FONT_SIZES = [26, 30, 34, 40, 46, 54, 62];
+
+const STORIES = [
+  {
+    id: 'bansko',
+    emoji: '⛷️',
+    title: 'יוּבַל וְאַבָּא בְּבַנְסְקוֹ',
+    paragraphs: [
+      'בְּיוֹם חֹרֶף קַר אֶחָד, בְּחֹדֶשׁ יָנוּאָר, הִתְעוֹרֵר יוּבַל מֻקְדָּם מְאוֹד. הַיּוֹם הוּא וְאַבָּא טָסִים לְחֻפְשַׁת סְקִי בְּבַנְסְקוֹ שֶׁבְּבוּלְגַּרְיָה!',
+      '"אַבָּא, קוּם!" קָרָא יוּבַל בְּשִׂמְחָה. "הַמָּטוֹס לֹא יְחַכֶּה לָנוּ!" אַבָּא צָחַק, וְיַחַד הֵם אָרְזוּ אֶת הַמִּזְוָדוֹת: מְעִילִים חַמִּים, כְּפָפוֹת, כּוֹבָעִים וְגַרְבַּיִם עָבִים.',
+      'בִּשְׂדֵה הַתְּעוּפָה יוּבַל הִסְתַּכֵּל מֵהַחַלּוֹן הַגָּדוֹל וְרָאָה מְטוֹסִים מַמְרִיאִים וְנוֹחֲתִים. "אֵיזֶה מָטוֹס שֶׁלָּנוּ?" שָׁאַל. אַבָּא הִצְבִּיעַ עַל מָטוֹס לָבָן וְכָחֹל. "הִנֵּה הוּא!"',
+      'בַּמָּטוֹס יוּבַל יָשַׁב לְיַד הַחַלּוֹן. כְּשֶׁהַמָּטוֹס הִמְרִיא, הַבֶּטֶן שֶׁלּוֹ דִּגְדְּגָה קְצָת, וְהוּא צָחַק. מִלְמַעְלָה הָעֲנָנִים נִרְאוּ כְּמוֹ כָּרִיּוֹת רַכּוֹת וּלְבָנוֹת. "אוּלַי אֶפְשָׁר לִקְפֹּץ עֲלֵיהֶם?" שָׁאַל יוּבַל. "רַק בַּדִּמְיוֹן," עָנָה אַבָּא וְחִיֵּךְ.',
+      'אַחֲרֵי הַנְּחִיתָה הֵם נָסְעוּ בְּאוֹטוֹבּוּס אֶל הֶהָרִים. בַּחוּץ הַכֹּל הָיָה לָבָן! שֶׁלֶג עַל הָעֵצִים, שֶׁלֶג עַל הַגַּגּוֹת, וַאֲפִלּוּ שֶׁלֶג עַל הַכְּלָבִים שֶׁרָצוּ בָּרְחוֹב. יוּבַל לֹא הֶאֱמִין לְעֵינָיו.',
+      'בַּבֹּקֶר הָרִאשׁוֹן הֵם לָבְשׁוּ אֶת הַמְּעִילִים, נָעֲלוּ מַגְּפֵי סְקִי כְּבֵדִים, וְעָלוּ בָּרַכֶּבֶל אֶל רֹאשׁ הָהָר. הָרַכֶּבֶל הִתְנַדְנֵד קְצָת, וְיוּבַל הֶחֱזִיק חָזָק אֶת הַיָּד שֶׁל אַבָּא. "תִּסְתַּכֵּל לְמַטָּה," אָמַר אַבָּא. "הָאֲנָשִׁים נִרְאִים כְּמוֹ נְמָלִים!"',
+      'לְמַעְלָה חִכָּה לָהֶם מַדְרִיךְ סְקִי בְּשֵׁם גֵּאוֹרְגִי. הוּא לִמֵּד אֶת יוּבַל אֵיךְ לַעֲמֹד עַל הַמִּגְלָשַׁיִם וְאֵיךְ לַעֲצֹר בְּצוּרַת פִּיצָה. בַּהַתְחָלָה יוּבַל נָפַל. וְעוֹד פַּעַם נָפַל. אֲבָל הַשֶּׁלֶג הָיָה רַךְ, וּבְכָל פַּעַם הוּא קָם וְצָחַק.',
+      'אַחֲרֵי שָׁלֹשׁ שָׁעוֹת קָרָה הַקֶּסֶם: יוּבַל גָּלַשׁ בְּמוֹרַד הָהָר לְבַד, בְּלִי לִפֹּל אֲפִלּוּ פַּעַם אַחַת! הָרוּחַ שָׁרְקָה בָּאָזְנַיִם, הַשֶּׁלֶג נִצְנֵץ בַּשֶּׁמֶשׁ, וְיוּבַל הִרְגִּישׁ כְּמוֹ צִפּוֹר. "אַבָּא! רָאִיתָ?" צָעַק. אַבָּא מָחָא כַּפַּיִם וְצָעַק בַּחֲזָרָה: "אַלּוּף!"',
+      'בָּעֶרֶב הֵם יָשְׁבוּ בְּבֵית קָפֶה קָטָן וְחַם, וְשָׁתוּ שׁוֹקוֹ חַם עִם הַרְבֵּה קַצֶּפֶת. בַּחוּץ יָרַד שֶׁלֶג חָדָשׁ, וּפְתִיתִים גְּדוֹלִים רָקְדוּ מוּל הַחַלּוֹן. "אַבָּא," אָמַר יוּבַל, "זֶה הַיּוֹם הֲכִי טוֹב בָּעוֹלָם." "וּמָחָר," אָמַר אַבָּא, "נַעֲשֶׂה אוֹתוֹ שׁוּב!"',
+      'וְכָךְ, בְּכָל בֹּקֶר, יוּבַל וְאַבָּא עָלוּ אֶל הָהָר, גָּלְשׁוּ, נָפְלוּ, קָמוּ וְצָחֲקוּ. וּכְשֶׁחָזְרוּ הַבַּיְתָה, הָיָה לְיוּבַל סִפּוּר אֶחָד גָּדוֹל לְסַפֵּר לְכָל הַחֲבֵרִים.',
+      'סוֹף.'
+    ]
+  }
+];
+
+// Scroll tracking state for the "slow reading" check
+const SLOW_SCROLL = {
+  maxDownVelocity: 900,   // px/sec — faster than this (going down) counts as "fast"
+  minSecPerLine: 0.6,     // minimum seconds per scrolled line to count as real reading
+  bottomTolerance: 12,    // px
+  topTolerance: 40        // px — returning here re-arms the fireworks
+};
+
+let currentStory = null;
+let textFontIndex = 4;
+let textScroll = {
+  armed: true,           // fireworks available on next arrival at the bottom
+  fast: false,           // a fast downward scroll was detected since arming
+  startTime: null,       // when the reader left the top
+  lastTop: 0,
+  lastTime: 0,
+  samples: []            // recent {t, y} for velocity smoothing
+};
+let fireworksShow = null; // active show controller, if any
+
+function storyWordCount(story) {
+  return story.paragraphs.join(' ').split(/\s+/).filter(Boolean).length;
+}
+
+function getTextReads(storyId) {
+  if (!state.textReads) state.textReads = {};
+  return state.textReads[storyId] || 0;
+}
+
+// ----- texts list -----
+function renderTextsList() {
+  const list = document.getElementById('texts-list');
+  list.innerHTML = '';
+  STORIES.forEach((story, i) => {
+    const card = document.createElement('div');
+    card.className = 'text-card';
+    card.onclick = () => openTextReader(i);
+
+    const emoji = document.createElement('div');
+    emoji.className = 'text-card-emoji';
+    emoji.textContent = story.emoji;
+
+    const info = document.createElement('div');
+    const title = document.createElement('div');
+    title.className = 'text-card-title';
+    title.textContent = story.title;
+    const meta = document.createElement('div');
+    meta.className = 'text-card-meta';
+    const reads = getTextReads(story.id);
+    meta.textContent = `${storyWordCount(story)} מילים` + (reads ? ` • נקרא ${reads} פעמים` : '');
+    info.appendChild(title);
+    info.appendChild(meta);
+
+    card.appendChild(emoji);
+    card.appendChild(info);
+    list.appendChild(card);
+  });
+}
+
+function openFullText() {
+  if (STORIES.length === 1) {
+    openTextReader(0);
+  } else {
+    showScreen('texts');
+  }
+}
+
+// ----- line splitting -----
+// Split a paragraph into lines of at most TEXT_MAX_WORDS words. Sentences are
+// kept whole where possible and long sentences are split into balanced chunks.
+function splitIntoLines(paragraph, maxWords) {
+  const words = paragraph.split(/\s+/).filter(Boolean);
+  const sentences = [];
+  let current = [];
+  words.forEach(w => {
+    current.push(w);
+    // Sentence ends on . ! ? : (possibly followed by a closing quote)
+    if (/[.!?:]["”]?$/.test(w)) {
+      sentences.push(current);
+      current = [];
+    }
+  });
+  if (current.length) sentences.push(current);
+
+  const lines = [];
+  sentences.forEach(sentence => {
+    const n = sentence.length;
+    const chunks = Math.ceil(n / maxWords);
+    const base = Math.floor(n / chunks);
+    let extra = n % chunks;
+    let idx = 0;
+    for (let c = 0; c < chunks; c++) {
+      const size = base + (extra > 0 ? 1 : 0);
+      if (extra > 0) extra--;
+      lines.push(sentence.slice(idx, idx + size).join(' '));
+      idx += size;
+    }
+  });
+  return lines;
+}
+
+// ----- reader -----
+function openTextReader(index) {
+  currentStory = STORIES[index];
+  showScreen('text');
+
+  document.getElementById('text-top-title').textContent = currentStory.title;
+  document.getElementById('text-heading').textContent = currentStory.title;
+  textFontIndex = 4;
+
+  const body = document.getElementById('text-body');
+  body.innerHTML = '';
+  currentStory.paragraphs.forEach(p => {
+    const para = document.createElement('div');
+    para.className = 'text-paragraph';
+    splitIntoLines(p, TEXT_MAX_WORDS).forEach(lineText => {
+      const line = document.createElement('div');
+      line.className = 'text-line';
+      line.textContent = lineText;
+      para.appendChild(line);
+    });
+    body.appendChild(para);
+  });
+  restripeLines();
+
+  fitTextFont();
+  updateTextReadCount();
+  setTextHint('גלול לאט וקרא עד הסוף...');
+
+  const scroller = document.getElementById('text-scroll');
+  scroller.scrollTop = 0;
+  resetScrollTracking();
+}
+
+function closeTextReader() {
+  speechSynthesis.cancel();
+  showScreen('start');
+}
+
+function applyTextFont() {
+  document.documentElement.style.setProperty('--text-font', TEXT_FONT_SIZES[textFontIndex] + 'px');
+  // If a line is too wide even for one line, let it wrap instead of clipping
+  const body = document.getElementById('text-body');
+  body.classList.remove('wrap');
+  if (linesOverflow()) body.classList.add('wrap');
+}
+
+function linesOverflow() {
+  const lines = document.querySelectorAll('#text-body .text-line');
+  for (const line of lines) {
+    if (line.scrollWidth > line.clientWidth + 1) return true;
+  }
+  return false;
+}
+
+// Alternate the line background colors (even / odd) over the whole text
+function restripeLines() {
+  document.querySelectorAll('#text-body .text-line').forEach((line, i) => {
+    line.classList.toggle('even', i % 2 === 0);
+    line.classList.toggle('odd', i % 2 === 1);
+  });
+}
+
+// Make every line fit on one line: first shrink the font (never below the
+// comfortable minimum), then split lines that are still too wide in two.
+const TEXT_DEFAULT_FONT_INDEX = 4; // 46px
+const TEXT_MIN_FIT_FONT_INDEX = 2; // 34px
+
+function fitTextFont() {
+  textFontIndex = TEXT_DEFAULT_FONT_INDEX;
+  document.getElementById('text-body').classList.remove('wrap');
+  document.documentElement.style.setProperty('--text-font', TEXT_FONT_SIZES[textFontIndex] + 'px');
+  while (textFontIndex > TEXT_MIN_FIT_FONT_INDEX && linesOverflow()) {
+    textFontIndex--;
+    document.documentElement.style.setProperty('--text-font', TEXT_FONT_SIZES[textFontIndex] + 'px');
+  }
+  // Split lines that are still too wide (narrow screens)
+  let guard = 0;
+  while (linesOverflow() && guard++ < 10) {
+    let splitAny = false;
+    document.querySelectorAll('#text-body .text-line').forEach(line => {
+      if (line.scrollWidth <= line.clientWidth + 1) return;
+      const words = line.textContent.trim().split(/\s+/);
+      if (words.length < 2) return;
+      const half = Math.ceil(words.length / 2);
+      const second = document.createElement('div');
+      second.className = 'text-line';
+      second.textContent = words.slice(half).join(' ');
+      line.textContent = words.slice(0, half).join(' ');
+      line.after(second);
+      splitAny = true;
+    });
+    if (!splitAny) break;
+  }
+  restripeLines();
+  applyTextFont();
+}
+
+function changeTextFont(delta) {
+  textFontIndex = Math.max(0, Math.min(TEXT_FONT_SIZES.length - 1, textFontIndex + delta));
+  applyTextFont();
+}
+
+window.addEventListener('resize', () => {
+  if (screens.text.classList.contains('active')) applyTextFont();
+});
+
+function updateTextReadCount() {
+  const reads = getTextReads(currentStory.id);
+  document.getElementById('text-read-count').textContent =
+    reads === 0 ? '' : reads === 1 ? 'קראת את הסיפור פעם אחת' : `קראת את הסיפור ${reads} פעמים`;
+}
+
+function setTextHint(text, warning) {
+  const hint = document.getElementById('text-hint');
+  hint.textContent = text;
+  hint.className = 'text-hint' + (warning ? ' slow-warning' : '');
+}
+
+// ----- slow-scroll detection -----
+function resetScrollTracking() {
+  const scroller = document.getElementById('text-scroll');
+  textScroll.armed = true;
+  textScroll.fast = false;
+  textScroll.startTime = null;
+  textScroll.lastTop = scroller.scrollTop;
+  textScroll.lastTime = performance.now();
+  textScroll.samples = [];
+}
+
+function onTextScroll() {
+  const scroller = document.getElementById('text-scroll');
+  const now = performance.now();
+  const top = scroller.scrollTop;
+  const maxTop = scroller.scrollHeight - scroller.clientHeight;
+
+  // Re-arm when the reader comes back to the top
+  if (top <= SLOW_SCROLL.topTolerance) {
+    if (!textScroll.armed || textScroll.fast) {
+      textScroll.armed = true;
+      textScroll.fast = false;
+      setTextHint('גלול לאט וקרא עד הסוף...');
+    }
+    textScroll.startTime = null;
+    textScroll.samples = [];
+  } else if (textScroll.startTime === null) {
+    textScroll.startTime = now;
+  }
+
+  // Smoothed downward velocity over the last ~250ms
+  textScroll.samples.push({ t: now, y: top });
+  while (textScroll.samples.length && now - textScroll.samples[0].t > 250) {
+    textScroll.samples.shift();
+  }
+  const first = textScroll.samples[0];
+  const dt = (now - first.t) / 1000;
+  if (dt > 0.03) {
+    const velocity = (top - first.y) / dt; // positive = scrolling down
+    if (velocity > SLOW_SCROLL.maxDownVelocity && textScroll.armed && !textScroll.fast) {
+      textScroll.fast = true;
+      setTextHint('אופס, זה היה מהר מדי! חזור למעלה וקרא לאט 🙂', true);
+    }
+  }
+
+  textScroll.lastTop = top;
+  textScroll.lastTime = now;
+
+  // Reached the bottom?
+  if (maxTop > 0 && top >= maxTop - SLOW_SCROLL.bottomTolerance && textScroll.armed) {
+    textScroll.armed = false;
+    const lineHeight = getLineHeightPx();
+    const linesScrolled = Math.max(1, maxTop / lineHeight);
+    const elapsedSec = textScroll.startTime ? (now - textScroll.startTime) / 1000 : 0;
+    const slowEnough = !textScroll.fast && elapsedSec >= linesScrolled * SLOW_SCROLL.minSecPerLine;
+
+    if (slowEnough) {
+      setTextHint('הגעת לסוף! 🎉');
+      launchFireworks('כָּל הַכָּבוֹד! קָרָאתָ הַכֹּל! 🎆');
+    } else if (!textScroll.fast) {
+      textScroll.fast = true;
+      setTextHint('אופס, זה היה מהר מדי! חזור למעלה וקרא לאט 🙂', true);
+    }
+  }
+}
+
+function getLineHeightPx() {
+  const line = document.querySelector('#text-body .text-line');
+  return line ? Math.max(1, line.getBoundingClientRect().height) : 60;
+}
+
+// ----- "I read it" button -----
+function textReadDone() {
+  if (!currentStory) return;
+  if (!state.textReads) state.textReads = {};
+  state.textReads[currentStory.id] = getTextReads(currentStory.id) + 1;
+  saveState();
+  updateTextReadCount();
+  setTextHint('איזה יופי! 🎉');
+  launchFireworks('קָרָאתָ! כָּל הַכָּבוֹד! 🎆');
+}
+
+// ----- fireworks show -----
+function launchFireworks(message, duration = 4500) {
+  // A show is already running: extend it and update the message
+  if (fireworksShow) {
+    fireworksShow.extend(message, duration);
+    return;
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.className = 'fireworks-canvas';
+  document.body.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+
+  const msgEl = document.createElement('div');
+  msgEl.className = 'fireworks-message';
+  msgEl.textContent = message;
+  document.body.appendChild(msgEl);
+  requestAnimationFrame(() => msgEl.classList.add('show'));
+
+  function resize() {
+    canvas.width = window.innerWidth * devicePixelRatio;
+    canvas.height = window.innerHeight * devicePixelRatio;
+    ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  const W = () => window.innerWidth;
+  const H = () => window.innerHeight;
+  const colors = ['#fb923c', '#fbbf24', '#f472b6', '#4ade80', '#4a9eff', '#a78bfa', '#f87171', '#ffffff'];
+  const rockets = [];
+  const particles = [];
+  const start = performance.now();
+  let endTime = start + duration;
+  let lastLaunch = 0;
+  let lastFrame = start;
+
+  fireworksShow = {
+    extend(newMessage, extraDuration) {
+      endTime = Math.max(endTime, performance.now() + extraDuration);
+      msgEl.textContent = newMessage;
+      msgEl.classList.add('show');
+    }
+  };
+
+  function launchRocket() {
+    rockets.push({
+      x: W() * (0.15 + Math.random() * 0.7),
+      y: H(),
+      vx: (Math.random() - 0.5) * 60,
+      vy: -(H() * 0.9 + Math.random() * H() * 0.4),
+      targetY: H() * (0.15 + Math.random() * 0.35),
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+
+  function explode(r) {
+    const count = 60 + Math.floor(Math.random() * 40);
+    const twoColor = Math.random() > 0.5;
+    const c2 = colors[Math.floor(Math.random() * colors.length)];
+    for (let i = 0; i < count; i++) {
+      const angle = (Math.PI * 2 * i) / count + Math.random() * 0.1;
+      const speed = 120 + Math.random() * 260;
+      particles.push({
+        x: r.x, y: r.y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        life: 1,
+        decay: 0.5 + Math.random() * 0.5,
+        size: 2 + Math.random() * 2.5,
+        color: twoColor && i % 2 ? c2 : r.color
+      });
+    }
+  }
+
+  function frame(now) {
+    const dt = Math.min(0.05, (now - lastFrame) / 1000);
+    lastFrame = now;
+    const remaining = endTime - now;
+
+    if (remaining > 1200 && now - lastLaunch > 260) {
+      launchRocket();
+      if (Math.random() > 0.6) launchRocket();
+      lastLaunch = now;
+    }
+
+    // Fade trail
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.fillStyle = 'rgba(0,0,0,0.22)';
+    ctx.fillRect(0, 0, W(), H());
+    ctx.globalCompositeOperation = 'lighter';
+
+    for (let i = rockets.length - 1; i >= 0; i--) {
+      const r = rockets[i];
+      r.x += r.vx * dt;
+      r.y += r.vy * dt;
+      r.vy += 500 * dt;
+      ctx.beginPath();
+      ctx.arc(r.x, r.y, 3, 0, Math.PI * 2);
+      ctx.fillStyle = r.color;
+      ctx.fill();
+      if (r.y <= r.targetY || r.vy >= -40) {
+        explode(r);
+        rockets.splice(i, 1);
+      }
+    }
+
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.x += p.vx * dt;
+      p.y += p.vy * dt;
+      p.vy += 220 * dt;
+      p.vx *= 0.985;
+      p.vy *= 0.985;
+      p.life -= p.decay * dt;
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+      ctx.globalAlpha = Math.max(0, p.life);
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+      ctx.fillStyle = p.color;
+      ctx.fill();
+    }
+    ctx.globalAlpha = 1;
+
+    if (remaining < 800) msgEl.classList.remove('show');
+
+    if (remaining > 0 || rockets.length || particles.length) {
+      requestAnimationFrame(frame);
+    } else {
+      window.removeEventListener('resize', resize);
+      canvas.remove();
+      msgEl.remove();
+      fireworksShow = null;
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+document.getElementById('text-scroll').addEventListener('scroll', onTextScroll, { passive: true });
 
 // ===== INIT =====
 renderStartScreen();

@@ -85,7 +85,8 @@ export const games: Game[] = [
     title: "Read It To Me",
     titleHe: "תקרא לי",
     emoji: "📖",
-    description: "Practice reading Hebrew words with nikud! Listen, split syllables, and level up your characters.",
+    description:
+      "Practice reading Hebrew words with nikud! Listen, split syllables, and level up your characters. Full-text mode: read a nikud story in big 4-word lines, scroll slowly to the end and get a fireworks show.",
     path: "/games/read-it-to-me/index.html",
   },
   {

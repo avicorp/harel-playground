@@ -869,6 +869,22 @@
 
     #text-body.wrap .text-line { white-space: normal; }
 
+    /* Hiriq highlight (both hiriq male and hiriq haser) */
+    .hiriq {
+      color: #c084fc;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(192, 132, 252, 0.45);
+    }
+
+    #text-body.no-hiriq .hiriq {
+      color: inherit;
+      font-weight: inherit;
+      text-shadow: none;
+    }
+
+    .text-icon-btn.hiriq-toggle { color: #c084fc; }
+    .text-icon-btn.hiriq-toggle.off { color: var(--text-muted); text-decoration: line-through; }
+
     .text-line.odd  { background: rgba(255, 255, 255, 0.10); }
     .text-line.even { background: rgba(74, 158, 255, 0.10); }
 
@@ -1064,6 +1080,7 @@
       <button class="text-icon-btn" onclick="closeTextReader()">→ חזרה</button>
       <div id="text-top-title" class="text-top-title"></div>
       <div class="text-top-actions">
+        <button id="hiriq-toggle" class="text-icon-btn hiriq-toggle" onclick="toggleHiriq()" title="הדגשת חיריק">חִי</button>
         <button class="text-icon-btn" onclick="changeTextFont(-1)" title="הקטן">A-</button>
         <button class="text-icon-btn" onclick="changeTextFont(1)" title="הגדל">A+</button>
       </div>
@@ -2050,7 +2067,7 @@ function openTextReader(index) {
     splitIntoLines(p, TEXT_MAX_WORDS).forEach(lineText => {
       const line = document.createElement('div');
       line.className = 'text-line';
-      line.textContent = lineText;
+      setLineText(line, lineText);
       para.appendChild(line);
     });
     body.appendChild(para);
@@ -2058,6 +2075,7 @@ function openTextReader(index) {
   restripeLines();
 
   fitTextFont();
+  applyHiriqSetting();
   updateTextReadCount();
   setTextHint('גלול לאט וקרא עד הסוף...');
 
@@ -2087,6 +2105,60 @@ function linesOverflow() {
   return false;
 }
 
+// ----- hiriq highlighting -----
+const HIRIQ = '\u05B4';
+const HEBREW_MARK = /[\u0591-\u05C7]/;
+
+function escapeHtml(str) {
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// Split text into clusters: a base character plus its nikud marks
+function hebrewClusters(text) {
+  const clusters = [];
+  for (const ch of text) {
+    if (HEBREW_MARK.test(ch) && clusters.length) clusters[clusters.length - 1] += ch;
+    else clusters.push(ch);
+  }
+  return clusters;
+}
+
+// Wrap every letter with a hiriq in a span. For hiriq male (letter + hiriq
+// followed by a bare yod) the yod is highlighted too.
+function highlightHiriq(text) {
+  const clusters = hebrewClusters(text);
+  let html = '';
+  for (let i = 0; i < clusters.length; i++) {
+    const c = clusters[i];
+    if (c.includes(HIRIQ)) {
+      let group = c;
+      const next = clusters[i + 1];
+      if (next === 'י') { group += next; i++; } // hiriq male: bare yod with no marks
+      html += '<span class="hiriq">' + escapeHtml(group) + '</span>';
+    } else {
+      html += escapeHtml(c);
+    }
+  }
+  return html;
+}
+
+function setLineText(el, text) {
+  el.dataset.text = text;
+  el.innerHTML = highlightHiriq(text);
+}
+
+function applyHiriqSetting() {
+  const on = state.hiriqHighlight !== false;
+  document.getElementById('text-body').classList.toggle('no-hiriq', !on);
+  document.getElementById('hiriq-toggle').classList.toggle('off', !on);
+}
+
+function toggleHiriq() {
+  state.hiriqHighlight = state.hiriqHighlight === false;
+  saveState();
+  applyHiriqSetting();
+}
+
 // Alternate the line background colors (even / odd) over the whole text
 function restripeLines() {
   document.querySelectorAll('#text-body .text-line').forEach((line, i) => {
@@ -2114,13 +2186,13 @@ function fitTextFont() {
     let splitAny = false;
     document.querySelectorAll('#text-body .text-line').forEach(line => {
       if (line.scrollWidth <= line.clientWidth + 1) return;
-      const words = line.textContent.trim().split(/\s+/);
+      const words = (line.dataset.text || line.textContent).trim().split(/\s+/);
       if (words.length < 2) return;
       const half = Math.ceil(words.length / 2);
       const second = document.createElement('div');
       second.className = 'text-line';
-      second.textContent = words.slice(half).join(' ');
-      line.textContent = words.slice(0, half).join(' ');
+      setLineText(second, words.slice(half).join(' '));
+      setLineText(line, words.slice(0, half).join(' '));
       line.after(second);
       splitAny = true;
     });

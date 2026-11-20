@@ -919,6 +919,99 @@
 
     .text-hint.slow-warning { color: var(--btn-super); }
 
+    /* Word counter (top-left of the reader) */
+    .word-counter {
+      position: absolute;
+      top: 78px;
+      left: 14px;
+      z-index: 3;
+      background: rgba(10, 22, 40, 0.88);
+      border: 2px solid var(--gold);
+      border-radius: 18px;
+      padding: 8px 16px 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 86px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      transition: border-color 0.3s, box-shadow 0.3s, filter 0.3s;
+      direction: rtl;
+    }
+
+    .word-counter-num {
+      font-size: 34px;
+      font-weight: bold;
+      color: var(--gold);
+      line-height: 1;
+      transition: color 0.3s;
+    }
+
+    .word-counter-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+    }
+
+    @keyframes counter-happy {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(1.4) rotate(-5deg); }
+      70%  { transform: scale(0.95) rotate(2deg); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes counter-sad {
+      0%   { transform: scale(1); }
+      40%  { transform: scale(0.75) translateY(8px) rotate(4deg); }
+      100% { transform: scale(1); }
+    }
+
+    .word-counter.happy {
+      animation: counter-happy 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      border-color: var(--btn-syllable);
+      box-shadow: 0 0 26px rgba(74, 222, 128, 0.55);
+    }
+
+    .word-counter.happy .word-counter-num { color: var(--btn-syllable); }
+
+    .word-counter.sad {
+      animation: counter-sad 0.55s ease;
+      border-color: #60a5fa;
+      box-shadow: 0 4px 18px rgba(96, 165, 250, 0.25);
+      filter: saturate(0.5);
+    }
+
+    .word-counter.sad .word-counter-num { color: #93c5fd; }
+
+    .counter-float {
+      position: absolute;
+      left: calc(100% + 10px);
+      top: 50%;
+      font-size: 22px;
+      font-weight: bold;
+      white-space: nowrap;
+      pointer-events: none;
+      animation: float-up 1s ease-out forwards;
+    }
+
+    .counter-float.up { color: var(--btn-syllable); text-shadow: 0 0 10px rgba(74, 222, 128, 0.6); }
+
+    .counter-float.down {
+      color: #93c5fd;
+      animation-name: float-down;
+    }
+
+    @keyframes float-up {
+      0%   { opacity: 0; transform: translate(0, -50%) scale(0.8); }
+      20%  { opacity: 1; }
+      100% { opacity: 0; transform: translate(14px, -50%) translateY(-36px) scale(1.25); }
+    }
+
+    @keyframes float-down {
+      0%   { opacity: 0; transform: translate(0, -50%) scale(1); }
+      20%  { opacity: 1; }
+      100% { opacity: 0; transform: translate(14px, -50%) translateY(40px) scale(0.75); }
+    }
+
     /* Fireworks */
     .fireworks-canvas {
       position: fixed;
@@ -954,6 +1047,9 @@
     @media (max-width: 600px) {
       .text-line { padding: 6px 12px; }
       .text-top-title { font-size: 18px; }
+      .text-heading { margin-top: 64px; }
+      .word-counter { top: 70px; left: 10px; min-width: 74px; padding: 6px 12px 5px; }
+      .word-counter-num { font-size: 28px; }
       .fireworks-message { font-size: 36px; white-space: normal; width: 90%; }
     }
   </style>
@@ -1084,6 +1180,10 @@
         <button class="text-icon-btn" onclick="changeTextFont(-1)" title="הקטן">A-</button>
         <button class="text-icon-btn" onclick="changeTextFont(1)" title="הגדל">A+</button>
       </div>
+    </div>
+    <div id="word-counter" class="word-counter">
+      <div id="word-counter-num" class="word-counter-num">0</div>
+      <div class="word-counter-label">מִלִּים</div>
     </div>
     <div id="text-scroll" class="text-scroll">
       <div class="text-page">
@@ -2127,6 +2227,8 @@ function openTextReader(index) {
   const scroller = document.getElementById('text-scroll');
   scroller.scrollTop = 0;
   resetScrollTracking();
+  resetWordCounter();
+  updateWordCounter();
 }
 
 function closeTextReader() {
@@ -2253,10 +2355,15 @@ function fitTextFont() {
 function changeTextFont(delta) {
   textFontIndex = Math.max(0, Math.min(TEXT_FONT_SIZES.length - 1, textFontIndex + delta));
   applyTextFont();
+  cacheLineOffsets();
+  updateWordCounter();
 }
 
 window.addEventListener('resize', () => {
-  if (screens.text.classList.contains('active')) applyTextFont();
+  if (!screens.text.classList.contains('active')) return;
+  applyTextFont();
+  cacheLineOffsets();
+  updateWordCounter();
 });
 
 function updateTextReadCount() {
@@ -2271,6 +2378,86 @@ function setTextHint(text, warning) {
   hint.className = 'text-hint' + (warning ? ' slow-warning' : '');
 }
 
+// ----- word counter -----
+// Counts the words of every line that has fully scrolled into view.
+let lineOffsets = [];      // [{ bottom, words }] in document order, relative to the scroller
+let countedWords = 0;
+let counterFloat = null;   // the current floating "+N" / "-N" bubble
+let counterFloatDelta = 0;
+let counterFloatTime = 0;
+
+function cacheLineOffsets() {
+  const scroller = document.getElementById('text-scroll');
+  const base = scroller.getBoundingClientRect().top - scroller.scrollTop;
+  lineOffsets = [...document.querySelectorAll('#text-body .text-line')].map(line => ({
+    bottom: line.getBoundingClientRect().bottom - base,
+    words: (line.dataset.text || line.textContent).trim().split(/\s+/).filter(Boolean).length
+  }));
+}
+
+function wordsInView() {
+  const scroller = document.getElementById('text-scroll');
+  const visibleBottom = scroller.scrollTop + scroller.clientHeight - 4;
+  let total = 0;
+  for (const line of lineOffsets) {
+    if (line.bottom > visibleBottom) break;
+    total += line.words;
+  }
+  return total;
+}
+
+function resetWordCounter() {
+  countedWords = 0;
+  document.getElementById('word-counter-num').textContent = '0';
+  const counter = document.getElementById('word-counter');
+  counter.classList.remove('happy', 'sad');
+  cacheLineOffsets();
+}
+
+function updateWordCounter() {
+  const target = wordsInView();
+  if (target === countedWords) return;
+  const delta = target - countedWords;
+  countedWords = target;
+
+  const counter = document.getElementById('word-counter');
+  document.getElementById('word-counter-num').textContent = String(target);
+
+  // Restart the pop animation: happy going down the text, sad going back up
+  counter.classList.remove('happy', 'sad');
+  void counter.offsetWidth;
+  counter.classList.add(delta > 0 ? 'happy' : 'sad');
+
+  showCounterFloat(delta);
+}
+
+function showCounterFloat(delta) {
+  const now = performance.now();
+  const sameDirection = counterFloat && Math.sign(counterFloatDelta) === Math.sign(delta);
+  if (counterFloat && sameDirection && now - counterFloatTime < 250) {
+    // Merge quick successive changes into the same bubble
+    counterFloatDelta += delta;
+    counterFloat.textContent = floatText(counterFloatDelta);
+    counterFloatTime = now;
+    return;
+  }
+  const el = document.createElement('div');
+  el.className = 'counter-float ' + (delta > 0 ? 'up' : 'down');
+  el.textContent = floatText(delta);
+  document.getElementById('word-counter').appendChild(el);
+  counterFloat = el;
+  counterFloatDelta = delta;
+  counterFloatTime = now;
+  setTimeout(() => {
+    el.remove();
+    if (counterFloat === el) counterFloat = null;
+  }, 1000);
+}
+
+function floatText(delta) {
+  return delta > 0 ? `+${delta} ✨` : `${delta} 😢`;
+}
+
 // ----- slow-scroll detection -----
 function resetScrollTracking() {
   const scroller = document.getElementById('text-scroll');
@@ -2283,6 +2470,7 @@ function resetScrollTracking() {
 }
 
 function onTextScroll() {
+  updateWordCounter();
   const scroller = document.getElementById('text-scroll');
   const now = performance.now();
   const top = scroller.scrollTop;

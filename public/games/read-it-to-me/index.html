@@ -871,9 +871,9 @@
 
     /* Hiriq highlight (both hiriq male and hiriq haser) */
     .hiriq {
-      color: #c084fc;
+      color: #ff3eb5;
       font-weight: bold;
-      text-shadow: 0 0 10px rgba(192, 132, 252, 0.45);
+      text-shadow: 0 0 14px rgba(255, 62, 181, 0.75);
     }
 
     #text-body.no-hiriq .hiriq {
@@ -882,7 +882,7 @@
       text-shadow: none;
     }
 
-    .text-icon-btn.hiriq-toggle { color: #c084fc; }
+    .text-icon-btn.hiriq-toggle { color: #ff3eb5; }
     .text-icon-btn.hiriq-toggle.off { color: var(--text-muted); text-decoration: line-through; }
 
     .text-line.odd  { background: rgba(255, 255, 255, 0.10); }
@@ -1044,6 +1044,337 @@
       transform: translate(-50%, -50%) scale(1);
     }
 
+    /* ===== STORY QUIZ ===== */
+    .btn-quiz {
+      background: linear-gradient(135deg, #a78bfa, #7c3aed);
+      color: white;
+      font-size: 26px;
+      padding: 16px 48px;
+      box-shadow: 0 4px 24px rgba(167, 139, 250, 0.4);
+    }
+
+    .quiz-best { font-size: 16px; color: var(--gold); }
+
+    #quiz-screen { justify-content: flex-start; }
+    .quiz-top-spacer { width: 90px; }
+
+    .quiz-dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 14px 16px 6px;
+      flex-shrink: 0;
+    }
+
+    .quiz-dot {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: 2px solid var(--text-muted);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quiz-dot.answered { background: rgba(167, 139, 250, 0.3); border-color: #a78bfa; color: var(--text-primary); }
+    .quiz-dot.current { transform: scale(1.18); border-color: var(--gold); box-shadow: 0 0 12px rgba(251, 191, 36, 0.5); }
+
+    .quiz-scroll {
+      flex: 1;
+      width: 100%;
+      overflow-y: auto;
+      padding: 10px 16px 20px;
+    }
+
+    .quiz-card {
+      max-width: 760px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border-radius: 22px;
+      padding: 26px 26px 30px;
+      animation: quiz-in 0.3s ease;
+    }
+
+    @keyframes quiz-in {
+      from { opacity: 0; transform: translateY(14px); }
+      to { opacity: 1; transform: none; }
+    }
+
+    .quiz-kind {
+      display: inline-block;
+      font-size: 16px;
+      color: #c4b5fd;
+      background: rgba(167, 139, 250, 0.15);
+      border-radius: 999px;
+      padding: 4px 14px;
+      margin-bottom: 12px;
+    }
+
+    .quiz-q {
+      font-size: 32px;
+      font-weight: bold;
+      line-height: 1.6;
+      margin-bottom: 22px;
+    }
+
+    .quiz-options { display: flex; flex-direction: column; gap: 12px; }
+
+    .quiz-option {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: right;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-family: inherit;
+      font-size: 27px;
+      line-height: 1.5;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .quiz-option:hover { background: rgba(255, 255, 255, 0.1); }
+    .quiz-option.selected { border-color: #a78bfa; background: rgba(167, 139, 250, 0.22); }
+
+    .quiz-letter {
+      flex-shrink: 0;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 21px;
+      font-weight: bold;
+    }
+
+    .quiz-option.selected .quiz-letter { background: #a78bfa; color: #1e1b4b; }
+
+    .quiz-textarea {
+      width: 100%;
+      min-height: 170px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 14px 18px;
+      font-family: inherit;
+      font-size: 26px;
+      line-height: 1.6;
+      color: var(--text-primary);
+      resize: vertical;
+      user-select: text;
+      -webkit-user-select: text;
+      direction: rtl;
+    }
+
+    .quiz-textarea:focus { outline: none; border-color: #a78bfa; }
+    .quiz-hint { font-size: 17px; color: var(--text-secondary); margin-top: 10px; }
+
+    .fill-bank {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      min-height: 72px;
+      padding: 14px;
+      margin-bottom: 22px;
+      border: 2px dashed rgba(251, 191, 36, 0.45);
+      border-radius: 16px;
+      background: rgba(251, 191, 36, 0.06);
+    }
+
+    .fill-bank-label {
+      width: 100%;
+      text-align: center;
+      font-size: 16px;
+      color: var(--gold);
+    }
+
+    .fill-chip {
+      background: linear-gradient(135deg, #fde68a, #fbbf24);
+      color: #422006;
+      border-radius: 12px;
+      padding: 8px 18px;
+      font-size: 26px;
+      font-weight: bold;
+      cursor: grab;
+      touch-action: none;
+      box-shadow: 0 3px 0 #b45309;
+      transition: transform 0.1s;
+    }
+
+    .fill-chip.selected { outline: 3px solid #a78bfa; transform: translateY(-3px); }
+    .fill-chip.dragging { opacity: 0.3; }
+
+    .drag-ghost {
+      position: fixed;
+      z-index: 1000;
+      pointer-events: none;
+      transform: translate(-50%, -60%) scale(1.1) rotate(-3deg);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .fill-sentences { display: flex; flex-direction: column; gap: 14px; }
+
+    .fill-sentence {
+      font-size: 27px;
+      line-height: 2.1;
+      padding: 8px 14px;
+      border-radius: 12px;
+    }
+
+    .fill-sentence:nth-child(odd) { background: rgba(255, 255, 255, 0.06); }
+    .fill-sentence:nth-child(even) { background: rgba(74, 158, 255, 0.08); }
+
+    .fill-num { color: var(--text-muted); font-size: 20px; margin-left: 6px; }
+
+    .fill-slot {
+      display: inline-block;
+      min-width: 110px;
+      min-height: 46px;
+      vertical-align: middle;
+      border-bottom: 3px solid var(--text-secondary);
+      border-radius: 8px 8px 0 0;
+      background: rgba(255, 255, 255, 0.06);
+      margin: 0 4px;
+      text-align: center;
+      line-height: 46px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .fill-slot.over, .fill-slot.ready { background: rgba(167, 139, 250, 0.3); border-color: #a78bfa; }
+    .fill-slot .fill-chip { display: inline-block; line-height: 1.3; }
+
+    .quiz-nav {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      padding: 12px 16px 18px;
+      flex-shrink: 0;
+      width: 100%;
+      background: rgba(10, 22, 40, 0.6);
+    }
+
+    .quiz-nav-btn { font-size: 22px; padding: 12px 30px; }
+    .quiz-next { background: linear-gradient(135deg, #a78bfa, #7c3aed); color: white; }
+    .quiz-submit { background: linear-gradient(135deg, var(--btn-syllable), #16a34a); color: white; }
+    .btn:disabled { opacity: 0.35; cursor: default; }
+
+    .quiz-confirm {
+      display: none;
+      position: absolute;
+      inset: 0;
+      z-index: 20;
+      background: rgba(0, 0, 0, 0.6);
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .quiz-confirm.show { display: flex; }
+
+    .quiz-confirm-box {
+      background: var(--bg-secondary);
+      border: 2px solid #a78bfa;
+      border-radius: 22px;
+      padding: 28px;
+      max-width: 520px;
+      text-align: center;
+    }
+
+    .quiz-confirm-text { font-size: 26px; line-height: 1.5; margin-bottom: 22px; }
+    .quiz-confirm-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .quiz-confirm-actions .btn { font-size: 20px; padding: 12px 24px; }
+
+    /* ----- results ----- */
+    #quiz-results-screen { justify-content: flex-start; overflow-y: auto; }
+
+    .quiz-results-page {
+      width: 100%;
+      max-width: 780px;
+      padding: 30px 16px 50px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .quiz-score {
+      width: 190px;
+      height: 190px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 8px solid var(--gold);
+      background: rgba(251, 191, 36, 0.1);
+      animation: counter-happy 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .quiz-score-num { font-size: 72px; font-weight: bold; color: var(--gold); line-height: 1; }
+    .quiz-score-of { font-size: 20px; color: var(--text-secondary); margin-top: 6px; }
+    .quiz-score-msg { font-size: 32px; font-weight: bold; text-align: center; }
+
+    .quiz-results-actions { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .quiz-results-actions .btn { font-size: 20px; padding: 12px 26px; }
+
+    .quiz-review { width: 100%; display: flex; flex-direction: column; gap: 14px; margin-top: 10px; }
+
+    .review-item {
+      background: var(--bg-card);
+      border-radius: 18px;
+      padding: 18px 20px;
+      border-right: 8px solid var(--text-muted);
+    }
+
+    .review-item.good { border-right-color: var(--btn-syllable); }
+    .review-item.part { border-right-color: var(--gold); }
+    .review-item.bad { border-right-color: #f87171; }
+
+    .review-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+    }
+
+    .review-points { font-weight: bold; font-size: 20px; white-space: nowrap; }
+    .review-item.good .review-points { color: var(--btn-syllable); }
+    .review-item.part .review-points { color: var(--gold); }
+    .review-item.bad .review-points { color: #f87171; }
+
+    .review-q { font-size: 24px; font-weight: bold; line-height: 1.5; margin-bottom: 8px; }
+    .review-line { font-size: 21px; line-height: 1.6; margin-top: 4px; }
+    .review-label { color: var(--text-secondary); }
+    .review-good { color: var(--btn-syllable); font-weight: bold; }
+    .review-bad { color: #f87171; font-weight: bold; text-decoration: line-through; }
+    .review-model { color: #c4b5fd; }
+
+    @media (max-width: 600px) {
+      .quiz-q { font-size: 26px; }
+      .quiz-option, .fill-sentence, .quiz-textarea, .fill-chip { font-size: 22px; }
+      .quiz-card { padding: 18px 14px 22px; }
+      .quiz-dots { gap: 5px; padding: 12px 8px 4px; }
+      .quiz-dot { width: 30px; height: 30px; font-size: 14px; }
+      .quiz-nav-btn { font-size: 18px; padding: 10px 16px; }
+      .quiz-top-spacer { width: 0; }
+      .fill-slot { min-width: 84px; }
+    }
+
     @media (max-width: 600px) {
       .text-line { padding: 6px 12px; }
       .text-top-title { font-size: 18px; }
@@ -1194,8 +1525,51 @@
           <div id="text-hint" class="text-hint"></div>
           <button class="btn btn-read-done" onclick="textReadDone()">קָרָאתִי!</button>
           <div id="text-read-count" class="text-read-count"></div>
+          <button id="text-quiz-btn" class="btn btn-quiz" onclick="startQuiz()">לַשְּׁאֵלוֹת ✏️</button>
+          <div id="text-quiz-best" class="quiz-best"></div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- ===== STORY QUIZ SCREEN ===== -->
+  <div id="quiz-screen" class="screen">
+    <div class="text-top-bar">
+      <button class="text-icon-btn" onclick="quizBackToStory()">→ לַסִּפּוּר</button>
+      <div id="quiz-top-title" class="text-top-title"></div>
+      <div class="quiz-top-spacer"></div>
+    </div>
+    <div id="quiz-dots" class="quiz-dots"></div>
+    <div class="quiz-scroll">
+      <div id="quiz-card" class="quiz-card"></div>
+    </div>
+    <div class="quiz-nav">
+      <button id="quiz-prev" class="btn btn-secondary quiz-nav-btn" onclick="quizGo(-1)">→ הַקּוֹדֶמֶת</button>
+      <button id="quiz-next" class="btn quiz-nav-btn quiz-next" onclick="quizGo(1)">הַבָּאָה ←</button>
+      <button id="quiz-submit" class="btn quiz-nav-btn quiz-submit" onclick="quizTrySubmit()">סִיַּמְתִּי! בְּדֹק אוֹתִי ✓</button>
+    </div>
+    <div id="quiz-confirm" class="quiz-confirm">
+      <div class="quiz-confirm-box">
+        <div id="quiz-confirm-text" class="quiz-confirm-text"></div>
+        <div class="quiz-confirm-actions">
+          <button class="btn btn-secondary" onclick="quizCloseConfirm()">אֲנִי רוֹצֶה לְהַשְׁלִים</button>
+          <button class="btn quiz-submit" onclick="quizSubmit()">בְּדֹק בְּכָל זֹאת</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== QUIZ RESULTS SCREEN ===== -->
+  <div id="quiz-results-screen" class="screen">
+    <div class="quiz-results-page">
+      <div id="quiz-score" class="quiz-score"></div>
+      <div id="quiz-score-msg" class="quiz-score-msg"></div>
+      <div class="quiz-results-actions">
+        <button class="btn quiz-next" onclick="quizRetry()">נַסֵּה שׁוּב 🔄</button>
+        <button class="btn btn-secondary" onclick="quizBackToStory()">לַסִּפּוּר 📖</button>
+        <button class="btn btn-secondary" onclick="showScreen('texts')">לְכָל הַסִּפּוּרִים</button>
+      </div>
+      <div id="quiz-review" class="quiz-review"></div>
     </div>
   </div>
 
@@ -1488,7 +1862,9 @@ const screens = {
   quest: document.getElementById('quest-screen'),
   settings: document.getElementById('settings-screen'),
   texts: document.getElementById('texts-screen'),
-  text: document.getElementById('text-screen')
+  text: document.getElementById('text-screen'),
+  quiz: document.getElementById('quiz-screen'),
+  quizResults: document.getElementById('quiz-results-screen')
 };
 
 function showScreen(name) {
@@ -2076,11 +2452,11 @@ const STORIES = [
     emoji: '🐱',
     title: 'גִ\'ינְגֶ\'ר הַמֻּפְלָא',
     paragraphs: [
-      'בִּרְחוֹב טוֹבָה וְטוּבְיָה מִילֶר 21 בִּרְחוֹבוֹת עוֹמֵד בִּנְיָן בֶּן שֶׁבַע קוֹמוֹת. בַּבִּנְיָן הַזֶּה גָּר חָתוּל פַּרְסִי עִם פַּרְוָה שֶׁל עֲנָנִים וּפָנִים שֶׁל מִישֶׁהוּ שֶׁכּוֹעֵס, אֲבָל לֹא בֶּאֱמֶת. קוֹרְאִים לוֹ גִ\'ינְגֶ\'ר.',
+      'בִּרְחוֹב טוֹבָה וְטוּבְיָה מִילֶר 21 בִּרְחוֹבוֹת עוֹמֵד בִּנְיָן בֶּן שֶׁבַע קוֹמוֹת. בַּבִּנְיָן הַזֶּה גָּר חָתוּל פַּרְסִי עִם פַּרְוָה בְּלוֹנְדִּינִית שֶׁל עֲנָנִים וּפָנִים שֶׁל מִישֶׁהוּ שֶׁכּוֹעֵס, אֲבָל לֹא בֶּאֱמֶת. קוֹרְאִים לוֹ גִ\'ינְגֶ\'ר, וְלַמְרוֹת הַשֵּׁם, הוּא בִּכְלָל לֹא גִ\'ינְגִ\'י.',
       'רֹב הַיּוֹם גִ\'ינְגֶ\'ר יָשֵׁן. הוּא יָשֵׁן עַל הַסַּפָּה, יָשֵׁן עַל הַכָּרִית, וְלִפְעָמִים יָשֵׁן אֲפִלּוּ בְּתוֹךְ הַכְּבִיסָה הַנְּקִיָּה. אֲבָל בָּרֶגַע שֶׁהַדֶּלֶת נִסְגֶּרֶת וְהַמִּשְׁפָּחָה יוֹצֵאת מֵהַבַּיִת, מַשֶּׁהוּ קוֹרֶה. הָעֵינַיִם נִפְקָחוֹת. הַזָּנָב מִזְדַּקֵּף. וְגִ\'ינְגֶ\'ר הַמֻּפְלָא יוֹצֵא לְהַרְפַּתְקָה.',
       'גִ\'ינְגֶ\'ר יוֹדֵעַ לִהְיוֹת רְצִינִי. הוּא יוֹשֵׁב זָקוּף כְּמוֹ מֶלֶךְ וּמִסְתַּכֵּל עַל כֻּלָּם מִלְמַעְלָה. אֲבָל הוּא גַּם יוֹדֵעַ לִפֹּל מֵהַסַּפָּה בְּאֶמְצַע הַשֵּׁנָה, לִרְדֹּף אַחֲרֵי הַזָּנָב שֶׁל עַצְמוֹ, וּלְהִתְחַבֵּא בְּקֻפְסַת קַרְטוֹן קְטַנָּה מִדַּי.',
-      'בְּיוֹם שְׁלִישִׁי אֶחָד, בְּדִיּוּק כְּשֶׁהַדֶּלֶת נִסְגְּרָה, נִשְׁמְעָה דְּפִיקָה בַּחַלּוֹן. זֶה הָיָה אֶרִיק, הַגּוּר הַשּׁוֹבָב מֵהַדִּירָה לְיַד. "גִ\'ינְגֶ\'ר! אָסוֹן!" צִיֵּץ אֶרִיק. "הַכַּדּוּר הָאָדֹם שֶׁלִּי הִתְגַּלְגֵּל בַּמַּדְרֵגוֹת עַד הַקּוֹמָה הָרִאשׁוֹנָה!"',
-      'מֵאֲחוֹרָיו עָמְדָה אוֹלִיבְיָה, הַחֲתוּלָה הַבּוֹגֶרֶת. הִיא לֹא אוֹהֶבֶת לִטּוּפִים, לֹא אוֹהֶבֶת חִיּוּכִים, וּבְעִקָּר לֹא אוֹהֶבֶת שְׁטוּיוֹת. "זֶה רַק כַּדּוּר," אָמְרָה בְּקֹר רוּחַ. אֲבָל גִ\'ינְגֶ\'ר כְּבָר קָפַץ מֵהַחַלּוֹן. "כַּדּוּר אָבוּד הוּא הַרְפַּתְקָה," הִכְרִיז.',
+      'בְּיוֹם שְׁלִישִׁי אֶחָד, בְּדִיּוּק כְּשֶׁהַדֶּלֶת נִסְגְּרָה, נִשְׁמְעָה דְּפִיקָה בַּחַלּוֹן. זֶה הָיָה אֶרִיק, הַגּוּר הַשָּׁחֹר וְהַשּׁוֹבָב מֵהַדִּירָה לְיַד. "גִ\'ינְגֶ\'ר! אָסוֹן!" צִיֵּץ אֶרִיק. "הַכַּדּוּר הָאָדֹם שֶׁלִּי הִתְגַּלְגֵּל בַּמַּדְרֵגוֹת עַד הַקּוֹמָה הָרִאשׁוֹנָה!"',
+      'מֵאֲחוֹרָיו עָמְדָה אוֹלִיבְיָה, הַחֲתוּלָה הָאֲפֹרָה וְהַבּוֹגֶרֶת. הִיא לֹא אוֹהֶבֶת לִטּוּפִים, לֹא אוֹהֶבֶת חִיּוּכִים, וּבְעִקָּר לֹא אוֹהֶבֶת שְׁטוּיוֹת. "זֶה רַק כַּדּוּר," אָמְרָה בְּקֹר רוּחַ. אֲבָל גִ\'ינְגֶ\'ר כְּבָר קָפַץ מֵהַחַלּוֹן. "כַּדּוּר אָבוּד הוּא הַרְפַּתְקָה," הִכְרִיז.',
       'הֵם רָצוּ בַּמַּדְרֵגוֹת. גִ\'ינְגֶ\'ר רָץ רִאשׁוֹן, הַפַּרְוָה שֶׁלּוֹ מִתְנַפְנֶפֶת כְּמוֹ עָנָן בָּרוּחַ. בְּאֶמְצַע הַדֶּרֶךְ הוּא הֶחְלִיק עַל מַדְרֵגָה, הִתְגַּלְגֵּל שָׁלוֹשׁ פְּעָמִים, וְנָחַת עַל הָרַגְלַיִם כְּאִלּוּ כָּךְ תִּכְנֵן. "זֶה הָיָה בְּכַוָּנָה," אָמַר. אֶרִיק צָחַק כָּל כָּךְ חָזָק שֶׁנָּפַל גַּם הוּא.',
       'בַּקּוֹמָה הַשִּׁשִּׁית חִכְּתָה לָהֶם הַפְתָּעָה: הַכֶּלֶב עִם שָׁלוֹשׁ הָרַגְלַיִם. הוּא קָטָן, מָהִיר, וְרָץ יוֹתֵר טוֹב מֵרֹב הַכְּלָבִים עִם אַרְבַּע. "לְאָן רָצִים?" נָבַח. "לְהַצִּיל כַּדּוּר!" עָנָה אֶרִיק. "אֲנִי בָּא!" מֵאֲחוֹרָיו, הַחֲתוּלָה הַשְּׁקֵטָה שֶׁגָּרָה אִתּוֹ פָּקְחָה עַיִן אַחַת, פִּהֲקָה, וְחָזְרָה לִישֹׁן.',
       'בַּקּוֹמָה הַחֲמִישִׁית, מֵהַדִּירָה שֶׁמִּתַּחַת לְאוֹלִיבְיָה וְאֶרִיק, הֵצִיצוּ שְׁנֵי חֲתוּלִים שְׁמֵנִים. "יֵשׁ שָׁם כֶּלֶב?" לָחֲשׁוּ בְּפַחַד. "רַק אֶחָד קָטָן," אָמַר גִ\'ינְגֶ\'ר. "אָז לֹא, תּוֹדָה," וְהֵם נֶעֶלְמוּ מֵאֲחוֹרֵי הַסַּפָּה.',
@@ -2089,6 +2465,92 @@ const STORIES = [
       'אֶרִיק רָקַד מִשִּׂמְחָה. הַכֶּלֶב עִם שָׁלוֹשׁ הָרַגְלַיִם קָפַץ עַל שָׁלוֹשׁ. וְגִ\'ינְגֶ\'ר? גִ\'ינְגֶ\'ר נִעְנֵעַ בְּרֹאשׁוֹ בִּרְצִינוּת, כְּמוֹ מְפַקֵּד אַחֲרֵי מְשִׂימָה מֻצְלַחַת.',
       'כְּשֶׁהַמִּשְׁפָּחָה חָזְרָה הַבַּיְתָה, גִ\'ינְגֶ\'ר שָׁכַב עַל הַכָּרִית, עֵינַיִם עֲצוּמוֹת, פַּרְוָה מְסֻדֶּרֶת. "תִּרְאוּ אֶת הֶעָצֵל הַזֶּה," צָחַק יוּבַל. "יָשַׁן כָּל הַיּוֹם."',
       'גִ\'ינְגֶ\'ר פָּקַח עַיִן אַחַת. וְאִם מִישֶׁהוּ הָיָה מִסְתַּכֵּל טוֹב, הוּא הָיָה רוֹאֶה: הֶחָתוּל חִיֵּךְ. כִּי מִי יוֹדֵעַ מָה יִקְרֶה מָחָר, כְּשֶׁהַדֶּלֶת תִּסָּגֵר שׁוּב?'
+    ]
+  },
+  {
+    id: 'erik-cat',
+    emoji: '🐈',
+    title: 'אֶרִיק וְהַחוֹמָה הַגְּבוֹהָה',
+    paragraphs: [
+      'בִּשְׁכוּנָה קְטַנָּה, בְּבַיִת עִם גִּנָּה יְרֻקָּה, גָּר חָתוּל שָׁחֹר בְּשֵׁם אֶרִיק. הָיְתָה לוֹ פַּרְוָה שְׁחֹרָה וּמַבְרִיקָה, זָנָב אָרֹךְ וְשָׂפָם מְסֻלְסָל. אֶרִיק אָהַב לִישֹׁן בַּשֶּׁמֶשׁ, לֶאֱכֹל דָּגִים וּלְסַפֵּר סִפּוּרִים.',
+      'בְּכָל קַיִץ הָיְתָה בַּשְּׁכוּנָה תַּחֲרוּת גְּדוֹלָה: "תַּחֲרוּת הַקְּפִיצָה". כָּל הַחֲתוּלִים נֶאֶסְפוּ לְיַד חוֹמַת הָאֶבֶן בְּסוֹף הָרְחוֹב. מִי שֶׁקּוֹפֵץ עַד רֹאשׁ הַחוֹמָה מְקַבֵּל אֶת הַתֹּאַר "אַלּוּף הַשְּׁכוּנָה".',
+      'בַּשָּׁנָה שֶׁעָבְרָה אֶרִיק נִסָּה לִקְפֹּץ. הוּא רָץ, קָפַץ גָּבוֹהַּ... וְנָפַל יָשָׁר לְתוֹךְ שִׂיחַ קוֹצִים! כָּל הַחֲתוּלִים צָחֲקוּ. הֲכִי חָזָק צָחַק טַיְגֶר, חָתוּל גָּדוֹל וְאָפֹר. "חֲתוּלִים כְּמוֹ אֶרִיק לֹא קוֹפְצִים," אָמַר טַיְגֶר. "הֵם רַק יְשֵׁנִים!"',
+      'מֵאָז אֶרִיק הִרְגִּישׁ נֶעֱלָב וְעָצוּב. בְּכָל פַּעַם שֶׁהִסְתַּכֵּל עַל הַחוֹמָה, הַבֶּטֶן שֶׁלּוֹ הִתְכַּוְּצָה מִפַּחַד. "הַשָּׁנָה אֲנִי לֹא מִשְׁתַּתֵּף," אָמַר לַחֲבֵרָה שֶׁלּוֹ, לוּנָה הַחֲתוּלָה הַלְּבָנָה.',
+      '"אֲבָל אַתָּה חָתוּל חָכָם וְאַמִּיץ!" אָמְרָה לוּנָה. "אֲנִי מַאֲמִינָה בְּךָ." "אַתְּ לֹא מְבִינָה!" כָּעַס אֶרִיק. "כֻּלָּם יִצְחֲקוּ עָלַי שׁוּב!" הוּא הִסְתּוֹבֵב וְהָלַךְ, וְלוּנָה נִשְׁאֲרָה לְבַד.',
+      'בָּעֶרֶב שֶׁלִּפְנֵי הַתַּחֲרוּת פָּרְצָה סְעָרָה. רוּחַ חֲזָקָה נָשְׁבָה, וְגֶשֶׁם כָּבֵד יָרַד. פִּתְאוֹם נִשְׁמַע קוֹל בֶּכִי דַּק: "מְיָאוּ! הַצִּילוּ!" זֹאת הָיְתָה פִּיצִי, הַחֲתַלְתּוּלָה הַקְּטַנָּה. הִיא רָדְפָה אַחֲרֵי פַּרְפַּר, טִפְּסָה עַל הַחוֹמָה, וְעַכְשָׁו לֹא יָדְעָה אֵיךְ לָרֶדֶת.',
+      'כָּל הַחֲתוּלִים רָצוּ אֶל הַחוֹמָה. טַיְגֶר קָפַץ רִאשׁוֹן, אֲבָל הָאֶבֶן הָיְתָה רְטֻבָּה וַחֲלַקְלַקָּה, וְהוּא הֶחֱלִיק לְמַטָּה לְתוֹךְ שְׁלוּלִית. גַּם הַחֲתוּלִים הָאֲחֵרִים נִסּוּ, וְנָפְלוּ. פִּיצִי בָּכְתָה עוֹד יוֹתֵר.',
+      'אֶרִיק עָמַד בַּגֶּשֶׁם וְרָעַד. הוּא נִזְכַּר בַּמִּלִּים שֶׁל סַבְתָּא שֶׁלּוֹ: "לֹא כָּל חָתוּל צָרִיךְ לִקְפֹּץ כְּמוֹ כֻּלָּם. כָּל חָתוּל צָרִיךְ לִמְצֹא אֶת הַדֶּרֶךְ שֶׁלּוֹ." אֶרִיק הִסְתַּכֵּל טוֹב. לְיַד הַחוֹמָה עָמְדָה חָבִית יְשָׁנָה. עַל יָדָהּ הָיָה אַרְגַּז עֵץ. וּמֵעַל הָאַרְגָּז נִמְתַּח עָנָף אָרֹךְ שֶׁל עֵץ הַתְּאֵנָה.',
+      '"אֲנִי לֹא צָרִיךְ לִקְפֹּץ," לָחַשׁ אֶרִיק. "אֲנִי יָכוֹל לְטַפֵּס." הוּא עָלָה עַל הֶחָבִית. אַחַר כָּךְ עַל הָאַרְגָּז. וְאָז תָּפַס בַּצִּפָּרְנַיִם אֶת הֶעָנָף. בְּכָל פַּעַם שֶׁפָּחַד, אָמַר לְעַצְמוֹ: "עוֹד צַעַד אֶחָד. רַק עוֹד צַעַד אֶחָד."',
+      'בְּאֶמְצַע הַדֶּרֶךְ הֶעָנָף הִתְנַדְנֵד, וְאֶרִיק כִּמְעַט וִתֵּר. אֲבָל אָז הוּא שָׁמַע אֶת פִּיצִי בּוֹכָה, וְאֶת לוּנָה קוֹרֵאת מִלְּמַטָּה: "אֶרִיק, אַתָּה יָכוֹל! אַל תְּוַתֵּר!" אֶרִיק חָשַׁב עַל פִּיצִי הַקְּטַנָּה שֶׁמְּחַכָּה לוֹ, נָשַׁם עָמֹק, וְהִמְשִׁיךְ.',
+      'עוֹד צַעַד, וְעוֹד צַעַד, וְהִנֵּה: אֶרִיק הָיָה עַל רֹאשׁ הַחוֹמָה! הוּא לִקֵּק אֶת פִּיצִי עַל הָרֹאשׁ וְאָמַר: "אַל תִּפְחֲדִי. לְכִי אַחֲרַי." לְאַט לְאַט, צַעַד אַחֲרֵי צַעַד, הֵם יָרְדוּ יַחַד בְּאוֹתָהּ דֶּרֶךְ. כָּל הַחֲתוּלִים מָחֲאוּ כַּפַּיִם.',
+      'אֶרִיק נִגַּשׁ אֶל לוּנָה. "סְלִיחָה שֶׁכָּעַסְתִּי עָלַיִךְ," אָמַר. "תּוֹדָה שֶׁהֶאֱמַנְתְּ בִּי." לוּנָה חִכְכָה אֶת הָרֹאשׁ שֶׁלָּהּ בָּרֹאשׁ שֶׁלּוֹ וְגִרְגְּרָה בְּשִׂמְחָה.',
+      'לְמָחֳרָת, בַּתַּחֲרוּת, אֶרִיק טִפֵּס שׁוּב לְרֹאשׁ הַחוֹמָה, בַּדֶּרֶךְ שֶׁלּוֹ. טַיְגֶר נִגַּשׁ אֵלָיו, הִשְׁפִּיל אֶת הָאָזְנַיִם וְאָמַר: "סְלִיחָה שֶׁצָּחַקְתִּי עָלֶיךָ. אַתָּה הֶחָתוּל הֲכִי אַמִּיץ בַּשְּׁכוּנָה." וְאֶרִיק? הוּא לֹא כָּעַס. הוּא רַק חִיֵּךְ וְאָמַר: "בּוֹא, אַרְאֶה לְךָ אֶת הַדֶּרֶךְ."',
+      'וּמֵאָז, עַל הַחוֹמָה בְּסוֹף הָרְחוֹב, תָּלוּי שֶׁלֶט קָטָן: "אֶרִיק, אַלּוּף הָאֹמֶץ".',
+      'סוֹף.'
+    ],
+    quiz: [
+      { type: 'mc',
+        q: 'מָה צָרִיךְ לַעֲשׂוֹת בְּ"תַחֲרוּת הַקְּפִיצָה"?',
+        options: ['לִקְפֹּץ עַד רֹאשׁ חוֹמַת הָאֶבֶן', 'לִתְפֹּס הֲכִי הַרְבֵּה עַכְבָּרִים', 'לָרוּץ מַהֵר סְבִיב הַשְּׁכוּנָה', 'לְטַפֵּס עַל עֵץ הַתְּאֵנָה'],
+        answer: 0 },
+      { type: 'mc',
+        q: 'מָה קָרָה לְאֶרִיק בַּשָּׁנָה שֶׁעָבְרָה?',
+        options: ['הוּא נִצַּח בַּתַּחֲרוּת', 'הוּא נָפַל לְתוֹךְ שִׂיחַ קוֹצִים', 'הוּא נִרְדַּם בַּשֶּׁמֶשׁ', 'הוּא הָלַךְ לְאִבּוּד'],
+        answer: 1 },
+      { type: 'mc',
+        q: 'מִי הֶאֱמִינָה בְּאֶרִיק גַּם כְּשֶׁהוּא לֹא הֶאֱמִין בְּעַצְמוֹ?',
+        options: ['פִּיצִי הַחֲתַלְתּוּלָה', 'סַבְתָּא שֶׁלּוֹ', 'לוּנָה הַחֲתוּלָה הַלְּבָנָה', 'טַיְגֶר הֶחָתוּל הָאָפֹר'],
+        answer: 2 },
+      { type: 'mc',
+        q: 'לָמָּה טַיְגֶר לֹא הִצְלִיחַ לְהַצִּיל אֶת פִּיצִי?',
+        options: ['הוּא פָּחַד מֵהַגֶּשֶׁם', 'הוּא הָיָה עָיֵף מִדַּי', 'הוּא לֹא רָצָה לַעֲזֹר', 'הָאֶבֶן הָיְתָה רְטֻבָּה וַחֲלַקְלַקָּה'],
+        answer: 3 },
+      { type: 'mc',
+        q: 'מָה עָזַר לְאֶרִיק לְהַמְשִׁיךְ כְּשֶׁכִּמְעַט וִתֵּר?',
+        options: ['הוּא חָשַׁב עַל פִּיצִי שֶׁמְּחַכָּה לוֹ', 'הוּא רָצָה לְקַבֵּל פְּרָס שֶׁל דָּגִים', 'טַיְגֶר דָּחַף אוֹתוֹ לְמַעְלָה', 'הַגֶּשֶׁם פִּתְאוֹם נֶעֱצַר'],
+        answer: 0 },
+      { type: 'mc',
+        q: 'מָה הַמֶּסֶר שֶׁל הַסִּפּוּר?',
+        options: ['חֲתוּלִים לֹא צְרִיכִים לְטַפֵּס עַל חוֹמוֹת', 'כְּדַאי תָּמִיד לַעֲשׂוֹת בְּדִיּוּק כְּמוֹ כֻּלָּם', 'כָּל אֶחָד יָכוֹל לְהַצְלִיחַ, בַּדֶּרֶךְ שֶׁלּוֹ', 'מִי שֶׁנּוֹפֵל פַּעַם אַחַת, לֹא יַצְלִיחַ אַף פַּעַם'],
+        answer: 2 },
+      { type: 'open',
+        q: 'מָה הָיְתָה הַבְּעָיָה (הַקּוֹנְפְלִיקְט) שֶׁל אֶרִיק בִּתְחִלַּת הַסִּפּוּר?',
+        model: 'אֶרִיק פָּחַד לִקְפֹּץ שׁוּב, כִּי בַּשָּׁנָה שֶׁעָבְרָה הוּא נָפַל לַקּוֹצִים וְכֻלָּם צָחֲקוּ עָלָיו. הוּא רָצָה לְהַצְלִיחַ, אֲבָל הַפַּחַד עָצַר אוֹתוֹ.',
+        keywords: [
+          ['פחד', 'פוחד', 'חשש', 'מפחיד'],
+          ['נפל', 'ליפול', 'לפול', 'נפיל', 'קוצ'],
+          ['צחק', 'לעג', 'טייגר', 'טיגר', 'נעלב'],
+          ['קפיצ', 'לקפוצ', 'קופצ', 'קפצ', 'חומ', 'תחרות']
+        ],
+        need: 2 },
+      { type: 'open',
+        q: 'אֵיךְ מָצָא אֶרִיק אֶת הַדֶּרֶךְ שֶׁלּוֹ לְהַגִּיעַ לְרֹאשׁ הַחוֹמָה?',
+        model: 'בִּמְקוֹם לִקְפֹּץ, אֶרִיק טִפֵּס: קֹדֶם עַל הֶחָבִית, אַחַר כָּךְ עַל הָאַרְגָּז, וְאָז עַל הֶעָנָף שֶׁל עֵץ הַתְּאֵנָה. הוּא אָמַר לְעַצְמוֹ "עוֹד צַעַד אֶחָד".',
+        keywords: [
+          ['חבית'],
+          ['ארגז'],
+          ['ענפ', 'תאנ', 'עצ'],
+          ['טיפס', 'טפס', 'מטפס', 'טיפוס', 'צעד', 'שלב']
+        ],
+        need: 2 },
+      { type: 'fill',
+        q: 'הַשְׁלִימוּ אֶת הַמִּשְׁפָּטִים לְפִי הַסִּפּוּר:',
+        sentences: [
+          { text: 'אֶרִיק הוּא חָתוּל ___ עִם זָנָב אָרֹךְ וְשָׂפָם מְסֻלְסָל.', answer: 'שָׁחֹר' },
+          { text: 'הֶחָתוּל הַגָּדוֹל וְהָאָפֹר נִקְרָא ___.', answer: 'טַיְגֶר' },
+          { text: 'פִּיצִי נִתְקְעָה עַל הַחוֹמָה בִּזְמַן ___.', answer: 'סְעָרָה' },
+          { text: 'קֹדֶם כֹּל אֶרִיק עָלָה עַל ___ יְשָׁנָה.', answer: 'חָבִית' }
+        ],
+        extra: ['כָּתֹם', 'כִּסֵּא'] },
+      { type: 'fill',
+        q: 'הַשְׁלִימוּ אֶת הַמִּשְׁפָּטִים לְפִי הַסִּפּוּר:',
+        sentences: [
+          { text: 'כְּשֶׁכֻּלָּם צָחֲקוּ עָלָיו, אֶרִיק הִרְגִּישׁ ___.', answer: 'נֶעֱלָב' },
+          { text: 'לוּנָה ___ בְּאֶרִיק וְעוֹדְדָה אוֹתוֹ.', answer: 'הֶאֱמִינָה' },
+          { text: 'כְּשֶׁפָּחַד, אֶרִיק אָמַר לְעַצְמוֹ: "עוֹד ___ אֶחָד".', answer: 'צַעַד' },
+          { text: 'בַּסּוֹף טַיְגֶר בִּקֵּשׁ ___ מֵאֶרִיק.', answer: 'סְלִיחָה' }
+        ],
+        extra: ['עֲנָנִים', 'רָצְתָה'] }
     ]
   }
 ];
@@ -2143,6 +2605,10 @@ function renderTextsList() {
     meta.className = 'text-card-meta';
     const reads = getTextReads(story.id);
     meta.textContent = `${storyWordCount(story)} מילים` + (reads ? ` • נקרא ${reads} פעמים` : '');
+    if (story.quiz) {
+      const best = getQuizBest(story.id);
+      meta.textContent += best != null ? ` • 📝 ציון: ${best}` : ' • 📝 עם שאלות';
+    }
     info.appendChild(title);
     info.appendChild(meta);
 
@@ -2222,6 +2688,7 @@ function openTextReader(index) {
   fitTextFont();
   applyHiriqSetting();
   updateTextReadCount();
+  updateQuizButton();
   setTextHint('גלול לאט וקרא עד הסוף...');
 
   const scroller = document.getElementById('text-scroll');
@@ -2677,6 +3144,446 @@ function launchFireworks(message, duration = 4500) {
     }
   }
   requestAnimationFrame(frame);
+}
+
+// ===== STORY QUIZ =====
+// A story may carry a `quiz` array: 'mc' (one of four), 'open' (free text,
+// scored by keyword groups) and 'fill' (four sentences, drag words from a
+// bank). Every question is worth 10 points; answers are checked only at the end.
+const QUIZ_POINTS = 10;
+const QUIZ_LETTERS = ['א', 'ב', 'ג', 'ד'];
+const QUIZ_KIND_LABELS = {
+  mc: 'בְּחִירָה: סַמְּנוּ תְּשׁוּבָה אַחַת',
+  open: 'שְׁאֵלָה פְּתוּחָה: כִּתְבוּ בְּמִלִּים שֶׁלָּכֶם',
+  fill: 'הַשְׁלָמַת מִשְׁפָּטִים: גִּרְרוּ מִלָּה מֵהַמַּחְסָן'
+};
+
+let quiz = null;      // { storyIndex, items, answers, index, submitted }
+let quizDrag = null;  // active drag of a word chip
+let quizSelectedWord = null; // tap-to-place fallback
+
+function getQuizBest(storyId) {
+  return (state.quizBest && state.quizBest[storyId] != null) ? state.quizBest[storyId] : null;
+}
+
+function updateQuizButton() {
+  const btn = document.getElementById('text-quiz-btn');
+  const best = document.getElementById('text-quiz-best');
+  const has = currentStory && currentStory.quiz;
+  btn.style.display = has ? '' : 'none';
+  const b = has ? getQuizBest(currentStory.id) : null;
+  best.textContent = b != null ? `הַצִּיּוּן הֲכִי טוֹב שֶׁלְּךָ: ${b}` : '';
+}
+
+function buildQuiz(storyIndex) {
+  const story = STORIES[storyIndex];
+  const items = story.quiz.map(src => {
+    if (src.type === 'mc') {
+      const options = shuffle(src.options.map((text, i) => ({ text, correct: i === src.answer })));
+      return { ...src, options };
+    }
+    if (src.type === 'fill') {
+      const words = src.sentences.map(s => s.answer).concat(src.extra || []);
+      const bank = shuffle(words.map((text, id) => ({ id, text })));
+      const sentences = src.sentences.map((s, i) => ({ text: s.text, answerId: i }));
+      return { ...src, sentences, bank };
+    }
+    return { ...src };
+  });
+  const answers = items.map(it => it.type === 'fill' ? it.sentences.map(() => null)
+    : it.type === 'open' ? '' : null);
+  return { storyIndex, items, answers, index: 0, submitted: false };
+}
+
+function startQuiz() {
+  const idx = STORIES.indexOf(currentStory);
+  if (idx < 0 || !currentStory.quiz) return;
+  speechSynthesis.cancel();
+  if (!quiz || quiz.storyIndex !== idx || quiz.submitted) quiz = buildQuiz(idx);
+  quizSelectedWord = null;
+  showScreen('quiz');
+  document.getElementById('quiz-top-title').textContent = 'שְׁאֵלוֹת: ' + currentStory.title;
+  renderQuiz();
+}
+
+function quizRetry() {
+  quiz = buildQuiz(quiz.storyIndex);
+  currentStory = STORIES[quiz.storyIndex];
+  startQuiz();
+}
+
+function quizBackToStory() {
+  quizCloseConfirm();
+  openTextReader(quiz ? quiz.storyIndex : 0);
+}
+
+function isAnswered(i) {
+  const it = quiz.items[i], a = quiz.answers[i];
+  if (it.type === 'mc') return a != null;
+  if (it.type === 'open') return a.trim().length > 0;
+  return a.every(x => x != null);
+}
+
+function quizGo(delta) {
+  saveOpenAnswer();
+  quiz.index = Math.max(0, Math.min(quiz.items.length - 1, quiz.index + delta));
+  quizSelectedWord = null;
+  renderQuiz();
+}
+
+function quizJump(i) {
+  saveOpenAnswer();
+  quiz.index = i;
+  quizSelectedWord = null;
+  renderQuiz();
+}
+
+function saveOpenAnswer() {
+  const ta = document.getElementById('quiz-open-input');
+  if (ta && quiz.items[quiz.index].type === 'open') quiz.answers[quiz.index] = ta.value;
+}
+
+function renderQuizDots() {
+  const dots = document.getElementById('quiz-dots');
+  dots.innerHTML = '';
+  quiz.items.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'quiz-dot' + (isAnswered(i) ? ' answered' : '') + (i === quiz.index ? ' current' : '');
+    d.textContent = i + 1;
+    d.onclick = () => quizJump(i);
+    dots.appendChild(d);
+  });
+}
+
+function renderQuiz() {
+  renderQuizDots();
+  const it = quiz.items[quiz.index];
+  const card = document.getElementById('quiz-card');
+  card.innerHTML = '';
+  // restart the entrance animation
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = '';
+
+  const kind = document.createElement('div');
+  kind.className = 'quiz-kind';
+  kind.textContent = `שְׁאֵלָה ${quiz.index + 1} מִתּוֹךְ ${quiz.items.length} • ${QUIZ_KIND_LABELS[it.type]}`;
+  card.appendChild(kind);
+
+  const q = document.createElement('div');
+  q.className = 'quiz-q';
+  q.textContent = it.q;
+  card.appendChild(q);
+
+  if (it.type === 'mc') renderMcQuestion(card, it);
+  else if (it.type === 'open') renderOpenQuestion(card, it);
+  else renderFillQuestion(card, it);
+
+  const last = quiz.index === quiz.items.length - 1;
+  document.getElementById('quiz-prev').disabled = quiz.index === 0;
+  document.getElementById('quiz-next').style.display = last ? 'none' : '';
+  document.getElementById('quiz-submit').style.display = last ? '' : 'none';
+}
+
+function renderMcQuestion(card, it) {
+  const wrap = document.createElement('div');
+  wrap.className = 'quiz-options';
+  it.options.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'quiz-option' + (quiz.answers[quiz.index] === i ? ' selected' : '');
+    const letter = document.createElement('span');
+    letter.className = 'quiz-letter';
+    letter.textContent = QUIZ_LETTERS[i];
+    const text = document.createElement('span');
+    text.textContent = opt.text;
+    b.appendChild(letter);
+    b.appendChild(text);
+    b.onclick = () => {
+      quiz.answers[quiz.index] = i;
+      wrap.querySelectorAll('.quiz-option').forEach((el, j) => el.classList.toggle('selected', j === i));
+      renderQuizDots();
+    };
+    wrap.appendChild(b);
+  });
+  card.appendChild(wrap);
+}
+
+function renderOpenQuestion(card, it) {
+  const ta = document.createElement('textarea');
+  ta.id = 'quiz-open-input';
+  ta.className = 'quiz-textarea';
+  ta.placeholder = 'כִּתְבוּ כָּאן אֶת הַתְּשׁוּבָה...';
+  ta.value = quiz.answers[quiz.index];
+  ta.oninput = () => {
+    const was = isAnswered(quiz.index);
+    quiz.answers[quiz.index] = ta.value;
+    if (was !== isAnswered(quiz.index)) renderQuizDots();
+  };
+  card.appendChild(ta);
+  const hint = document.createElement('div');
+  hint.className = 'quiz-hint';
+  hint.textContent = 'טִיפּ: עֲנוּ בְּמִשְׁפָּט מָלֵא וְהַזְכִּירוּ פְּרָטִים מֵהַסִּפּוּר.';
+  card.appendChild(hint);
+}
+
+function wordText(it, id) {
+  return it.bank.find(w => w.id === id).text;
+}
+
+function makeChip(it, id, fromSlot) {
+  const chip = document.createElement('span');
+  chip.className = 'fill-chip' + (fromSlot == null && quizSelectedWord === id ? ' selected' : '');
+  chip.textContent = wordText(it, id);
+  chip.addEventListener('pointerdown', e => onChipPointerDown(e, id, fromSlot));
+  return chip;
+}
+
+function renderFillQuestion(card, it) {
+  const ans = quiz.answers[quiz.index];
+
+  const bank = document.createElement('div');
+  bank.className = 'fill-bank';
+  bank.id = 'fill-bank';
+  const label = document.createElement('div');
+  label.className = 'fill-bank-label';
+  label.textContent = 'מַחְסַן מִלִּים';
+  bank.appendChild(label);
+  it.bank.forEach(w => {
+    if (!ans.includes(w.id)) bank.appendChild(makeChip(it, w.id, null));
+  });
+  card.appendChild(bank);
+
+  const list = document.createElement('div');
+  list.className = 'fill-sentences';
+  it.sentences.forEach((s, si) => {
+    const row = document.createElement('div');
+    row.className = 'fill-sentence';
+    const num = document.createElement('span');
+    num.className = 'fill-num';
+    num.textContent = (si + 1) + '.';
+    row.appendChild(num);
+    const [before, after] = s.text.split('___');
+    row.appendChild(document.createTextNode(before));
+    const slot = document.createElement('span');
+    slot.className = 'fill-slot' + (quizSelectedWord != null && ans[si] == null ? ' ready' : '');
+    slot.dataset.slot = si;
+    if (ans[si] != null) slot.appendChild(makeChip(it, ans[si], si));
+    slot.addEventListener('click', () => {
+      if (quizSelectedWord != null && ans[si] == null) placeWord(si, quizSelectedWord, null);
+    });
+    row.appendChild(slot);
+    row.appendChild(document.createTextNode(after || ''));
+    list.appendChild(row);
+  });
+  card.appendChild(list);
+}
+
+function placeWord(slot, wordId, fromSlot) {
+  const ans = quiz.answers[quiz.index];
+  const prev = ans[slot];
+  if (fromSlot != null) ans[fromSlot] = (prev != null && fromSlot !== slot) ? prev : null; // swap
+  ans[slot] = wordId;
+  quizSelectedWord = null;
+  renderQuiz();
+}
+
+function onChipPointerDown(e, wordId, fromSlot) {
+  if (e.button != null && e.button > 0) return;
+  e.preventDefault();
+  e.stopPropagation();
+  quizDrag = { wordId, fromSlot, src: e.currentTarget, x0: e.clientX, y0: e.clientY, ghost: null, over: null };
+  window.addEventListener('pointermove', onChipDragMove);
+  window.addEventListener('pointerup', onChipDragEnd);
+  window.addEventListener('pointercancel', onChipDragEnd);
+}
+
+function slotAt(x, y) {
+  const el = document.elementFromPoint(x, y);
+  return el ? el.closest('.fill-slot') : null;
+}
+
+function onChipDragMove(e) {
+  const d = quizDrag;
+  if (!d) return;
+  if (!d.ghost) {
+    if (Math.hypot(e.clientX - d.x0, e.clientY - d.y0) < 8) return;
+    d.ghost = d.src.cloneNode(true);
+    d.ghost.classList.add('drag-ghost');
+    d.ghost.classList.remove('selected');
+    document.body.appendChild(d.ghost);
+    d.src.classList.add('dragging');
+    d.scrollTimer = setInterval(quizDragAutoScroll, 16);
+  }
+  d.x = e.clientX;
+  d.y = e.clientY;
+  d.ghost.style.left = d.x + 'px';
+  d.ghost.style.top = d.y + 'px';
+  updateDragOver();
+}
+
+function updateDragOver() {
+  const d = quizDrag;
+  const over = slotAt(d.x, d.y);
+  if (over !== d.over) {
+    if (d.over) d.over.classList.remove('over');
+    if (over) over.classList.add('over');
+    d.over = over;
+  }
+}
+
+// Scroll the question while a word is held near its top or bottom edge
+function quizDragAutoScroll() {
+  const d = quizDrag;
+  if (!d) return;
+  const sc = document.querySelector('.quiz-scroll');
+  const r = sc.getBoundingClientRect();
+  const edge = 70;
+  let dy = 0;
+  if (d.y > r.bottom - edge) dy = Math.min(edge, d.y - (r.bottom - edge));
+  else if (d.y < r.top + edge) dy = -Math.min(edge, (r.top + edge) - d.y);
+  if (dy) {
+    sc.scrollTop += dy / 5;
+    updateDragOver();
+  }
+}
+
+function onChipDragEnd(e) {
+  window.removeEventListener('pointermove', onChipDragMove);
+  window.removeEventListener('pointerup', onChipDragEnd);
+  window.removeEventListener('pointercancel', onChipDragEnd);
+  const d = quizDrag;
+  quizDrag = null;
+  if (!d) return;
+  clearInterval(d.scrollTimer);
+  const ans = quiz.answers[quiz.index];
+
+  if (!d.ghost) {
+    // A tap: a word in a slot goes back to the bank; a bank word gets selected
+    if (d.fromSlot != null) {
+      ans[d.fromSlot] = null;
+    } else {
+      quizSelectedWord = quizSelectedWord === d.wordId ? null : d.wordId;
+    }
+    renderQuiz();
+    return;
+  }
+
+  d.ghost.remove();
+  const target = e.type === 'pointerup' ? (d.over || slotAt(e.clientX, e.clientY)) : null;
+  if (target) {
+    placeWord(Number(target.dataset.slot), d.wordId, d.fromSlot);
+  } else {
+    if (d.fromSlot != null) ans[d.fromSlot] = null; // dragged out of a slot: back to the bank
+    renderQuiz();
+  }
+}
+
+// ----- submit & grading -----
+function quizTrySubmit() {
+  saveOpenAnswer();
+  const missing = quiz.items.filter((_, i) => !isAnswered(i)).length;
+  if (missing === 0) return quizSubmit();
+  document.getElementById('quiz-confirm-text').textContent =
+    missing === 1 ? 'נִשְׁאֲרָה עוֹד שְׁאֵלָה אַחַת בְּלִי תְּשׁוּבָה. לִבְדֹּק בְּכָל זֹאת?'
+                  : `נִשְׁאֲרוּ עוֹד ${missing} שְׁאֵלוֹת בְּלִי תְּשׁוּבָה. לִבְדֹּק בְּכָל זֹאת?`;
+  document.getElementById('quiz-confirm').classList.add('show');
+}
+
+function quizCloseConfirm() {
+  document.getElementById('quiz-confirm').classList.remove('show');
+}
+
+// Strip nikud, punctuation and final letters so keyword stems match free text
+function normalizeHebrew(str) {
+  return str
+    .replace(/[֑-ׇ]/g, '')
+    .replace(/ך/g, 'כ').replace(/ם/g, 'מ').replace(/ן/g, 'נ').replace(/ף/g, 'פ').replace(/ץ/g, 'צ')
+    .replace(/[^א-ת\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function gradeItem(it, a) {
+  if (it.type === 'mc') {
+    return a != null && it.options[a].correct ? QUIZ_POINTS : 0;
+  }
+  if (it.type === 'open') {
+    const text = normalizeHebrew(a || '');
+    if (text.split(' ').filter(Boolean).length < 3) return 0;
+    const hits = it.keywords.filter(group => group.some(stem => text.includes(stem))).length;
+    if (hits >= it.need) return QUIZ_POINTS;
+    return hits > 0 ? QUIZ_POINTS / 2 : 0;
+  }
+  const right = it.sentences.filter((s, i) => a[i] != null && wordText(it, a[i]) === wordText(it, s.answerId)).length;
+  return right * QUIZ_POINTS / it.sentences.length;
+}
+
+function quizSubmit() {
+  quizCloseConfirm();
+  saveOpenAnswer();
+  quiz.submitted = true;
+  const scores = quiz.items.map((it, i) => gradeItem(it, quiz.answers[i]));
+  const total = Math.round(scores.reduce((s, x) => s + x, 0) * 100 / (quiz.items.length * QUIZ_POINTS));
+
+  const story = STORIES[quiz.storyIndex];
+  if (!state.quizBest) state.quizBest = {};
+  if (getQuizBest(story.id) == null || total > state.quizBest[story.id]) state.quizBest[story.id] = total;
+  saveState();
+
+  showScreen('quizResults');
+  document.getElementById('quiz-results-screen').scrollTop = 0;
+  document.getElementById('quiz-score').innerHTML =
+    `<div class="quiz-score-num">${total}</div><div class="quiz-score-of">מִתּוֹךְ 100</div>`;
+  const msg = total >= 90 ? 'מַדְהִים! אַלּוּף הַקְּרִיאָה! 🏆'
+    : total >= 75 ? 'כָּל הַכָּבוֹד! עֲבוֹדָה מְצֻיֶּנֶת! 🌟'
+    : total >= 55 ? 'יָפֶה מְאוֹד! עוֹד קְצָת וְאַתָּה שָׁם 💪'
+    : 'לֹא נוֹרָא! כְּמוֹ אֶרִיק: עוֹד צַעַד אֶחָד, וְנַסֶּה שׁוּב 🐾';
+  document.getElementById('quiz-score-msg').textContent = msg;
+  renderQuizReview(scores);
+  if (total >= 75) launchFireworks(`${total} נְקוּדוֹת! 🎆`);
+}
+
+function reviewLine(label, html) {
+  return `<div class="review-line"><span class="review-label">${label}</span> ${html}</div>`;
+}
+
+function renderQuizReview(scores) {
+  const box = document.getElementById('quiz-review');
+  box.innerHTML = '';
+  quiz.items.forEach((it, i) => {
+    const pts = scores[i];
+    const a = quiz.answers[i];
+    const el = document.createElement('div');
+    el.className = 'review-item ' + (pts === QUIZ_POINTS ? 'good' : pts > 0 ? 'part' : 'bad');
+    const icon = pts === QUIZ_POINTS ? '✅' : pts > 0 ? '🟡' : '❌';
+    let body = '';
+    if (it.type === 'mc') {
+      const correct = it.options.find(o => o.correct).text;
+      if (a == null) body += reviewLine('לֹא עָנִיתָ.', '');
+      else if (it.options[a].correct) body += reviewLine('עָנִיתָ:', `<span class="review-good">${escapeHtml(it.options[a].text)}</span>`);
+      else body += reviewLine('עָנִיתָ:', `<span class="review-bad">${escapeHtml(it.options[a].text)}</span>`);
+      if (a == null || !it.options[a].correct) body += reviewLine('הַתְּשׁוּבָה הַנְּכוֹנָה:', `<span class="review-good">${escapeHtml(correct)}</span>`);
+    } else if (it.type === 'open') {
+      body += reviewLine('כָּתַבְתָּ:', a.trim() ? escapeHtml(a.trim()) : '<span class="review-label">(לֹא נִכְתְּבָה תְּשׁוּבָה)</span>');
+      body += reviewLine('תְּשׁוּבָה לְדֻגְמָה:', `<span class="review-model">${escapeHtml(it.model)}</span>`);
+    } else {
+      it.sentences.forEach((s, si) => {
+        const correct = wordText(it, s.answerId);
+        const chosen = a[si] != null ? wordText(it, a[si]) : null;
+        const [before, after] = s.text.split('___').map(escapeHtml);
+        let mid;
+        if (chosen === correct) mid = `<span class="review-good">${escapeHtml(correct)}</span>`;
+        else mid = (chosen ? `<span class="review-bad">${escapeHtml(chosen)}</span> ` : '') +
+                   `<span class="review-good">${escapeHtml(correct)}</span>`;
+        body += `<div class="review-line">${chosen === correct ? '✓' : '✗'} ${before}${mid}${after || ''}</div>`;
+      });
+    }
+    const ptsText = Number.isInteger(pts) ? pts : pts.toFixed(1);
+    el.innerHTML = `<div class="review-head"><span>${icon} שְׁאֵלָה ${i + 1}</span>` +
+      `<span class="review-points">${ptsText} / ${QUIZ_POINTS}</span></div>` +
+      `<div class="review-q">${escapeHtml(it.q)}</div>${body}`;
+    box.appendChild(el);
+  });
 }
 
 document.getElementById('text-scroll').addEventListener('scroll', onTextScroll, { passive: true });

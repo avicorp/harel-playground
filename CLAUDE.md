@@ -55,7 +55,7 @@ harel-playground/
 | `public/games/yearly-calendar/` | Yearly calendar with Israeli holidays! |
 | `public/games/hebrew-verbs/` | Learn Hebrew verb conjugation! |
 | `public/games/hebrew-piano/` | Learn piano notes Guitar Hero style! |
-| `public/games/read-it-to-me/` | Practice reading Hebrew words with nikud! Includes a full-text mode (`STORIES` array in `index.html`): nikud stories in big lines of max 4 words with alternating backgrounds, slow-scroll-to-the-end fireworks, and a קָרָאתִי button. A story can also have a `quiz` array (10 questions: 6 multiple-choice, 2 open with keyword scoring, 2 drag-from-word-bank fill-ins of 4 sentences) checked only at the end with a score out of 100 — see אֵרִיק וְהַחוֹמָה הַגְּבוֹהָה. |
+| `public/games/read-it-to-me/` | Practice reading Hebrew words with nikud! Includes a full-text mode (`STORIES` array in `index.html`): nikud stories in big lines of max 4 words with alternating backgrounds, slow-scroll-to-the-end fireworks, and a קָרָאתִי button. A story can also have a `quiz` array (10 questions: 6 multiple-choice, 2 open with keyword scoring, 2 drag-from-word-bank fill-ins of 4 sentences) checked only at the end with a score out of 100 — see אֶרִיק וְהַחוֹמָה הַגְּבוֹהָה. |
 | `public/games/division-remainder/` | Practice division with remainders for 6th grade! |
 | `public/games/function-explorer/` | Plot functions, drag m and b, compose g(f(x)) and see the inverse! |
 | `public/games/english-learning-v3/` | Learn English 3.0 — test prep for 6.11 (24 words of exercise 23, 20 mixed questions out of a 50-question bank) plus units 1+2 word list in 10 categories with 4 games (listen, word→picture, picture→word, English→Hebrew) and a mixed mode! |
